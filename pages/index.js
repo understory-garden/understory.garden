@@ -1,9 +1,11 @@
 import Head from 'next/head'
 
+import factory from '@graphy/core.data.factory'
 import useSWR from 'swr'
 import auth from 'solid-auth-client'
 
 import useWebId from "../hooks/useWebId"
+import useObject from "../hooks/useObject"
 
 
 function AuthButton(){
@@ -23,9 +25,9 @@ function AuthButton(){
 
 function Profile(){
   const webId = useWebId()
-  const { data } = useSWR(useWebId, auth.fetch)
-  if (data){
-    return <div>hello, {data.name}</div>
+  const { object } = useObject(webId, {})
+  if (object){
+    return <div>hello, {object.name}</div>
   } else {
     return <div>loading...</div>
   }

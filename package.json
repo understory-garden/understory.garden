@@ -8,7 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "graphy": "^4.2.1",
     "next": "9.4.4",
+    "rdf-namespaces": "^1.8.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "solid-auth-client": "^2.4.1",
