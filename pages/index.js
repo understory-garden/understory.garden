@@ -27,6 +27,7 @@ function Profile(){
   const webId = useWebId()
   const { object } = useObject(webId, {})
   if (object){
+    object.name = "HAM BONE"
     return <div>hello, {object.name}</div>
   } else {
     return <div>loading...</div>

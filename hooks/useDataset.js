@@ -39,16 +39,18 @@ const loadData = (response, dataset) => new Promise((resolve, reject) => {
 export default function useDataset(uri){
   const { data, error } = useSWR(uri, auth.fetch)
   const [dataset, setDataset] = useState()
+  const [graph, setGraph] = useState()
   useEffect(
     () => {
       if (data && !data.bodyUsed){
         async function loadDataset(){
           setDataset(await loadData(data, newDataset()))
+          setGraph(factory.namedNode(data.url))
         }
         loadDataset()
       }
     }
     , [data]
   )
-  return { dataset, error }
+  return { dataset, graph, error }
 }
