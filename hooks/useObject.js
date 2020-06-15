@@ -16,19 +16,48 @@ class DatasetObject {
     this.bindings = bindings
 
     this.nameNamedNode = factory.namedNode(foaf.name)
+    this.knowsNamedNode = factory.namedNode(foaf.knows)
   }
 
   get nameQuads(){
-    return Array.from(this.dataset.match(this.subjectNamedNode, this.nameNamedNode))
+    return this.dataset.match(this.subjectNamedNode, this.nameNamedNode)
+  }
+
+  get nameObject(){
+    for (const quad of this.nameQuads){
+      return quad.object
+    }
   }
 
   get name(){
-    return this.nameQuads[0].object.value
+    return this.nameObject.value
   }
 
   set name(newName){
     this.dataset.delete(...this.nameQuads)
     this.dataset.add(factory.quad(this.subjectNamedNode, this.nameNamedNode, factory.namedNode(newName), this.defaultGraph))
+  }
+
+  get knowsQuads(){
+    return this.dataset.match(this.subjectNamedNode, this.knowsNamedNode)
+  }
+
+  get knowsObjects(){
+    return Array.from(this.knowsQuads).map(q => q.object)
+  }
+
+  get knows(){
+    return this.knowsObjects.map(o => o.value)
+  }
+
+  addKnows(newKnows){
+    this.dataset.add(factory.quad(this.subjectNamedNode, this.knowsNamedNode,
+                                  factory.namedNode(newKnows), this.defaultGraph))
+  }
+
+  deleteKnows(knows){
+    this.dataset.delete(factory.quad(this.subjectNamedNode, this.knowsNamedNode,
+                                     factory.namedNode(knows), this.defaultGraph))
   }
 }
 

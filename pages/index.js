@@ -28,7 +28,21 @@ function Profile(){
   const { object } = useObject(webId, {})
   if (object){
     object.name = "HAM BONE"
-    return <div>hello, {object.name}</div>
+    console.log(object.knows)
+    return (
+      <>
+        <div>
+          hello, {object.name}
+        </div>
+        <button onClick={
+          () => {
+            object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
+            console.log(object.knows)
+          }}>
+          add knows
+        </button>
+      </>
+    )
   } else {
     return <div>loading...</div>
   }
