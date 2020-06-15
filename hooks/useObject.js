@@ -1,9 +1,11 @@
 import { foaf } from 'rdf-namespaces'
 
+import useSWR from 'swr'
+
 import factory from '@graphy/core.data.factory'
 import newDataset from '@graphy/memory.dataset.fast'
 
-import useDataset from "../hooks/useDataset"
+import useDataset, { fetchDataset } from "../hooks/useDataset"
 
 
 
@@ -61,8 +63,20 @@ class DatasetObject {
   }
 }
 
-export default function useObject(uri, bindings){
-  const { dataset, graph } = useDataset(uri)
+export const fetchObject = async (uri, ...args) => {
+  const dataset = await fetchDataset(uri, ...args)
+  const response = dataset.response
+  const graph = factory.namedNode(response.url)
   const object = dataset && new DatasetObject(uri, dataset, graph, {})
-  return ({ object })
+  return object
+}
+
+export default function useObject(uri, bindings, options={}){
+  const { data, ...props } = useSWR(
+    uri, fetchObject,
+    {
+      compare: (a, b) => (a === b) || (a && b && a.dataset.equals(b.dataset)),
+      ...options
+    })
+  return ({ object: data, ...props })
 }

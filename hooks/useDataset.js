@@ -36,21 +36,16 @@ const loadData = (response, dataset) => new Promise((resolve, reject) => {
   next();
 })
 
-export default function useDataset(uri){
-  const { data, error } = useSWR(uri, auth.fetch)
-  const [dataset, setDataset] = useState()
-  const [graph, setGraph] = useState()
-  useEffect(
-    () => {
-      if (data && !data.bodyUsed){
-        async function loadDataset(){
-          setDataset(await loadData(data, newDataset()))
-          setGraph(factory.namedNode(data.url))
-        }
-        loadDataset()
-      }
-    }
-    , [data]
-  )
-  return { dataset, graph, error }
+export const fetchDataset = async (uri, ...args) => {
+  const response = await auth.fetch(uri, ...args)
+  const dataset = await loadData(response, newDataset())
+  dataset.response = response
+  return dataset
+}
+
+export default function useDataset(uri, options={}){
+  const { data: dataset, ...props } = useSWR(uri, fetchDataset, {
+    compare: (a, b) => (a === b) || (a && b && a.equals(b)),
+  })
+  return { dataset, ...props }
 }

@@ -25,7 +25,7 @@ function AuthButton(){
 
 function Profile(){
   const webId = useWebId()
-  const { object } = useObject(webId, {})
+  const { object, mutate } = useObject(webId, {})
   if (object){
     object.name = "HAM BONE"
     console.log(object.knows)
@@ -34,9 +34,13 @@ function Profile(){
         <div>
           hello, {object.name}
         </div>
+        {object && object.knows && object.knows.map(url => (
+          <p key={url}>{url}</p>
+        ))}
         <button onClick={
           () => {
             object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
+            mutate(object)
             console.log(object.knows)
           }}>
           add knows
