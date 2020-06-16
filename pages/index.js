@@ -27,8 +27,8 @@ function Profile(){
   const webId = useWebId()
   const { object, mutate } = useObject(webId, {})
   if (object){
-    object.name = "HAM BONE"
-    console.log(object.knows)
+    object.name = "HAM CLONE"
+
     return (
       <>
         <div>
@@ -38,9 +38,9 @@ function Profile(){
           <p key={url}>{url}</p>
         ))}
         <button onClick={
-          () => {
+          async () => {
             object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
-            mutate(object)
+            await object.save()
             console.log(object.knows)
           }}>
           add knows

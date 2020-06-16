@@ -1,20 +1,19 @@
 import { foaf } from 'rdf-namespaces'
 
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 import factory from '@graphy/core.data.factory'
 import newDataset from '@graphy/memory.dataset.fast'
 
-import useDataset, { fetchDataset } from "../hooks/useDataset"
-
-
+import useDataset, { fetchDataset, patchDataset } from "../hooks/useDataset"
 
 class DatasetObject {
   constructor(subjectUri, dataset, defaultGraph, bindings){
+    this.subjectUri = subjectUri
     this.subjectNamedNode = factory.namedNode(subjectUri)
+    this.originalDataset = dataset.canonicalize()
     this.dataset = dataset
     this.defaultGraph = defaultGraph
-    this.updates = newDataset();
     this.bindings = bindings
 
     this.nameNamedNode = factory.namedNode(foaf.name)
@@ -37,7 +36,7 @@ class DatasetObject {
 
   set name(newName){
     this.dataset.delete(...this.nameQuads)
-    this.dataset.add(factory.quad(this.subjectNamedNode, this.nameNamedNode, factory.namedNode(newName), this.defaultGraph))
+    this.dataset.add(factory.quad(this.subjectNamedNode, this.nameNamedNode, factory.literal(newName), this.defaultGraph))
   }
 
   get knowsQuads(){
@@ -61,6 +60,22 @@ class DatasetObject {
     this.dataset.delete(factory.quad(this.subjectNamedNode, this.knowsNamedNode,
                                      factory.namedNode(knows), this.defaultGraph))
   }
+
+  async save(){
+    const newObject = new DatasetObject(this.subjectUri, this.dataset, this.defaultGraph, this.bindings)
+    mutate(this.subjectUri, newObject, false)
+
+    const result = await mutate(this.subjectUri, async (cachedObject) => {
+      const response = await patchDataset(this.subjectUri, this.originalDataset, this.dataset.canonicalize())
+      if (response.status == "200") {
+        return newObject
+      } else {
+        console.log("response other than a 200, reverting to cached object", response)
+        return cachedObject
+      }
+    }, false)
+    return result
+  }
 }
 
 export const fetchObject = async (uri, ...args) => {
@@ -75,7 +90,7 @@ export default function useObject(uri, bindings, options={}){
   const { data, ...props } = useSWR(
     uri, fetchObject,
     {
-      compare: (a, b) => (a === b) || (a && b && a.dataset.equals(b.dataset)),
+      compare: (a, b) => (a === b) || (a && b && a.originalDataset.equals(b.originalDataset)),
       ...options
     })
   return ({ object: data, ...props })
