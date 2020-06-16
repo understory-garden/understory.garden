@@ -9,12 +9,18 @@ import newDataset from '@graphy/memory.dataset.fast'
 
 import useDataset, { fetchDataset, patchDataset } from "../hooks/useDataset"
 
+function copyDataset(dataset){
+  const d = newDataset()
+  d.addQuads(dataset)
+  return d
+}
+
 class DatasetObject {
   constructor(subjectUri, dataset, defaultGraph, bindings){
     this.subjectUri = subjectUri
     this.subjectNamedNode = factory.namedNode(subjectUri)
-    this.originalDataset = dataset.canonicalize()
-    this.dataset = dataset
+    this.originalDataset = dataset
+    this.dataset = copyDataset(dataset)
     this.defaultGraph = defaultGraph
     this.bindings = bindings
 
@@ -64,43 +70,28 @@ class DatasetObject {
   }
 
   async save(){
-    const newObject = new DatasetObject(this.subjectUri, this.dataset, this.defaultGraph, this.bindings)
-    mutate(this.subjectUri, newObject, false)
-
-    const result = await mutate(this.subjectUri, async (cachedObject) => {
-      const response = await patchDataset(this.subjectUri, this.originalDataset, this.dataset.canonicalize())
+    const uri = this.defaultGraph.value
+    const newDataset = copyDataset(this.dataset).canonicalize()
+    const result = await mutate(uri, async (cachedDataset) => {
+      const response = await patchDataset(this.subjectUri, cachedDataset, newDataset)
       if (response.status == "200") {
-        return newObject
+        return newDataset
       } else {
         console.log("response other than a 200, reverting to cached object", response)
-        return cachedObject
+        return cachedDataset
       }
     }, false)
     return result
   }
 }
 
-export const fetchObject = async (uri, ...args) => {
-  const dataset = await fetchDataset(uri, ...args)
-  const response = dataset.response
-  const graph = factory.namedNode(response.url)
-  const object = dataset && new DatasetObject(uri, dataset, graph, {})
-  return object
-}
-
 export default function useObject(uri, bindings, options={}){
-  const { dataset, documentUri} = useDataset(uri, options)
+  const { dataset, documentUri, ...props } = useDataset(uri, options)
   const [object, setObject] = useState()
   useEffect(() => {
     if (dataset){
       setObject(new DatasetObject(uri, dataset, factory.namedNode(documentUri), {}))
     }
   }, [dataset])
-  const { data, ...props } = useSWR(
-    uri, fetchObject,
-    {
-      compare: (a, b) => (a === b) || (a && b && a.originalDataset.equals(b.originalDataset)),
-      ...options
-    })
-  return ({ object: data, ...props })
+  return ({ object, ...props })
 }

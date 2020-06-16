@@ -46,8 +46,7 @@ const loadData = (response, dataset) => new Promise((resolve, reject) => {
 export const fetchDataset = async (uri, ...args) => {
   const response = await auth.fetch(uri, ...args)
   const dataset = await loadData(response, newDataset())
-  dataset.response = response
-  return dataset
+  return dataset.canonicalize()
 }
 
 export async function quadsToString(quads) {
@@ -68,7 +67,7 @@ export async function quadsToString(quads) {
     })
     for (const quad of quads){
       if (quad.subject.isBlankNode){
-        console.debug("ignoring blank node")
+        console.log("ignoring blank node")
       } else {
         scriber.write(quad)
       }

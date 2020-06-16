@@ -25,7 +25,7 @@ function AuthButton(){
 
 function Profile(){
   const webId = useWebId()
-  const { object, mutate } = useObject(webId, {})
+  const { object } = useObject(webId, {})
   if (object){
     object.name = "HAM ZONE"
 
@@ -38,11 +38,17 @@ function Profile(){
           <p key={url}>{url}</p>
         ))}
         <button onClick={
-          async () => {
-            object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
-            await object.save()
-            console.log(object.knows)
-          }}>
+                  async () => {
+                    object.deleteKnows("https://lordvacon.inrupt.net/profile/card#me")
+                    await object.save()
+                  }}>
+          delete knows
+        </button>
+        <button onClick={
+                  async () => {
+                    object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
+                    await object.save()
+                  }}>
           add knows
         </button>
       </>
