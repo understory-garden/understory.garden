@@ -100,8 +100,13 @@ export const patchDataset = async (uri, from, to) => {
 }
 
 export default function useDataset(uri, options={}){
-  const { data: dataset, ...props } = useSWR(uri, fetchDataset, {
+  const documentURL = uri && new URL(uri)
+  if (documentURL) {
+    documentURL.hash = ""
+  }
+  const documentUri = documentURL && documentURL.toString()
+  const { data: dataset, ...props } = useSWR(documentUri, fetchDataset, {
     compare: (a, b) => (a === b) || (a && b && a.equals(b)),
   })
-  return { dataset, ...props }
+  return { dataset, documentUri, ...props }
 }

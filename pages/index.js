@@ -27,7 +27,7 @@ function Profile(){
   const webId = useWebId()
   const { object, mutate } = useObject(webId, {})
   if (object){
-    object.name = "HAM CLONE"
+    object.name = "HAM ZONE"
 
     return (
       <>

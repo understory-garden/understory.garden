@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+
 import { foaf } from 'rdf-namespaces'
 
 import useSWR, { mutate } from 'swr'
@@ -87,6 +89,13 @@ export const fetchObject = async (uri, ...args) => {
 }
 
 export default function useObject(uri, bindings, options={}){
+  const { dataset, documentUri} = useDataset(uri, options)
+  const [object, setObject] = useState()
+  useEffect(() => {
+    if (dataset){
+      setObject(new DatasetObject(uri, dataset, factory.namedNode(documentUri), {}))
+    }
+  }, [dataset])
   const { data, ...props } = useSWR(
     uri, fetchObject,
     {
