@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest --watch",
+    "test:ci": "jest --ci"
   },
   "dependencies": {
     "graphy": "^4.2.1",
@@ -15,5 +17,12 @@
     "react-dom": "16.13.1",
     "solid-auth-client": "^2.4.1",
     "swr": "^0.2.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.10.1",
+    "@testing-library/react": "^10.3.0",
+    "babel-jest": "^26.0.1",
+    "jest": "^26.0.1",
+    "solid-auth-cli": "^1.0.14"
   }
 }

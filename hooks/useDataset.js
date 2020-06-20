@@ -6,8 +6,8 @@ import readTtl from '@graphy/content.ttl.read'
 import factory from '@graphy/core.data.factory'
 import ttlScribe from '@graphy/content.ttl.scribe'
 
-
-const loadData = (response, dataset) => new Promise((resolve, reject) => {
+export const responseToDataset = (response) => new Promise((resolve, reject) => {
+  const dataset = newDataset()
   const bodyReader = response.body.getReader();
   const ttlReader = readTtl({
     data(yQuad) {
@@ -16,6 +16,7 @@ const loadData = (response, dataset) => new Promise((resolve, reject) => {
     },
 
     eof(h_prefixes) {
+      dataset.canonicalize()
       resolve(dataset)
     },
 
@@ -43,11 +44,9 @@ const loadData = (response, dataset) => new Promise((resolve, reject) => {
   next();
 })
 
-export const fetchDataset = async (uri, ...args) => {
-  const response = await auth.fetch(uri, ...args)
-  const dataset = await loadData(response, newDataset())
-  return dataset.canonicalize()
-}
+const datasetFetcher = (fetch) => (...args) => fetch(...args).then(responseToDataset)
+
+const fetchDataset = datasetFetcher(auth.fetch)
 
 export async function quadsToString(quads) {
   return new Promise((resolve, reject) => {
@@ -98,13 +97,16 @@ export const patchDataset = async (uri, from, to) => {
   })
 }
 
-export default function useDataset(uri, options={}){
+const defaultOptions = {}
+
+export default function useDataset(uri, options=defaultOptions){
   const documentURL = uri && new URL(uri)
   if (documentURL) {
     documentURL.hash = ""
   }
   const documentUri = documentURL && documentURL.toString()
-  const { data: dataset, ...props } = useSWR(documentUri, fetchDataset, {
+  const fetcher = options.fetch ? datasetFetcher(options.fetch) : fetchDataset
+  const { data: dataset, ...props } = useSWR(documentUri, fetcher, {
     compare: (a, b) => (a === b) || (a && b && a.equals(b)),
   })
   return { dataset, documentUri, ...props }

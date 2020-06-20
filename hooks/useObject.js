@@ -85,7 +85,10 @@ class DatasetObject {
   }
 }
 
-export default function useObject(uri, bindings, options={}){
+
+const defaultOptions = {}
+
+export default function useObject(uri, bindings, options=defaultOptions){
   const { dataset, documentUri, ...props } = useDataset(uri, options)
   const [object, setObject] = useState()
   useEffect(() => {
