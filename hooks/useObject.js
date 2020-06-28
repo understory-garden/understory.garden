@@ -28,6 +28,8 @@ class DatasetObject {
     this.knowsNamedNode = factory.namedNode(foaf.knows)
   }
 
+  // local single value
+
   get nameQuads(){
     return this.dataset.match(this.subjectNamedNode, this.nameNamedNode)
   }
@@ -47,6 +49,8 @@ class DatasetObject {
     this.dataset.add(factory.quad(this.subjectNamedNode, this.nameNamedNode, factory.literal(newName), this.defaultGraph))
   }
 
+  // local multi value
+
   get knowsQuads(){
     return this.dataset.match(this.subjectNamedNode, this.knowsNamedNode)
   }
@@ -64,9 +68,19 @@ class DatasetObject {
                                   factory.namedNode(newKnows), this.defaultGraph))
   }
 
-  deleteKnows(knows){
+  removeKnows(knows){
     this.dataset.delete(factory.quad(this.subjectNamedNode, this.knowsNamedNode,
                                      factory.namedNode(knows), this.defaultGraph))
+  }
+
+  // remote single value
+
+  // TODO
+
+  // remote multi value
+
+  async getImagesQuads(){
+    return this.dataset.match(this.subjectNamedNode, this.imagesNamedNode)
   }
 
   async save(){

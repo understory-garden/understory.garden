@@ -27,8 +27,6 @@ function Profile(){
   const webId = useWebId()
   const { object } = useObject(webId, {})
   if (object){
-    object.name = "HAM ZONE"
-
     return (
       <>
         <div>
@@ -39,10 +37,10 @@ function Profile(){
         ))}
         <button onClick={
                   async () => {
-                    object.deleteKnows("https://lordvacon.inrupt.net/profile/card#me")
+                    object.removeKnows("https://lordvacon.inrupt.net/profile/card#me")
                     await object.save()
                   }}>
-          delete knows
+          remove knows
         </button>
         <button onClick={
                   async () => {
