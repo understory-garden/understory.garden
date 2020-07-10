@@ -6,27 +6,32 @@ import readTtl from '@graphy/content.ttl.read'
 import factory from '@graphy/core.data.factory'
 import ttlScribe from '@graphy/content.ttl.scribe'
 
-export const responseToDataset = (response) => new Promise((resolve, reject) => {
+function readToNewDatasetConfig(graphUri, resolve, reject){
   const dataset = newDataset()
+  return (
+    {
+      data(yQuad) {
+        yQuad.graph = factory.namedNode(graphUri)
+        dataset.add(yQuad);
+      },
+
+      eof(h_prefixes) {
+        dataset.canonicalize()
+        resolve(dataset)
+      },
+
+      error(e) {
+        reject(e)
+      },
+
+      baseUri: graphUri
+    }
+  )
+}
+
+export const responseToDataset = (response) => new Promise((resolve, reject) => {
+  const ttlReader = readTtl(readToNewDatasetConfig(response.url, resolve, reject));
   const bodyReader = response.body.getReader();
-  const ttlReader = readTtl({
-    data(yQuad) {
-      yQuad.graph = factory.namedNode(response.url)
-      dataset.add(yQuad);
-    },
-
-    eof(h_prefixes) {
-      dataset.canonicalize()
-      resolve(dataset)
-    },
-
-    error(e) {
-      reject(e)
-    },
-
-    baseUri: response.url
-  });
-
   function next() {
     bodyReader.read().then(read_chunk);
   }
