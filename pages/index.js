@@ -4,12 +4,13 @@ import Head from 'next/head'
 import auth from 'solid-auth-client'
 import {
   fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
-  saveLitDatasetAt, setThing
+  saveLitDatasetAt, setThing, getUrlOne
 } from '@solid/lit-pod'
-import { foaf } from 'rdf-namespaces'
+import { foaf, vcard } from 'rdf-namespaces'
 
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
+import Button from "../components/Button"
 
 
 function AuthButton(){
@@ -18,12 +19,12 @@ function AuthButton(){
     return <div>loading...</div>
   } else if (webId === null) {
     return (
-      <button onClick={() => auth.popupLogin({ popupUri: "/popup.html" })}>
+      <Button onClick={() => auth.popupLogin({ popupUri: "/popup.html" })}>
         Log In
-      </button>
+      </Button>
     )
   } else {
-    return <button onClick={() => auth.logout()}>Log Out</button>
+    return <Button onClick={() => auth.logout()}>Log Out</Button>
   }
 }
 
@@ -33,6 +34,7 @@ function Profile(){
   const {thing: profile, save: saveProfile} = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const knows = profile && getUrlAll(profile, foaf.knows)
+  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   const [saving, setSaving] = useState(false)
   if (profile){
     return (
@@ -40,10 +42,11 @@ function Profile(){
         <div>
           hello, {name}
         </div>
+        {profileImage && <img src={profileImage}/>}
         {knows && knows.map(url => (
           <p key={url}>{url}</p>
         ))}
-        <button onClick={
+        <Button onClick={
                   async () => {
                     setSaving(true)
                     await saveProfile(removeUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
@@ -52,8 +55,8 @@ function Profile(){
                 disabled={saving}
         >
           remove knows
-        </button>
-        <button onClick={
+        </Button>
+        <Button onClick={
                   async () => {
                     setSaving(true)
                     await saveProfile(addUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
@@ -62,7 +65,7 @@ function Profile(){
                 disabled={saving}
         >
           add knows
-        </button>
+        </Button>
       </>
     )
   } else {
@@ -82,9 +85,6 @@ export default function Home() {
       <main>
         <AuthButton/>
         <Profile />
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
       </main>
 
       <footer>
