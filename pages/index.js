@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 
-import useSWR from 'swr'
 import auth from 'solid-auth-client'
 import {
   fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
@@ -10,7 +9,7 @@ import {
 import { foaf } from 'rdf-namespaces'
 
 import useWebId from "../hooks/useWebId"
-import useObject from "../hooks/useObject"
+import useThing from "../hooks/useThing"
 
 
 function AuthButton(){
@@ -28,29 +27,6 @@ function AuthButton(){
   }
 }
 
-function useThing(uri, ...args){
-  const documentURL = uri && new URL(uri)
-  if (documentURL) {
-    documentURL.hash = ""
-  }
-  const documentUri = documentURL && documentURL.toString()
-  const { data, mutate, ...rest } = useSWR(documentUri, fetchLitDataset, ...args)
-  const thing  = data && getThingOne(data, uri)
-  const save = async (newThing) => {
-    const newDataset = setThing(data, newThing)
-    mutate(newDataset, false)
-    const savedDataset = await saveLitDatasetAt(documentUri, newDataset)
-    mutate(savedDataset)
-    return savedDataset
-  }
-  return (
-    {
-      thing,
-      save,
-      ...rest
-    }
-  )
-}
 
 function Profile(){
   const webId = useWebId()
@@ -67,10 +43,11 @@ function Profile(){
         {knows && knows.map(url => (
           <p key={url}>{url}</p>
         ))}
-        {saving && "saving?"}
         <button onClick={
                   async () => {
+                    setSaving(true)
                     await saveProfile(removeUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
+                    setSaving(false)
                   }}
                 disabled={saving}
         >
@@ -78,7 +55,9 @@ function Profile(){
         </button>
         <button onClick={
                   async () => {
+                    setSaving(true)
                     await saveProfile(addUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
+                    setSaving(false)
                   }}
                 disabled={saving}
         >
