@@ -1,8 +1,13 @@
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 
-import factory from '@graphy/core.data.factory'
 import useSWR from 'swr'
 import auth from 'solid-auth-client'
+import {
+  fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
+  saveLitDatasetAt, setThing
+} from '@solid/lit-pod'
+import { foaf } from 'rdf-namespaces'
 
 import useWebId from "../hooks/useWebId"
 import useObject from "../hooks/useObject"
@@ -23,30 +28,60 @@ function AuthButton(){
   }
 }
 
+function useThing(uri, ...args){
+  const documentURL = uri && new URL(uri)
+  if (documentURL) {
+    documentURL.hash = ""
+  }
+  const documentUri = documentURL && documentURL.toString()
+  const { data, mutate, ...rest } = useSWR(documentUri, fetchLitDataset, ...args)
+  const thing  = data && getThingOne(data, uri)
+  const save = async (newThing) => {
+    const newDataset = setThing(data, newThing)
+    mutate(newDataset, false)
+    const savedDataset = await saveLitDatasetAt(documentUri, newDataset)
+    mutate(savedDataset)
+    return savedDataset
+  }
+  return (
+    {
+      thing,
+      save,
+      ...rest
+    }
+  )
+}
+
 function Profile(){
   const webId = useWebId()
-  const { object } = useObject(webId, {})
-  if (object){
+  const {thing: profile, save: saveProfile} = useThing(webId)
+  const name = profile && getStringNoLocaleOne(profile, foaf.name)
+  const knows = profile && getUrlAll(profile, foaf.knows)
+  const [saving, setSaving] = useState(false)
+  if (profile){
     return (
       <>
         <div>
-          hello, {object.name}
+          hello, {name}
         </div>
-        {object && object.knows && object.knows.map(url => (
+        {knows && knows.map(url => (
           <p key={url}>{url}</p>
         ))}
+        {saving && "saving?"}
         <button onClick={
                   async () => {
-                    object.removeKnows("https://lordvacon.inrupt.net/profile/card#me")
-                    await object.save()
-                  }}>
+                    await saveProfile(removeUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
+                  }}
+                disabled={saving}
+        >
           remove knows
         </button>
         <button onClick={
                   async () => {
-                    object.addKnows("https://lordvacon.inrupt.net/profile/card#me")
-                    await object.save()
-                  }}>
+                    await saveProfile(addUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
+                  }}
+                disabled={saving}
+        >
           add knows
         </button>
       </>

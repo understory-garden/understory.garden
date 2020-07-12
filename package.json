@@ -10,6 +10,7 @@
     "test:ci": "jest --ci"
   },
   "dependencies": {
+    "@solid/lit-pod": "file:.yalc/@solid/lit-pod",
     "graphy": "^4.2.1",
     "next": "9.4.4",
     "rdf-namespaces": "^1.8.0",
