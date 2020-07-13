@@ -17,7 +17,8 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "solid-auth-client": "^2.4.1",
-    "swr": "^0.2.3"
+    "swr": "^0.2.3",
+    "tailwindcss-gradients": "^3.0.0"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.3.0",
