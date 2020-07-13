@@ -11,6 +11,8 @@ import { foaf, vcard } from 'rdf-namespaces'
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
 import Button from "../components/Button"
+import {Space, Flow, Module} from "../components/layout"
+import ProfileModule from "../modules/Profile"
 
 
 function AuthButton(){
@@ -26,39 +28,6 @@ function AuthButton(){
   } else {
     return <Button onClick={() => auth.logout()}>Log Out</Button>
   }
-}
-
-function Space({className, ...props}){
-  return <div className={`flex flex-column bg-gradient-tl-background w-screen h-screen p-6 ${className}`} {...props}/>
-}
-
-function Flow({className, ...props}){
-  return <div className={`flex flex-row h-84 ${className}`} {...props}/>
-}
-
-function Module({className, ...props}){
-  return <div className={`m-6 rounded-lg bg-white bg-opacity-25 border-white border-opacity-25 border-solid border-8 ${className}`} {...props}/>
-}
-
-function Profile(){
-  const webId = useWebId()
-  const {thing: profile, save: saveProfile} = useThing(webId)
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
-  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
-  const [saving, setSaving] = useState(false)
-  if (profile){
-    return (
-      <>
-        <div>
-          hello, {name}
-        </div>
-        {profileImage && <img src={profileImage}/>}
-      </>
-    )
-  } else {
-    return <div>loading...</div>
-  }
-
 }
 
 function Friends(){
@@ -116,9 +85,7 @@ export default function Home() {
       <main>
         <Space>
           <Flow>
-            <Module>
-              <Profile />
-            </Module>
+            <ProfileModule />
             <Module>
               <Friends />
             </Module>
