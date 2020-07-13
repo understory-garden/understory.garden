@@ -1,27 +1,24 @@
-import {useState} from "react"
 import { foaf, vcard } from 'rdf-namespaces'
 import {
-  fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
-  saveLitDatasetAt, setThing, getUrlOne
+  getStringNoLocaleOne, getUrlOne
 } from '@solid/lit-pod'
 
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
-import {Space, Flow, Module} from "../components/layout"
+import {Module} from "../components/layout"
 
 export default function Profile(){
   const webId = useWebId()
-  const {thing: profile, save: saveProfile} = useThing(webId)
+  const {thing: profile} = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
-  const [saving, setSaving] = useState(false)
   if (profile){
     return (
       <Module>
         <div>
           hello, {name}
         </div>
-        {profileImage && <img src={profileImage}/>}
+        {profileImage && <img src={profileImage} alt={name}/>}
       </Module>
     )
   } else {

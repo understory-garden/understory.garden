@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Head from 'next/head'
 
 import auth from 'solid-auth-client'
 import {
-  fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
-  saveLitDatasetAt, setThing, getUrlOne
+  getUrlAll, removeUrl, addUrl
 } from '@solid/lit-pod'
-import { foaf, vcard } from 'rdf-namespaces'
+import { foaf } from 'rdf-namespaces'
 
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
@@ -33,9 +32,7 @@ function AuthButton(){
 function Friends(){
   const webId = useWebId()
   const {thing: profile, save: saveProfile} = useThing(webId)
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const knows = profile && getUrlAll(profile, foaf.knows)
-  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   const [saving, setSaving] = useState(false)
   if (profile){
     return (

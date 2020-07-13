@@ -1,7 +1,6 @@
 import useSWR from 'swr'
 import {
-  fetchLitDataset, getThingOne, getStringNoLocaleOne, getUrlAll, removeUrl, addUrl,
-  saveLitDatasetAt, setThing
+  fetchLitDataset, getThingOne, saveLitDatasetAt, setThing
 } from '@solid/lit-pod'
 
 function useThing(uri, ...args){
