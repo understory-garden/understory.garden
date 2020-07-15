@@ -5,20 +5,21 @@ import {
 
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
-import {Module} from "../components/layout"
+import { Module } from "../components/layout"
 
-export default function Profile(){
+export default function Profile() {
   const webId = useWebId()
-  const {thing: profile} = useThing(webId)
+  const { thing: profile } = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
-  if (profile){
+  if (profile) {
     return (
-      <Module>
-        <div>
-          hello, {name}
+      <Module className="p-6 wiggly">
+        <div className="inset-0 absolute opacity-0 hover:opacity-100 ">
+          <i className="fas fa-edit"></i>
+                                                                                                              hello, {name}
         </div>
-        {profileImage && <img src={profileImage} alt={name}/>}
+        {profileImage && <img className="h-full m-auto " src={profileImage} alt={name} />}
       </Module>
     )
   } else {

@@ -1,16 +1,15 @@
-import { useState } from "react"
-
 import {
-  getUrlAll, removeUrl, addUrl
+  getUrlAll, removeUrl, addUrl, getUrlOne, getStringNoLocaleOne
 } from '@solid/lit-pod'
 import auth from "solid-auth-client"
-import { foaf } from "rdf-namespaces"
+import { foaf, vcard } from "rdf-namespaces"
 
 import useWebId from "../hooks/useWebId"
 import useThing from "../hooks/useThing"
 import { Flow, Module } from "../components/layout"
 import { Button } from "../components/elements"
 import ProfileModule from "../modules/Profile"
+import { otherPath } from "../lib/urls"
 
 function AuthButton() {
   const webId = useWebId()
@@ -27,41 +26,35 @@ function AuthButton() {
   }
 }
 
+function Friend({ webId, ...rest }) {
+  const { thing: profile } = useThing(webId)
+  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
+  const name = profile && getStringNoLocaleOne(profile, foaf.name)
+  return (
+    <div className="relative" {...rest}>
+      <a href={otherPath(webId)}>
+        <div className="inset-0 absolute opacity-0 hover:opacity-100 ">
+          {name}
+        </div>
+        <img className="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6"
+          alt="profile"
+          src={profileImage} />
+      </a>
+    </div>
+  )
+}
+
 function Friends() {
   const webId = useWebId()
-  const { thing: profile, save: saveProfile } = useThing(webId)
+  const { thing: profile } = useThing(webId)
   const knows = profile && getUrlAll(profile, foaf.knows)
-  const [saving, setSaving] = useState(false)
   if (profile) {
     return (
-      <>
+      <div className="flex flex-row h-full">
         {knows && knows.map(url => (
-          <div key={url}>
-            {url}
-            <Button onClick={
-              async () => {
-                setSaving(true)
-                await saveProfile(removeUrl(profile, foaf.knows, url))
-                setSaving(false)
-              }}
-              disabled={saving}
-            >
-              remove knows
-            </Button>
-          </div>
+          <Friend webId={url} key={{ url }} />
         ))}
-
-        <Button onClick={
-          async () => {
-            setSaving(true)
-            await saveProfile(addUrl(profile, foaf.knows, "https://lordvacon.inrupt.net/profile/card#me"))
-            setSaving(false)
-          }}
-          disabled={saving}
-        >
-          add knows
-        </Button>
-      </>
+      </div>
     )
   } else {
     return <div>loading...</div>

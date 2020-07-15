@@ -16,7 +16,7 @@ module.exports = {
     conicGradientColors: theme => theme('gradientColors'),
   },
   variants: {
-
+    visibility: ['responsive', 'hover'],
   },
   plugins: [
     require('tailwindcss-gradients'),
