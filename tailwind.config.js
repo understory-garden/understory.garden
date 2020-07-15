@@ -31,6 +31,9 @@ module.exports = {
   },
   variants: {
     visibility: ['responsive', 'hover'],
+    width: ['responsive', 'hover'],
+    height: ['responsive', 'hover'],
+    inset: ['responsive', 'hover']
   },
   plugins: [
     require('tailwindcss-gradients'),

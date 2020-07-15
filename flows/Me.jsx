@@ -38,7 +38,7 @@ function Friend({ webId, ...rest }) {
         <img className="h-16 w-16 color-white"
           alt="profile"
           src={profileImage || '/user.svg'} />
-        <div className="p-6 h-32 w-32 absolute -top-8 -left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
+        <div className="p-6 h-16 w-16 top-0 left-0 hover:w-32 hover:h-32 absolute hover:-top-8 hover:-left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition-transform duration-100 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
           <h4>{name}</h4>
         </div>
       </a>
