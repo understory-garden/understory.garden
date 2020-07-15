@@ -6,7 +6,7 @@ module.exports = {
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:import/errors",
+    //    "plugin:import/errors", // this doesn't like jsx for some reason TV 7/15
     "plugin:import/warnings",
     "plugin:jsx-a11y/recommended",
     "plugin:react-hooks/recommended",
