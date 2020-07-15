@@ -16,7 +16,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.11",
-    "@solid/lit-pod": "file:.yalc/@solid/lit-pod",
+    "@solid/lit-pod": "github:inrupt/lit-pod#master",
     "formik": "^2.1.5",
     "graphy": "^4.2.1",
     "next": "9.4.4",
