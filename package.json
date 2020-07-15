@@ -13,7 +13,11 @@
     "lint:fix:dry": "npm run lint -- --fix-dry-run"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@solid/lit-pod": "file:.yalc/@solid/lit-pod",
+    "formik": "^2.1.5",
     "graphy": "^4.2.1",
     "next": "9.4.4",
     "rdf-namespaces": "^1.8.0",
@@ -32,6 +36,7 @@
     "@types/react-dom": "^16.9.8",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.6.1",
+    "@zeit/next-css": "^1.0.1",
     "autoprefixer": "^9.8.5",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",

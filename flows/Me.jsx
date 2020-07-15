@@ -8,8 +8,10 @@ import useWebId from "~hooks/useWebId"
 import useThing from "~hooks/useThing"
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
+import { TextField } from "~components/form"
 import ProfileModule from "~modules/Profile"
 import { otherPath } from "~lib/urls"
+
 
 function AuthButton() {
   const webId = useWebId()
@@ -31,14 +33,14 @@ function Friend({ webId, ...rest }) {
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   return (
-    <div className="relative" {...rest}>
-      <a href={otherPath(webId)}>
-        <div className="inset-0 absolute opacity-0 hover:opacity-100 ">
-          {name}
-        </div>
-        <img className="h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6"
+    <div className="col-span-3 rounded-full overflow-hidden" {...rest}>
+      <a href={otherPath(webId)} >
+        <img className="h-16 w-16 color-white"
           alt="profile"
-          src={profileImage} />
+          src={profileImage || '/user.svg'} />
+        <div className="p-6 h-32 w-32 absolute -top-8 -left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
+          <h4>{name}</h4>
+        </div>
       </a>
     </div>
   )
@@ -50,9 +52,9 @@ function Friends() {
   const knows = profile && getUrlAll(profile, foaf.knows)
   if (profile) {
     return (
-      <div className="flex flex-row h-full">
+      <div className="absolute nset-0 grid-cols-12">
         {knows && knows.map(url => (
-          <Friend webId={url} key={{ url }} />
+          <Friend webId={url} key={url} />
         ))}
       </div>
     )

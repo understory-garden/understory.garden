@@ -7,5 +7,5 @@ export function Flow({ className, ...props }) {
 }
 
 export function Module({ className, ...props }) {
-  return <div className={`w-84 m-6 rounded-lg bg-white bg-opacity-25 border-white border-opacity-25 border-solid border-8 relative ${className}`} {...props} />
+  return <div className={`w-84 m-6 p-6 rounded-lg bg-white bg-opacity-25 border-white border-opacity-25 border-solid border-8 relative ${className}`} {...props} />
 }
