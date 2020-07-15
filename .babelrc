@@ -11,7 +11,8 @@
           "~modules": "./modules",
           "~spaces": "./spaces",
           "~flows": "./flows",
-          "~hooks": "./hooks"
+          "~hooks": "./hooks",
+          "@solid/lit-pod": "@itme/lit-pod"
         }
       }
     ]
