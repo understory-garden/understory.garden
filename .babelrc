@@ -1,3 +1,19 @@
 {
-  "presets": ["next/babel"]
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "~": "./",
+          "~components": "./components",
+          "~lib": "./lib",
+          "~modules": "./modules",
+          "~spaces": "./spaces",
+          "~flows": "./flows",
+          "~hooks": "./hooks"
+        }
+      }
+    ]
+  ]
 }

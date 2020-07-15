@@ -1,15 +1,15 @@
 import {
-  getUrlAll, removeUrl, addUrl, getUrlOne, getStringNoLocaleOne
+  getUrlAll, getUrlOne, getStringNoLocaleOne
 } from '@solid/lit-pod'
 import auth from "solid-auth-client"
 import { foaf, vcard } from "rdf-namespaces"
 
-import useWebId from "../hooks/useWebId"
-import useThing from "../hooks/useThing"
-import { Flow, Module } from "../components/layout"
-import { Button } from "../components/elements"
-import ProfileModule from "../modules/Profile"
-import { otherPath } from "../lib/urls"
+import useWebId from "~hooks/useWebId"
+import useThing from "~hooks/useThing"
+import { Flow, Module } from "~components/layout"
+import { Button } from "~components/elements"
+import ProfileModule from "~modules/Profile"
+import { otherPath } from "~lib/urls"
 
 function AuthButton() {
   const webId = useWebId()
