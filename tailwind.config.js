@@ -1,8 +1,10 @@
 module.exports = {
-  purge: [],
+  // something weird is happening and I can't figure out how to use this, so just stick with the manual setup
+  purge: false,
   theme: {
     extend: {
       inset: {
+        '-1': '-0.25rem',
         '-2': '-0.5rem',
         '-4': '-1rem',
         '-8': '-2rem',
