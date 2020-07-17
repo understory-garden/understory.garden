@@ -53,12 +53,14 @@ export default function OtherProfile() {
       <Space>
         <Flow className="h-full w-full">
           <Module className="p-6 flex-grow">
-            <div className="">
-              {name}
+            <div className="flex flex-row">
+              {profileImage && <img className="w-64 m-4" src={profileImage} alt={name} />}
+              <div>
+                <h2>{name}</h2>
+                <AddKnows webId={webId} />
+              </div>
             </div>
-            <AddKnows webId={webId} />
 
-            {profileImage && <img className="h-full m-auto" src={profileImage} alt={name} />}
           </Module>
         </Flow>
       </Space>
