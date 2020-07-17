@@ -33,9 +33,9 @@ function Friend({ webId, ...rest }) {
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   return (
-    <div className="col-span-3 rounded-full overflow-hidden" {...rest}>
+    <div className="relative col-span-3" {...rest}>
       <a href={otherPath(webId)} >
-        <img className="h-16 w-16 color-white"
+        <img className="h-16 w-16 color-white overflow-hidden rounded-full"
           alt="profile"
           src={profileImage || '/user.svg'} />
         <div className="p-6 h-16 w-16 top-0 left-0 hover:w-32 hover:h-32 absolute hover:-top-8 hover:-left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition-transform duration-100 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
@@ -52,7 +52,7 @@ function Friends() {
   const knows = profile && getUrlAll(profile, foaf.knows)
   if (profile) {
     return (
-      <div className="absolute nset-0 grid-cols-12">
+      <div className="absolute inset-0 grid grid-cols-12">
         {knows && knows.map(url => (
           <Friend webId={url} key={url} />
         ))}
