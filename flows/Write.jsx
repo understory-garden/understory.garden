@@ -2,21 +2,21 @@ import { useState } from "react"
 
 import { Formik, Form } from 'formik';
 import {
-  createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, getUrlAll, getStringNoLocaleOne
+  getThingOne, createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
+  saveLitDatasetInContainer, getUrlAll, getStringNoLocaleOne, getDatetimeOne
 } from "@solid/lit-pod";
-import { schema, rdf, ldp } from "rdf-namespaces"
+import { schema, rdf, dct } from "rdf-namespaces"
 
 import { TextField } from "~components/form"
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
 import usePostContainer from "~hooks/usePostContainer"
-import useThing from "~hooks/useThing"
+import useThing, { useContainer } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
 import { mutate } from "swr"
 
-function Post({ url, deletePost }) {
-  const { thing: post } = useThing(url)
+function Post({ resource, deletePost }) {
+  const { thing: post } = useThing(`${resource.url}#post`)
   const title = post && getStringNoLocaleOne(post, schema.headline)
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
@@ -31,16 +31,19 @@ function Post({ url, deletePost }) {
   )
 }
 
+function by(term) {
+  (a, b) => getDatetimeOne(a, term) > getDatetimeOne(b, term)
+}
+
 function PostModules() {
   const postContainer = usePostContainer()
-  const { thing: posts, mutate: mutatePosts } = useThing(postContainer)
-  const postUrls = posts && getUrlAll(posts, ldp.contains)
+  const { resources, mutate: mutatePosts } = useContainer(postContainer)
   return (
     <>
-      {postUrls && postUrls.reverse().map(postUrl => (
-        <Module key={postUrl}>
-          <Post url={`${postUrl}#post`} deletePost={async () => {
-            await deleteFile(postUrl)
+      {resources && resources.sort(by(dct.modified)).map(resource => (
+        <Module key={resource.url}>
+          <Post resource={resource} deletePost={async () => {
+            await deleteFile(resource.url)
             mutatePosts()
           }} />
         </Module>

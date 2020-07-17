@@ -8,6 +8,7 @@ import useThing from "~hooks/useThing"
 import { Module } from "~components/layout"
 
 import { EditableText } from "~components/editable"
+import { otherPath } from "~lib/urls"
 
 
 
@@ -22,10 +23,11 @@ export default function Profile() {
   if (profile) {
     return (
       <Module>
-        <div className="inset-0 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 ">
-          <h3 className="p-6">
+        <div className="typography inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 ">
+          <h3>
             hello, <EditableText save={saveName} value={name} placeholder="name">{name}</EditableText>
           </h3>
+          <a href={otherPath(webId)}><h4>Public Profile</h4></a>
         </div>
         {profileImage && <img className="h-full m-auto" src={profileImage} alt={name} />}
 

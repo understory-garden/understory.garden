@@ -39,5 +39,6 @@ module.exports = {
   },
   plugins: [
     require('tailwindcss-gradients'),
+    require('@tailwindcss/typography'),
   ],
 }

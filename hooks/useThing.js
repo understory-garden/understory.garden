@@ -1,7 +1,9 @@
 import useSWR from 'swr'
 import {
-  fetchLitDataset, getThingOne, saveLitDatasetAt, setThing
+  fetchLitDataset, getThingOne, saveLitDatasetAt, setThing, getUrlAll
 } from '@solid/lit-pod'
+import { ldp } from "rdf-namespaces"
+
 import equal from 'fast-deep-equal/es6'
 
 function useThing(uri, { compare, ...options } = {}) {
@@ -29,6 +31,18 @@ function useThing(uri, { compare, ...options } = {}) {
       ...rest
     }
   )
+}
+
+
+export function useContainer(uri, { compare, ...options } = {}) {
+  options.compare = compare || equal
+  const { data, ...rest } = useSWR(uri, fetchLitDataset, options)
+  const resourceUrls = data && getUrlAll(data, ldp.contains)
+  const resources = resourceUrls && resourceUrls.map(url => {
+    return getThingOne(data, url)
+  })
+  return { resources, ...rest }
+
 }
 
 export default useThing;
