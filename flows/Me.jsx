@@ -52,7 +52,7 @@ function Friends() {
   const knows = profile && getUrlAll(profile, foaf.knows)
   if (profile) {
     return (
-      <div className="absolute inset-0 grid grid-cols-12">
+      <div className="absolute inset-0 p-3 grid grid-cols-12">
         {knows && knows.map(url => (
           <Friend webId={url} key={url} />
         ))}
