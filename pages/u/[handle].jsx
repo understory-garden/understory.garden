@@ -31,9 +31,20 @@ function AddKnows({ webId }) {
   )
 }
 
+function handleToWebId(handle) {
+  try {
+    new URL(handle);
+    // if this doesn't throw, it's a valid URL
+    return handle
+  } catch (_) {
+    return `https://${handle}/profile/card#me`
+  }
+}
+
 export default function OtherProfile() {
   const router = useRouter()
-  const { webId } = router.query
+  const { handle } = router.query
+  const webId = handleToWebId(handle)
   const { thing: profile } = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
