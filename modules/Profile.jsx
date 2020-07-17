@@ -28,6 +28,7 @@ export default function Profile() {
           </h3>
         </div>
         {profileImage && <img className="h-full m-auto" src={profileImage} alt={name} />}
+
       </Module>
     )
   } else {

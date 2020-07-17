@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Formik, Field, Form } from 'formik';
 import { Edit } from "~components/icons"
+import { Formik, Form } from 'formik';
 import { TextField } from "~components/form"
 
 export function EditableText({ save, placeholder, className, value, children, ...rest }) {
