@@ -1,28 +1,48 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 import { Formik, Form } from 'formik';
 import {
   createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, getUrlAll
+  saveLitDatasetInContainer, getUrlAll, getStringNoLocaleOne
 } from "@solid/lit-pod";
-import { schema, rdf, space, ldp } from "rdf-namespaces"
-import useThing from "~hooks/useThing"
+import { schema, rdf, ldp } from "rdf-namespaces"
 
 import { TextField } from "~components/form"
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
 import usePostContainer from "~hooks/usePostContainer"
+import useThing from "~hooks/useThing"
+import { deleteFile } from '~lib/http'
+import { mutate } from "swr"
+
+function Post({ url, deletePost }) {
+  const { thing: post } = useThing(url)
+  const title = post && getStringNoLocaleOne(post, schema.headline)
+  const body = post && getStringNoLocaleOne(post, schema.articleBody)
+
+  return (
+    <div className="inset-0">
+      <h3>{title}</h3>
+      <p>{body}</p>
+      <Button onClick={deletePost}>
+        Delete
+      </Button>
+    </div>
+  )
+}
 
 function PostModules() {
   const postContainer = usePostContainer()
-  const { thing: posts } = useThing(postContainer)
+  const { thing: posts, mutate: mutatePosts } = useThing(postContainer)
   const postUrls = posts && getUrlAll(posts, ldp.contains)
-  console.log(postUrls)
   return (
     <>
-      {postUrls && postUrls.map(postUrl => (
+      {postUrls && postUrls.reverse().map(postUrl => (
         <Module key={postUrl}>
-          {postUrl}
+          <Post url={`${postUrl}#post`} deletePost={async () => {
+            await deleteFile(postUrl)
+            mutatePosts()
+          }} />
         </Module>
       ))}
     </>
@@ -32,15 +52,15 @@ function PostModules() {
 export default function WriteFlow() {
   const postContainer = usePostContainer()
   const [creating, setCreating] = useState(false)
-  const createPost = ({ body, title }) => {
-    var post = createThing();
+  const createPost = async ({ body, title }) => {
+    var post = createThing({ name: 'post' });
     post = addUrl(post, rdf.type, schema.BlogPosting)
     post = addStringNoLocale(post, schema.headline, title);
     post = addStringNoLocale(post, schema.articleBody, body);
     var postDataset = createLitDataset()
     postDataset = setThing(postDataset, post)
-    saveLitDatasetInContainer(postContainer, postDataset, { slugSuggestion: title })
-
+    await saveLitDatasetInContainer(postContainer, postDataset, { slugSuggestion: title })
+    mutate(postContainer)
   }
   return (
     <Flow>
