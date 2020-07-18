@@ -7,13 +7,14 @@ import {
 } from "@solid/lit-pod";
 import { schema, rdf, dct } from "rdf-namespaces"
 
-import { TextField } from "~components/form"
+import { TextField, TextAreaField } from "~components/form"
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
 import usePostContainer from "~hooks/usePostContainer"
 import useThing, { useContainer } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
 import { mutate } from "swr"
+import ReactMarkdown from "react-markdown"
 
 function Post({ resource, deletePost }) {
   const { thing: post } = useThing(`${resource.url}#post`)
@@ -21,9 +22,9 @@ function Post({ resource, deletePost }) {
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
   return (
-    <div className="inset-0">
-      <h3>{title}</h3>
-      <p>{body}</p>
+    <div className="inset-0 prose">
+      <h2>{title}</h2>
+      <ReactMarkdown source={body} />
       <Button onClick={deletePost}>
         Delete
       </Button>
@@ -80,8 +81,20 @@ export default function WriteFlow() {
             }}
           >
             <Form>
-              <TextField name="title" autoFocus />
-              <TextField name="body" />
+              <div className="mb-4 text-align-center">
+                <h3>create a post</h3>
+                <label className="block text-gray-700 text-sm font-bold mb-2" for="title">
+                  title
+                </label>
+                <TextField className="w-full" name="title" autoFocus />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" for="body">
+                  body
+                </label>
+                <TextAreaField name="body" className="w-full" />
+              </div>
+
               <Button type="submit">Create</Button>
             </Form>
           </Formik>
