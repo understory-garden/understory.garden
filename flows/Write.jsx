@@ -10,13 +10,14 @@ import { schema, rdf, dct } from "rdf-namespaces"
 import { TextField, TextAreaField } from "~components/form"
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
+import { CircleWithCross } from "~components/icons"
 import usePostContainer from "~hooks/usePostContainer"
 import useThing, { useContainer } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
 import { mutate } from "swr"
 import ReactMarkdown from "react-markdown"
 
-function Post({ resource, deletePost }) {
+function Post({ resource }) {
   const { thing: post } = useThing(`${resource.url}#post`)
   const title = post && getStringNoLocaleOne(post, schema.headline)
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
@@ -25,9 +26,6 @@ function Post({ resource, deletePost }) {
     <div className="inset-0 prose">
       <h2>{title}</h2>
       <ReactMarkdown source={body} />
-      <Button onClick={deletePost}>
-        Delete
-      </Button>
     </div>
   )
 }
@@ -39,14 +37,20 @@ function byDatetime(term) {
 function PostModules() {
   const postContainer = usePostContainer()
   const { resources, mutate: mutatePosts } = useContainer(postContainer)
+  const deletePost = async (postResource) => {
+    await deleteFile(postResource.url)
+    mutatePosts()
+  }
   return (
     <>
       {resources && resources.sort(byDatetime(dct.modified)).map(resource => (
-        <Module key={resource.url}>
-          <Post resource={resource} deletePost={async () => {
-            await deleteFile(resource.url)
-            mutatePosts()
-          }} />
+        <Module key={resource.url} className="pt-10 overflow-y-scroll">
+          <div className="absolute top-0 left-0 right-0 pb-2 bg-white bg-opacity-25 flex flex-row">
+            <div className="flex-grow" />
+            <CircleWithCross className="w-5 h-5 text-white cursor-pointer"
+              onClick={() => deletePost(resource)} />
+          </div>
+          <Post resource={resource} />
         </Module>
       ))}
     </>

@@ -25,7 +25,7 @@ export default function Profile() {
     <Module>
       {profile ? (
         <>
-          <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 ">
+          <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 prose">
             <h3>
               hello, <EditableText save={saveName} value={name} placeholder="name">{name}</EditableText>
             </h3>
