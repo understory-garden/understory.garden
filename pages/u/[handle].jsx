@@ -6,10 +6,11 @@ import {
 } from '@solid/lit-pod'
 import { useRouter } from 'next/router'
 
-import useThing from "../../hooks/useThing"
-import { Space, Flow, Module } from "../../components/layout"
-import { Button } from "../../components/elements"
-import useWebId from "../../hooks/useWebId"
+import useThing from "~hooks/useThing"
+import { Space, Flow, Module } from "~components/layout"
+import { Button, Loader } from "~components/elements"
+import useWebId from "~hooks/useWebId"
+
 
 function AddKnows({ webId }) {
   const myWebId = useWebId()
@@ -17,7 +18,7 @@ function AddKnows({ webId }) {
   const alreadyKnows = myProfile && getUrlAll(myProfile, foaf.knows).includes(webId)
   const [saving, setSaving] = useState(false)
   const toggleKnows = alreadyKnows ? removeUrl : addUrl
-  return (myProfile == undefined) ? ("Loading...") : (
+  return (myProfile == undefined) ? (<Loader />) : (
     <Button onClick={
       async () => {
         setSaving(true)
@@ -66,7 +67,7 @@ export default function OtherProfile() {
       </Space>
     )
   } else {
-    return <div>loading...!!</div>
+    return <div><Loader /></div>
   }
 
 }

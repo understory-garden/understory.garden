@@ -7,8 +7,7 @@ import { foaf, vcard } from "rdf-namespaces"
 import useWebId from "~hooks/useWebId"
 import useThing from "~hooks/useThing"
 import { Flow, Module } from "~components/layout"
-import { Button } from "~components/elements"
-import { TextField } from "~components/form"
+import { Button, Loader } from "~components/elements"
 import ProfileModule from "~modules/Profile"
 import { otherPath } from "~lib/urls"
 
@@ -16,7 +15,7 @@ import { otherPath } from "~lib/urls"
 function AuthButton() {
   const webId = useWebId()
   if (webId === undefined) {
-    return <div>loading...</div>
+    return <div><Loader /></div>
   } else if (webId === null) {
     return (
       <Button onClick={() => auth.popupLogin({ popupUri: "/popup.html" })}>
@@ -59,7 +58,7 @@ function Friends() {
       </div>
     )
   } else {
-    return <div>loading...</div>
+    return <div><Loader /></div>
   }
 
 }

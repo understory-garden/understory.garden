@@ -1,6 +1,7 @@
 import Head from 'next/head'
 
 import '../styles.css';
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
 function App({ Component, pageProps }) {
   return (
