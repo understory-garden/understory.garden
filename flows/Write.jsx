@@ -32,7 +32,7 @@ function Post({ resource, deletePost }) {
   )
 }
 
-function by(term) {
+function byDatetime(term) {
   (a, b) => getDatetimeOne(a, term) > getDatetimeOne(b, term)
 }
 
@@ -41,7 +41,7 @@ function PostModules() {
   const { resources, mutate: mutatePosts } = useContainer(postContainer)
   return (
     <>
-      {resources && resources.sort(by(dct.modified)).map(resource => (
+      {resources && resources.sort(byDatetime(dct.modified)).map(resource => (
         <Module key={resource.url}>
           <Post resource={resource} deletePost={async () => {
             await deleteFile(resource.url)
