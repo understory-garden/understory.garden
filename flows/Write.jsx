@@ -23,7 +23,7 @@ function Post({ resource }) {
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
   return (
-    <div className="inset-0 prose">
+    <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
       <h2>{title}</h2>
       <ReactMarkdown source={body} />
     </div>
@@ -44,7 +44,7 @@ function PostModules() {
   return (
     <>
       {resources && resources.sort(byDatetime(dct.modified)).map(resource => (
-        <Module key={resource.url} className="pt-10 overflow-y-scroll">
+        <Module key={resource.url} className="pt-10">
           <div className="absolute top-0 left-0 right-0 pb-2 bg-white bg-opacity-25 flex flex-row">
             <div className="flex-grow" />
             <CircleWithCross className="w-5 h-5 text-white cursor-pointer"
