@@ -2,6 +2,7 @@ import Head from 'next/head'
 
 import '../styles.css';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+import 'cropperjs/dist/cropper.css';
 
 function App({ Component, pageProps }) {
   return (

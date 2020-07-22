@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import Cropper from 'react-cropper';
-import 'cropperjs/dist/cropper.css';
 import auth from 'solid-auth-client';
 
 import { Button, Loader } from '~components/elements';
