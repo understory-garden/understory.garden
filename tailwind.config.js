@@ -1,6 +1,13 @@
 module.exports = {
-  // something weird is happening and I can't figure out how to use this, so just stick with the manual setup
-  purge: false,
+  purge: [
+    "./pages/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+    "./spaces/**/*.{js,jsx,ts,tsx}",
+    "./flows/**/*.{js,jsx,ts,tsx}",
+    "./modules/**/*.{js,jsx,ts,tsx}",
+    "./lib/**/*.{js,jsx,ts,tsx}",
+    "./hooks/**/*.{js,jsx,ts,tsx}"
+  ],
   theme: {
     extend: {
       inset: {
