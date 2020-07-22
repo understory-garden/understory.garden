@@ -7,25 +7,9 @@ import { foaf, vcard } from "rdf-namespaces"
 import useWebId from "~hooks/useWebId"
 import useThing from "~hooks/useThing"
 import { Flow, Module } from "~components/layout"
-import { Button, Loader } from "~components/elements"
+import { AuthButton, Loader } from "~components/elements"
 import ProfileModule from "~modules/Profile"
 import { otherPath } from "~lib/urls"
-
-
-function AuthButton() {
-  const webId = useWebId()
-  if (webId === undefined) {
-    return <div><Loader /></div>
-  } else if (webId === null) {
-    return (
-      <Button onClick={() => auth.popupLogin({ popupUri: "/popup.html" })}>
-        Log In
-      </Button>
-    )
-  } else {
-    return <Button onClick={() => auth.logout()}>Log Out</Button>
-  }
-}
 
 function Friend({ webId, ...rest }) {
   const { thing: profile } = useThing(webId)

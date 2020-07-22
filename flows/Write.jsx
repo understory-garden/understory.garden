@@ -6,16 +6,17 @@ import {
   saveLitDatasetInContainer, getUrlAll, getStringNoLocaleOne, getDatetimeOne
 } from "@solid/lit-pod";
 import { schema, rdf, dct } from "rdf-namespaces"
-
-import { TextField, TextAreaField } from "~components/form"
-import { Flow, Module } from "~components/layout"
-import { Button } from "~components/elements"
-import { CircleWithCross } from "~components/icons"
-import usePostContainer from "~hooks/usePostContainer"
-import useThing, { useContainer } from "~hooks/useThing"
-import { deleteFile } from '~lib/http'
 import { mutate } from "swr"
 import ReactMarkdown from "react-markdown"
+
+import { TextField, TextAreaField } from "~components/form"
+import { Flow, Module, ModuleHeader } from "~components/layout"
+import { Button } from "~components/elements"
+import { CircleWithCross } from "~components/icons"
+import { usePostsContainerUri } from "~hooks/uris"
+import useThing, { useContainer } from "~hooks/useThing"
+import { deleteFile } from '~lib/http'
+import { byDctModified } from '~lib/sort'
 
 function Post({ resource }) {
   const { thing: post } = useThing(`${resource.url}#post`)
@@ -30,26 +31,22 @@ function Post({ resource }) {
   )
 }
 
-function byDatetime(term) {
-  (a, b) => getDatetimeOne(a, term) > getDatetimeOne(b, term)
-}
-
 function PostModules() {
-  const postContainer = usePostContainer()
-  const { resources, mutate: mutatePosts } = useContainer(postContainer)
+  const postContainerUri = usePostsContainerUri()
+  const { resources, mutate: mutatePosts } = useContainer(postContainerUri)
   const deletePost = async (postResource) => {
     await deleteFile(postResource.url)
     mutatePosts()
   }
   return (
     <>
-      {resources && resources.sort(byDatetime(dct.modified)).map(resource => (
+      {resources && resources.sort(byDctModified).reverse().map(resource => (
         <Module key={resource.url} className="pt-10">
-          <div className="absolute top-0 left-0 right-0 pb-2 bg-white bg-opacity-25 flex flex-row">
+          <ModuleHeader>
             <div className="flex-grow" />
             <CircleWithCross className="w-5 h-5 text-white cursor-pointer"
               onClick={() => deletePost(resource)} />
-          </div>
+          </ModuleHeader>
           <Post resource={resource} />
         </Module>
       ))}
@@ -58,7 +55,7 @@ function PostModules() {
 }
 
 export default function WriteFlow() {
-  const postContainer = usePostContainer()
+  const postContainerUri = usePostsContainerUri()
   const [creating, setCreating] = useState(false)
   const createPost = async ({ body, title }) => {
     var post = createThing({ name: 'post' });
@@ -67,8 +64,8 @@ export default function WriteFlow() {
     post = addStringNoLocale(post, schema.articleBody, body);
     var postDataset = createLitDataset()
     postDataset = setThing(postDataset, post)
-    await saveLitDatasetInContainer(postContainer, postDataset, { slugSuggestion: title })
-    mutate(postContainer)
+    await saveLitDatasetInContainer(postContainerUri, postDataset, { slugSuggestion: title })
+    mutate(postContainerUri)
   }
   return (
     <Flow>

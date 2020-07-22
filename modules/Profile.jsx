@@ -6,28 +6,25 @@ import {
 } from '@solid/lit-pod'
 
 import useWebId from "~hooks/useWebId"
-import useStorageUri from "~hooks/useStorageUri"
-import useEnsured from "~hooks/useEnsured"
 import useProfile from "~hooks/useProfile"
+import { useImagesContainerUri } from "~hooks/uris"
 import { Module } from "~components/layout"
 import { Loader } from "~components/elements"
 import { Edit } from "~components/icons"
-
 import { EditableText } from "~components/editable"
 import ImageUploader from "~components/ImageUploader"
 import { otherPath } from "~lib/urls"
 
 function ProfileImageUploader({ onSaved, onClose }) {
   const { profile, save: saveProfile } = useProfile()
-  const storageUri = useStorageUri()
-  const imageContainerUri = useEnsured(storageUri && `${storageUri}public/images/`)
-  const onUpload = async (response, fileType) => {
+  const imageContainerUri = useImagesContainerUri()
+  const onUpload = async (response) => {
     const fileUrl = new URL(response.headers.get("location"), response.url).toString()
     saveProfile(setUrl(profile, vcard.hasPhoto, fileUrl))
     onSaved && onSaved()
   }
   return (
-    <ImageUploader open={true} uploadDirectory={imageContainerUri}
+    <ImageUploader uploadDirectory={imageContainerUri}
       onUpload={onUpload} onClose={onClose} />
   )
 }
