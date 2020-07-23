@@ -31,8 +31,8 @@ function Post({ resource }) {
   )
 }
 
-function PostModules() {
-  const postContainerUri = usePostsContainerUri()
+function PostModules({ path = "private" }) {
+  const postContainerUri = usePostsContainerUri(path)
   const { resources, mutate: mutatePosts } = useContainer(postContainerUri)
   const deletePost = async (postResource) => {
     await deleteFile(postResource.url)
@@ -54,9 +54,9 @@ function PostModules() {
   )
 }
 
-export default function WriteFlow() {
-  const postContainerUri = usePostsContainerUri()
-  const [creating, setCreating] = useState(false)
+function CreatePostModule({ path = "private", onCreated }) {
+  const postContainerUri = usePostsContainerUri(path)
+
   const createPost = async ({ body, title }) => {
     var post = createThing({ name: 'post' });
     post = addUrl(post, rdf.type, schema.BlogPosting)
@@ -67,42 +67,58 @@ export default function WriteFlow() {
     await saveLitDatasetInContainer(postContainerUri, postDataset, { slugSuggestion: title })
     mutate(postContainerUri)
   }
+
+  return (
+    <Module>
+      <Formik
+        initialValues={{ title: "", body: "" }}
+        onSubmit={async (post) => {
+          await createPost(post)
+          onCreated && onCreated(path, post)
+        }}
+      >
+        <Form>
+          <div className="mb-4 text-align-center">
+            <h3>create a post</h3>
+            <label className="block text-gray-700 text-sm font-bold mb-2" for="title">
+              title
+            </label>
+            <TextField className="w-full" name="title" autoFocus />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" for="body">
+              body
+            </label>
+            <TextAreaField name="body" className="w-full" />
+          </div>
+
+          <Button type="submit">Create</Button>
+        </Form>
+      </Formik>
+
+    </Module>
+  )
+}
+
+export default function WriteFlow() {
+  const [creating, setCreating] = useState()
+  const [showing, setShowing] = useState('private')
   return (
     <Flow>
       <Module>
-        <Button onClick={() => { setCreating(true) }}>Create Post</Button>
+        <Button onClick={() => { setCreating('private') }}>Create Private Post</Button>
+        <Button onClick={() => { setCreating('public') }}>Create Public Post</Button>
+        {showing === 'private' ? (
+          <Button onClick={() => { setShowing('public') }}>Show Public Posts</Button>
+        ) : (
+            <Button onClick={() => { setShowing('private') }}>Show Private Posts</Button>
+          )}
       </Module>
-      {creating && (
-        <Module>
-          <Formik
-            initialValues={{ title: "", body: "" }}
-            onSubmit={async (post) => {
-              await createPost(post)
-              setCreating(false)
-            }}
-          >
-            <Form>
-              <div className="mb-4 text-align-center">
-                <h3>create a post</h3>
-                <label className="block text-gray-700 text-sm font-bold mb-2" for="title">
-                  title
-                </label>
-                <TextField className="w-full" name="title" autoFocus />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" for="body">
-                  body
-                </label>
-                <TextAreaField name="body" className="w-full" />
-              </div>
-
-              <Button type="submit">Create</Button>
-            </Form>
-          </Formik>
-
-        </Module>
-      )}
-      <PostModules />
+      {creating && (<CreatePostModule path={creating} onCreated={(path) => {
+        setCreating(undefined)
+        setShowing(path)
+      }} />)}
+      <PostModules path={showing} />
     </Flow>
   )
 }

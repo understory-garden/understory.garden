@@ -32,29 +32,50 @@ function Image({ resource, deleteImage }) {
   )
 }
 
-export default function ImagesFlow() {
-  const [creating, setCreating] = useState(false)
-
-  const imagesContainerUri = useImagesContainerUri()
+function ImageModules({ path = 'private' }) {
+  const imagesContainerUri = useImagesContainerUri(path)
   const { resources, mutate: mutatePhotos } = useContainer(imagesContainerUri)
   const deleteImage = async (imageResource) => {
     await deleteFile(imageResource.url)
     mutatePhotos()
   }
   return (
+    <>
+      {resources && resources.sort(byDctModified).reverse().map(resource => (
+        <Image key={resource.url} resource={resource} deleteImage={() => deleteImage(resource)} />
+      ))}
+    </>
+  )
+}
+
+export default function ImagesFlow() {
+  const [creating, setCreating] = useState()
+  const [showing, setShowing] = useState('private')
+
+  const imagesContainerUri = useImagesContainerUri('private')
+  const { mutate: mutatePhotos } = useContainer(imagesContainerUri)
+  return (
     <Flow>
       <Module>
-        <Button onClick={() => { setCreating(true) }}>Upload Photo</Button>
+        <Button onClick={() => { setCreating('private') }}>Upload Private Images</Button>
+        <Button onClick={() => { setCreating('public') }}>Upload Public Images</Button>
+        {showing === 'private' ? (
+          <Button onClick={() => { setShowing('public') }}>Show Public Images</Button>
+        ) : (
+            <Button onClick={() => { setShowing('private') }}>Show Private Images</Button>
+          )}
+
       </Module>
       {creating && (
         <ImageUploader uploadDirectory={imagesContainerUri}
           onUpload={() => { mutatePhotos() }}
-          onClose={() => { setCreating(false) }}
+          onClose={() => {
+            setShowing(creating)
+            setCreating(undefined)
+          }}
         />
       )}
-      {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <Image key={resource.url} resource={resource} deleteImage={() => deleteImage(resource)} />
-      ))}
+      <ImageModules path={showing} />
     </Flow>
   )
 }

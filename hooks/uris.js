@@ -4,14 +4,14 @@ import { getUrlOne } from "@solid/lit-pod";
 import useProfile from "~hooks/useProfile"
 import useEnsured from "~hooks/useEnsured"
 
-export function usePostsContainerUri() {
+export function usePostsContainerUri(path = 'public') {
   const { profile } = useProfile()
   const storageContainer = profile && getUrlOne(profile, space.storage)
-  return useEnsured(storageContainer && `${storageContainer}public/posts/`)
+  return useEnsured(storageContainer && `${storageContainer}${path}/posts/`)
 }
 
-export function useImagesContainerUri() {
+export function useImagesContainerUri(path = 'private') {
   const { profile } = useProfile()
   const storageContainer = profile && getUrlOne(profile, space.storage)
-  return useEnsured(storageContainer && `${storageContainer}public/images/`)
+  return useEnsured(storageContainer && `${storageContainer}${path}/images/`)
 }
