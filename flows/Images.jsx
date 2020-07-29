@@ -14,7 +14,7 @@ import { useImagesContainerUri } from "~hooks/uris"
 import { byDctModified } from "~lib/sort"
 import { deleteFile } from '~lib/http'
 
-function Image({ resource, deleteImage }) {
+function ImageModule({ resource, deleteImage }) {
   const { profile, save: saveProfile } = useProfile()
   const setProfilePicture = () => {
     saveProfile(setUrl(profile, vcard.hasPhoto, resource.url))
@@ -27,6 +27,7 @@ function Image({ resource, deleteImage }) {
         <h6>Modified: {modified && modified.toString()}</h6>
         <Button onClick={deleteImage}>Delete</Button>
         <Button onClick={setProfilePicture}>Make Profile Photo</Button>
+        <a href={resource.url}>Link</a>
       </div>
     </Module>
   )
@@ -42,7 +43,7 @@ function ImageModules({ path = 'private' }) {
   return (
     <>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <Image key={resource.url} resource={resource} deleteImage={() => deleteImage(resource)} />
+        <ImageModule key={resource.url} resource={resource} deleteImage={() => deleteImage(resource)} />
       ))}
     </>
   )
