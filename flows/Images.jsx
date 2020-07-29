@@ -53,7 +53,7 @@ export default function ImagesFlow() {
   const [creating, setCreating] = useState()
   const [showing, setShowing] = useState('private')
 
-  const imagesContainerUri = useImagesContainerUri('private')
+  const imagesContainerUri = useImagesContainerUri(creating)
   const { mutate: mutatePhotos } = useContainer(imagesContainerUri)
   return (
     <Flow>
