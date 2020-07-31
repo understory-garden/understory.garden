@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
 import { schema } from "rdf-namespaces"
 
-import { Space, Flow, Module, LoggedInPage } from "~components/layout"
+import { Space, Flow, Module, Page } from "~components/layout"
 import { Button, Loader } from "~components/elements"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
@@ -107,7 +107,7 @@ export default function UserProfile() {
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   if (profile) {
     return (
-      <LoggedInPage>
+      <Page>
         <Space>
           <Flow>
             <Module className="p-6 flex-grow">
@@ -126,7 +126,7 @@ export default function UserProfile() {
           <ImagesFlow />
           <PostsFlow />
         </Space>
-      </LoggedInPage>
+      </Page>
     )
   } else {
     return <div><Loader /></div>
