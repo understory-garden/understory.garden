@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { foaf, vcard } from 'rdf-namespaces'
 import {
   getUrlAll, removeUrl, addUrl,
-  getStringNoLocaleOne, getUrlOne
-} from '@solid/lit-pod'
+  getStringNoLocaleOne, getUrlOne, asUrl
+} from '@itme/solid-client'
 import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
 import { schema } from "rdf-namespaces"
@@ -41,25 +41,27 @@ function AddKnows({ webId }) {
 }
 
 function handleToWebId(handle) {
-  try {
-    new URL(handle);
-    // if this doesn't throw, it's a valid URL
-    return handle
-  } catch (_) {
-    return `https://${handle}/profile/card#me`
+  if (handle) {
+    try {
+      new URL(handle);
+      // if this doesn't throw, it's a valid URL
+      return handle
+    } catch (_) {
+      return `https://${handle}/profile/card#me`
+    }
   }
 }
 
 function ImageModule({ resource }) {
   return (
     <Module>
-      <img src={resource.url} className="object-contain h-full" alt="no description" />
+      <img src={asUrl(resource)} className="object-contain h-full" alt="no description" />
     </Module>
   )
 }
 
 function PostModule({ resource }) {
-  const { thing: post } = useThing(`${resource.url}#post`)
+  const { thing: post } = useThing(resource && `${asUrl(resource)}#post`)
   const title = post && getStringNoLocaleOne(post, schema.headline)
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
@@ -79,7 +81,7 @@ function ImagesFlow() {
   return (
     <Flow>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <ImageModule key={resource.url} resource={resource} />
+        <ImageModule key={asUrl(resource)} resource={resource} />
       ))}
     </Flow>
   )
@@ -91,7 +93,7 @@ function PostsFlow() {
   return (
     <Flow>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <PostModule key={resource.url} resource={resource} />
+        <PostModule key={asUrl(resource)} resource={resource} />
       ))}
     </Flow>
   )
@@ -101,7 +103,7 @@ export default function UserProfile() {
   const myWebId = useWebId()
   const router = useRouter()
   const { handle } = router.query
-  const webId = handleToWebId(handle)
+  const webId = handle && handleToWebId(handle)
   const { thing: profile } = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)

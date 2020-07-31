@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 import {
   fetchLitDataset, getThingOne, saveLitDatasetAt, setThing, getUrlAll
-} from '@solid/lit-pod'
+} from '@itme/solid-client'
 import { ldp } from "rdf-namespaces"
 
 import equal from 'fast-deep-equal/es6'

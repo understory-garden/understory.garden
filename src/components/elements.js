@@ -29,7 +29,7 @@ export function AuthButton() {
 export const Link = forwardRef(({ children, className = '', ...props }, ref) => {
   return (
     <NextLink {...props} >
-      <a ref={ref} className={`lowercase text-pink-900 no-underline ${className}`}>{children}</a>
+      <a ref={ref} className={`font-semibold lowercase text-pink-900 no-underline ${className}`}>{children}</a>
     </NextLink>
   )
 })

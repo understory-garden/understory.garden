@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { foaf, vcard } from 'rdf-namespaces'
 import {
   setStringNoLocale, getStringNoLocaleOne, getUrlOne, setUrl
-} from '@solid/lit-pod'
+} from '@itme/solid-client'
 
 import useWebId from "~hooks/useWebId"
 import useProfile from "~hooks/useProfile"

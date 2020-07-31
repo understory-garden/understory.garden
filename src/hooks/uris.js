@@ -1,5 +1,5 @@
 import { space } from "rdf-namespaces"
-import { getUrlOne } from "@solid/lit-pod";
+import { getUrlOne } from "@inrupt/solid-client";
 
 import useProfile from "~hooks/useProfile"
 import useEnsured from "~hooks/useEnsured"

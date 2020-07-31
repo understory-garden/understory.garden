@@ -1,10 +1,7 @@
 import { useState } from "react"
-import { getDatetimeOne } from "@solid/lit-pod";
 import { dct } from "rdf-namespaces"
-import { foaf, vcard } from 'rdf-namespaces'
-import {
-  setStringNoLocale, getStringNoLocaleOne, getUrlOne, setUrl
-} from '@solid/lit-pod'
+import { vcard } from 'rdf-namespaces'
+import { setUrl, getDatetimeOne, asUrl } from '@itme/solid-client'
 
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
@@ -17,17 +14,17 @@ import { deleteFile } from '~lib/http'
 function ImageModule({ resource, deleteImage }) {
   const { profile, save: saveProfile } = useProfile()
   const setProfilePicture = () => {
-    saveProfile(setUrl(profile, vcard.hasPhoto, resource.url))
+    saveProfile(setUrl(profile, vcard.hasPhoto, asUrl(resource)))
   }
   const modified = resource && getDatetimeOne(resource, dct.modified)
   return (
     <Module>
-      <img src={resource.url} className="object-contain h-full" alt="no description" />
+      <img src={asUrl(resource)} className="object-contain h-full" alt="no description" />
       <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 prose flex flex-col">
         <h6>Modified: {modified && modified.toString()}</h6>
         <Button onClick={deleteImage}>Delete</Button>
         <Button onClick={setProfilePicture}>Make Profile Photo</Button>
-        <a href={resource.url}>Link</a>
+        <a href={asUrl(resource)}>Link</a>
       </div>
     </Module>
   )
@@ -37,13 +34,13 @@ function ImageModules({ path = 'private' }) {
   const imagesContainerUri = useImagesContainerUri(path)
   const { resources, mutate: mutatePhotos } = useContainer(imagesContainerUri)
   const deleteImage = async (imageResource) => {
-    await deleteFile(imageResource.url)
+    await deleteFile(asUrl(imageResource))
     mutatePhotos()
   }
   return (
     <>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <ImageModule key={resource.url} resource={resource} deleteImage={() => deleteImage(resource)} />
+        <ImageModule key={asUrl(resource)} resource={resource} deleteImage={() => deleteImage(resource)} />
       ))}
     </>
   )

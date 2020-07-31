@@ -1,6 +1,6 @@
 import {
   getUrlAll, getUrlOne, getStringNoLocaleOne
-} from '@solid/lit-pod'
+} from '@itme/solid-client'
 import auth from "solid-auth-client"
 import { foaf, vcard } from "rdf-namespaces"
 

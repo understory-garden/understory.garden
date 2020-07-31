@@ -2,9 +2,9 @@ import { useState } from "react"
 
 import { Formik, Form } from 'formik';
 import {
-  getThingOne, createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, getUrlAll, getStringNoLocaleOne, getDatetimeOne
-} from "@solid/lit-pod";
+  createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
+  saveLitDatasetInContainer, asUrl, getStringNoLocaleOne
+} from "@itme/solid-client";
 import { schema, rdf, dct } from "rdf-namespaces"
 import { mutate } from "swr"
 import ReactMarkdown from "react-markdown"
@@ -19,7 +19,7 @@ import { deleteFile } from '~lib/http'
 import { byDctModified } from '~lib/sort'
 
 function Post({ resource }) {
-  const { thing: post } = useThing(`${resource.url}#post`)
+  const { thing: post } = useThing(resource && `${asUrl(resource)}#post`)
   const title = post && getStringNoLocaleOne(post, schema.headline)
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
@@ -35,13 +35,13 @@ function PostModules({ path = "private" }) {
   const postContainerUri = usePostsContainerUri(path)
   const { resources, mutate: mutatePosts } = useContainer(postContainerUri)
   const deletePost = async (postResource) => {
-    await deleteFile(postResource.url)
+    await deleteFile(asUrl(postResource))
     mutatePosts()
   }
   return (
     <>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <Module key={resource.url} className="pt-10">
+        <Module key={asUrl(resource)} className="pt-10">
           <ModuleHeader>
             <div className="flex-grow" />
             <CircleWithCrossIcon className="w-5 h-5 text-white cursor-pointer"
