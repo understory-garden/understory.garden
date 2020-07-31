@@ -1,6 +1,6 @@
-import HomeSpace from "../spaces/Home"
-import LoginSpace from "../spaces/Login"
-import LoadingSpace from "../spaces/Loading"
+import HomeSpace from "~spaces/Home"
+import LoginSpace from "~spaces/Login"
+import LoadingSpace from "~spaces/Loading"
 import { useWebId } from '~hooks'
 
 

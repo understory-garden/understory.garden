@@ -1,12 +1,7 @@
 module.exports = {
   purge: [
     "./pages/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-    "./spaces/**/*.{js,jsx,ts,tsx}",
-    "./flows/**/*.{js,jsx,ts,tsx}",
-    "./modules/**/*.{js,jsx,ts,tsx}",
-    "./lib/**/*.{js,jsx,ts,tsx}",
-    "./hooks/**/*.{js,jsx,ts,tsx}"
+    "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
     extend: {

@@ -5,13 +5,13 @@
       "module-resolver",
       {
         "alias": {
-          "~": "./",
-          "~components": "./components",
-          "~lib": "./lib",
-          "~modules": "./modules",
-          "~spaces": "./spaces",
-          "~flows": "./flows",
-          "~hooks": "./hooks",
+          "~": "./src",
+          "~components": "./src/components",
+          "~lib": "./src/lib",
+          "~modules": "./src/modules",
+          "~spaces": "./src/spaces",
+          "~flows": "./src/flows",
+          "~hooks": "./src/hooks",
           "@solid/lit-pod": "@itme/lit-pod"
         }
       }
