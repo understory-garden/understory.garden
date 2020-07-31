@@ -6,13 +6,13 @@ import { setUrl, getDatetimeOne, asUrl } from '@itme/solid-client'
 import { Flow, Module } from "~components/layout"
 import { Button } from "~components/elements"
 import ImageUploader from "~components/ImageUploader"
-import { useContainer, useProfile } from "~hooks"
+import { useWebId, useContainer, useMyProfile } from "~hooks"
 import { useImagesContainerUri } from "~hooks/uris"
 import { byDctModified } from "~lib/sort"
 import { deleteFile } from '~lib/http'
 
 function ImageModule({ resource, deleteImage }) {
-  const { profile, save: saveProfile } = useProfile()
+  const { profile, save: saveProfile } = useMyProfile()
   const setProfilePicture = () => {
     saveProfile(setUrl(profile, vcard.hasPhoto, asUrl(resource)))
   }
@@ -31,7 +31,8 @@ function ImageModule({ resource, deleteImage }) {
 }
 
 function ImageModules({ path = 'private' }) {
-  const imagesContainerUri = useImagesContainerUri(path)
+  const myWebId = useWebId()
+  const imagesContainerUri = useImagesContainerUri(myWebId, path)
   const { resources, mutate: mutatePhotos } = useContainer(imagesContainerUri)
   const deleteImage = async (imageResource) => {
     await deleteFile(asUrl(imageResource))
@@ -49,8 +50,8 @@ function ImageModules({ path = 'private' }) {
 export default function ImagesFlow() {
   const [creating, setCreating] = useState()
   const [showing, setShowing] = useState('private')
-
-  const imagesContainerUri = useImagesContainerUri(creating)
+  const myWebId = useWebId()
+  const imagesContainerUri = useImagesContainerUri(myWebId, creating)
   const { mutate: mutatePhotos } = useContainer(imagesContainerUri)
   return (
     <Flow>

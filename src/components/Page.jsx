@@ -1,4 +1,3 @@
-import ReactTooltip from 'react-tooltip'
 import { Link } from '~components/elements'
 import { HomeIcon, CircleWithCrossIcon } from '~components/icons'
 import { AuthProvider, useAuthContext } from '~lib/auth'

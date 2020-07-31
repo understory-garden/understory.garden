@@ -6,7 +6,7 @@ import {
 } from '@itme/solid-client'
 
 import useWebId from "~hooks/useWebId"
-import useProfile from "~hooks/useProfile"
+import { useMyProfile } from "~hooks"
 import { useImagesContainerUri } from "~hooks/uris"
 import { Module } from "~components/layout"
 import { Link, Loader } from "~components/elements"
@@ -16,7 +16,7 @@ import ImageUploader from "~components/ImageUploader"
 import { otherPath } from "~lib/urls"
 
 function ProfileImageUploader({ onSaved, onClose }) {
-  const { profile, save: saveProfile } = useProfile()
+  const { profile, save: saveProfile } = useMyProfile()
   const imageContainerUri = useImagesContainerUri()
   const onUpload = async (response) => {
     const fileUrl = new URL(response.headers.get("location"), response.url).toString()
@@ -32,7 +32,7 @@ function ProfileImageUploader({ onSaved, onClose }) {
 export default function Profile() {
   const [editingImage, setEditingImage] = useState(false)
   const webId = useWebId()
-  const { profile, save: saveProfile } = useProfile()
+  const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   const saveName = async newName => {

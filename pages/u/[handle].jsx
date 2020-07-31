@@ -76,8 +76,8 @@ function PostModule({ resource }) {
   )
 }
 
-function ImagesFlow() {
-  const imagesContainerUri = useImagesContainerUri("public")
+function ImagesFlow({ webId }) {
+  const imagesContainerUri = useImagesContainerUri(webId, "public")
   const { resources } = useContainer(imagesContainerUri)
   return (
     <Flow>
@@ -88,8 +88,8 @@ function ImagesFlow() {
   )
 }
 
-function PostsFlow() {
-  const postContainerUri = usePostsContainerUri("public")
+function PostsFlow({ webId }) {
+  const postContainerUri = usePostsContainerUri(webId, "public")
   const { resources } = useContainer(postContainerUri)
   return (
     <Flow>
@@ -126,8 +126,8 @@ export default function UserProfile() {
               </div>
             </Module>
           </Flow>
-          <ImagesFlow />
-          <PostsFlow />
+          <ImagesFlow webId={webId} />
+          <PostsFlow webId={webId} />
         </Space>
       </Page>
     )

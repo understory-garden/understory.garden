@@ -13,6 +13,7 @@ import { TextField, TextAreaField } from "~components/form"
 import { Flow, Module, ModuleHeader } from "~components/layout"
 import { Button } from "~components/elements"
 import { CircleWithCrossIcon } from "~components/icons"
+import { useWebId } from "~hooks"
 import { usePostsContainerUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
@@ -32,7 +33,8 @@ function Post({ resource }) {
 }
 
 function PostModules({ path = "private" }) {
-  const postContainerUri = usePostsContainerUri(path)
+  const myWebId = useWebId()
+  const postContainerUri = usePostsContainerUri(myWebId, path)
   const { resources, mutate: mutatePosts } = useContainer(postContainerUri)
   const deletePost = async (postResource) => {
     await deleteFile(asUrl(postResource))
@@ -55,7 +57,8 @@ function PostModules({ path = "private" }) {
 }
 
 function CreatePostModule({ path = "private", onCreated }) {
-  const postContainerUri = usePostsContainerUri(path)
+  const myWebId = useWebId()
+  const postContainerUri = usePostsContainerUri(myWebId, path)
 
   const createPost = async ({ body, title }) => {
     var post = createThing({ name: 'post' });

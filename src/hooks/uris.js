@@ -1,17 +1,16 @@
 import { space } from "rdf-namespaces"
 import { getUrlOne } from "@inrupt/solid-client";
 
-import useProfile from "~hooks/useProfile"
-import useEnsured from "~hooks/useEnsured"
+import { useProfile, useEnsured } from "./"
 
-export function usePostsContainerUri(path = 'public') {
-  const { profile } = useProfile()
+export function usePostsContainerUri(webId, path = 'public') {
+  const { profile } = useProfile(webId)
   const storageContainer = profile && getUrlOne(profile, space.storage)
   return useEnsured(storageContainer && `${storageContainer}${path}/posts/`)
 }
 
-export function useImagesContainerUri(path = 'private') {
-  const { profile } = useProfile()
+export function useImagesContainerUri(webId, path = 'private') {
+  const { profile } = useProfile(webId)
   const storageContainer = profile && getUrlOne(profile, space.storage)
   return useEnsured(storageContainer && `${storageContainer}${path}/images/`)
 }
