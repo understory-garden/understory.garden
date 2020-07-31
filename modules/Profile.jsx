@@ -9,7 +9,7 @@ import useWebId from "~hooks/useWebId"
 import useProfile from "~hooks/useProfile"
 import { useImagesContainerUri } from "~hooks/uris"
 import { Module } from "~components/layout"
-import { Loader } from "~components/elements"
+import { Link, Loader } from "~components/elements"
 import { Edit } from "~components/icons"
 import { EditableText } from "~components/editable"
 import ImageUploader from "~components/ImageUploader"
@@ -43,15 +43,15 @@ export default function Profile() {
       <Module>
         {profile ? (
           <>
-            <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 prose">
+            <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100">
               <Edit tooltip="edit profile image"
                 className="absolute right-0 top-0 w-6 h-6 text-gray-900 cursor-pointer"
                 onClick={() => setEditingImage(true)}
               />
-              <h3>
+              <h3 className="text-2xl">
                 hello, <EditableText save={saveName} value={name} placeholder="name">{name}</EditableText>
               </h3>
-              <a href={otherPath(webId)}><h4>Public Profile</h4></a>
+              <Link href="/u/[handle]" as={otherPath(webId)}><h4>Public Profile</h4></Link>
             </div>
             {profileImage && <img className="h-full m-auto" src={profileImage} alt={name} />}
           </>

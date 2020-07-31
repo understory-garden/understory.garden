@@ -12,7 +12,7 @@ import ReactMarkdown from "react-markdown"
 import { TextField, TextAreaField } from "~components/form"
 import { Flow, Module, ModuleHeader } from "~components/layout"
 import { Button } from "~components/elements"
-import { CircleWithCross } from "~components/icons"
+import { CircleWithCrossIcon } from "~components/icons"
 import { usePostsContainerUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
@@ -44,7 +44,7 @@ function PostModules({ path = "private" }) {
         <Module key={resource.url} className="pt-10">
           <ModuleHeader>
             <div className="flex-grow" />
-            <CircleWithCross className="w-5 h-5 text-white cursor-pointer"
+            <CircleWithCrossIcon className="w-5 h-5 text-white cursor-pointer"
               onClick={() => deletePost(resource)} />
           </ModuleHeader>
           <Post resource={resource} />

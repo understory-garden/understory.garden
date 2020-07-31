@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
 import { schema } from "rdf-namespaces"
 
-import { Space, Flow, Module } from "~components/layout"
+import { Space, Flow, Module, LoggedInPage } from "~components/layout"
 import { Button, Loader } from "~components/elements"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
@@ -22,6 +22,10 @@ function AddKnows({ webId }) {
   const alreadyKnows = myProfile && getUrlAll(myProfile, foaf.knows).includes(webId)
   const [saving, setSaving] = useState(false)
   const toggleKnows = alreadyKnows ? removeUrl : addUrl
+
+  const { thing: profile } = useThing(webId)
+  const name = profile && getStringNoLocaleOne(profile, foaf.name)
+
   return (myProfile == undefined) ? (<Loader />) : (
     <Button onClick={
       async () => {
@@ -31,7 +35,7 @@ function AddKnows({ webId }) {
       }}
       disabled={saving}
     >
-      {alreadyKnows ? "remove" : "add"} knows
+      {alreadyKnows ? "I don't know" : "I know"} {name}
     </Button>
   )
 }
@@ -94,6 +98,7 @@ function PostsFlow() {
 }
 
 export default function UserProfile() {
+  const myWebId = useWebId()
   const router = useRouter()
   const { handle } = router.query
   const webId = handleToWebId(handle)
@@ -102,21 +107,26 @@ export default function UserProfile() {
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
   if (profile) {
     return (
-      <Space>
-        <Flow>
-          <Module className="p-6 flex-grow">
-            <div className="flex flex-row">
-              {profileImage && <img className="w-64 m-4" src={profileImage} alt={name} />}
-              <div>
-                <h2>{name}</h2>
-                <AddKnows webId={webId} />
+      <LoggedInPage>
+        <Space>
+          <Flow>
+            <Module className="p-6 flex-grow">
+              <div className="flex flex-row">
+                <div>
+
+                </div>
+                {profileImage && <img className="w-64 mr-6 " src={profileImage} alt={name} />}
+                <div>
+                  <h2>{name}</h2>
+                  {(myWebId !== webId) && <AddKnows webId={webId} />}
+                </div>
               </div>
-            </div>
-          </Module>
-        </Flow>
-        <ImagesFlow />
-        <PostsFlow />
-      </Space>
+            </Module>
+          </Flow>
+          <ImagesFlow />
+          <PostsFlow />
+        </Space>
+      </LoggedInPage>
     )
   } else {
     return <div><Loader /></div>
