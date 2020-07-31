@@ -1,13 +1,17 @@
+import ReactTooltip from 'react-tooltip'
+
+import Page from "~components/Page"
 import HomeSpace from "~spaces/Home"
 import LoginSpace from "~spaces/Login"
 import LoadingSpace from "~spaces/Loading"
 import { useWebId } from '~hooks'
 
 
+
 export default function Home() {
   const webId = useWebId()
   return (
-    <div className="container">
+    <Page>
       <main>
         {webId === undefined ? (
           <LoadingSpace />
@@ -22,6 +26,6 @@ export default function Home() {
       <footer>
 
       </footer>
-    </div>
+    </Page>
   )
 }

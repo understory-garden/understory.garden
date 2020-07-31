@@ -1,13 +1,12 @@
 import {
   getUrlAll, getUrlOne, getStringNoLocaleOne
 } from '@itme/solid-client'
-import auth from "solid-auth-client"
 import { foaf, vcard } from "rdf-namespaces"
 
 import useWebId from "~hooks/useWebId"
 import useThing from "~hooks/useThing"
 import { Flow, Module } from "~components/layout"
-import { AuthButton, Loader } from "~components/elements"
+import { Loader } from "~components/elements"
 import ProfileModule from "~modules/Profile"
 import { otherPath } from "~lib/urls"
 
@@ -54,9 +53,6 @@ export default () => {
       <ProfileModule />
       <Module>
         <Friends />
-      </Module>
-      <Module>
-        <AuthButton />
       </Module>
     </Flow>
   )

@@ -8,7 +8,8 @@ import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
 import { schema } from "rdf-namespaces"
 
-import { Space, Flow, Module, Page } from "~components/layout"
+import { Space, Flow, Module } from "~components/layout"
+import Page from "~components/Page"
 import { Button, Loader } from "~components/elements"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"

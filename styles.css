@@ -13,4 +13,12 @@
     @apply border-white border-opacity-25 border-solid;
 }
 
+.nav-button {
+    @apply h-8 py-1 px-2 text-pink-900;
+}
+
+.nav-button:hover {
+    @apply bg-white bg-opacity-25;
+}
+
 @tailwind utilities;

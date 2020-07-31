@@ -1,3 +1,4 @@
+import ReactTooltip from 'react-tooltip'
 import { Link } from '~components/elements'
 import { HomeIcon, CircleWithCrossIcon } from '~components/icons'
 import { AuthProvider, useAuthContext } from '~lib/auth'
@@ -10,14 +11,17 @@ export default function Page({ children }) {
     <AuthProvider>
       <div className="bg-gradient-tl-background w-screen min-h-screen">
         {webId && (
-          <nav className="mx-12 mb-2 py-2 bg-white bg-opacity-25 module-border border-8 rounded-lg relative -top-2 flex flex-row justify-between">
-            <Link href="/"><HomeIcon className="h-5 px-2 module-border border-r-2" /></Link>
+          <nav className="mx-12 mb-2 bg-white bg-opacity-25 module-border border-8 rounded-lg relative -top-2 flex flex-row justify-between">
+            <Link href="/"><HomeIcon className="nav-button module-border border-r-2" data-tip="home" /></Link>
 
-            <CircleWithCrossIcon className="h-5 px-2 text-pink-900 module-border border-l-2 cursor-pointer module-border" onClick={() => logOut()} />
+            <CircleWithCrossIcon className="nav-button module-border border-l-2 cursor-pointer module-border"
+              data-tip="log out"
+              onClick={() => logOut()} />
           </nav>
         )}
         {children}
       </div>
+      <ReactTooltip className="font-black" />
     </AuthProvider>
   )
 }

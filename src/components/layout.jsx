@@ -13,7 +13,3 @@ export function Module({ className = '', ...props }) {
 export const ModuleHeader = (props) => (
   <div className="absolute top-0 left-0 right-0 pb-2 bg-white bg-opacity-25 flex flex-row" {...props} />
 )
-
-import Page from './Page'
-
-export { Page }
