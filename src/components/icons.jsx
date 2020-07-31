@@ -1,5 +1,15 @@
-function Icon({ className = "", viewBox = "0 0 20 20", ...props }) {
-  return <svg className={`fill-current ${className}`} viewBox={viewBox} {...props} />
+function Icon({ tooltip, className = "", viewBox = "0 0 20 20", ...props }) {
+  return (
+    <div className="with-tooltip">
+      <svg className={`fill-current ${className}`} viewBox={viewBox} {...props} />
+      {tooltip && (
+        <div className="tooltip">
+          {tooltip}
+        </div>
+      )}
+    </div>
+  )
+
 }
 
 /**** from Entypo https://github.com/adamwathan/entypo-optimized/tree/master/dist/icons  ***/

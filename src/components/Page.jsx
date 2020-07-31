@@ -12,16 +12,15 @@ export default function Page({ children }) {
       <div className="bg-gradient-tl-background w-screen min-h-screen">
         {webId && (
           <nav className="mx-12 mb-2 bg-white bg-opacity-25 module-border border-8 rounded-lg relative -top-2 flex flex-row justify-between">
-            <Link href="/"><HomeIcon className="nav-button module-border border-r-2" data-tip="home" /></Link>
+            <Link href="/"><HomeIcon className="nav-button module-border border-r-2" tooltip="home" /></Link>
 
             <CircleWithCrossIcon className="nav-button module-border border-l-2 cursor-pointer module-border"
-              data-tip="log out"
+              tooltip="log out"
               onClick={() => logOut()} />
           </nav>
         )}
         {children}
       </div>
-      <ReactTooltip className="font-black" />
     </AuthProvider>
   )
 }

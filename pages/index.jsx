@@ -1,5 +1,3 @@
-import ReactTooltip from 'react-tooltip'
-
 import Page from "~components/Page"
 import HomeSpace from "~spaces/Home"
 import LoginSpace from "~spaces/Login"
