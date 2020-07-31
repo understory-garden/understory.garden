@@ -29,4 +29,35 @@
     @apply visible;
 }
 
+
+@keyframes slideModuleIn {
+    from {
+        @apply -ml-84;
+    }
+
+    to {
+        @apply ml-6;
+    }
+}
+
+@keyframes slideFlowIn {
+    from {
+        @apply -mt-84;
+    }
+
+    to {
+        @apply mt-6;
+    }
+}
+
+@keyframes slideNavIn {
+    from {
+        @apply -top-8;
+    }
+
+    to {
+        @apply -top-2;
+    }
+}
+
 @tailwind utilities;

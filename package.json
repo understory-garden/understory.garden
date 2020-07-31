@@ -51,7 +51,7 @@
     "eslint-plugin-react-hooks": "^4.0.8",
     "jest": "^26.0.1",
     "solid-auth-cli": "^1.0.14",
-    "tailwindcss": "^1.4.6",
+    "tailwindcss": "^1.6.0",
     "typescript": "^3.9.6"
   }
 }

@@ -55,7 +55,7 @@ function handleToWebId(handle) {
 
 function ImageModule({ resource }) {
   return (
-    <Module>
+    <Module className="motion-safe:animate-slide-module-in">
       <img src={asUrl(resource)} className="object-contain h-full" alt="no description" />
     </Module>
   )
@@ -67,7 +67,7 @@ function PostModule({ resource }) {
   const body = post && getStringNoLocaleOne(post, schema.articleBody)
 
   return (
-    <Module>
+    <Module className="motion-safe:animate-slide-module-in ">
       <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
         <h2>{title}</h2>
         <ReactMarkdown source={body} />
@@ -76,11 +76,11 @@ function PostModule({ resource }) {
   )
 }
 
-function ImagesFlow({ webId }) {
+function ImagesFlow({ webId, ...props }) {
   const imagesContainerUri = useImagesContainerUri(webId, "public")
   const { resources } = useContainer(imagesContainerUri)
   return (
-    <Flow>
+    <Flow {...props}>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
         <ImageModule key={asUrl(resource)} resource={resource} />
       ))}
@@ -88,11 +88,11 @@ function ImagesFlow({ webId }) {
   )
 }
 
-function PostsFlow({ webId }) {
+function PostsFlow({ webId, ...props }) {
   const postContainerUri = usePostsContainerUri(webId, "public")
   const { resources } = useContainer(postContainerUri)
   return (
-    <Flow>
+    <Flow {...props}>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
         <PostModule key={asUrl(resource)} resource={resource} />
       ))}
@@ -115,9 +115,6 @@ export default function UserProfile() {
           <Flow>
             <Module className="p-6 flex-grow">
               <div className="flex flex-row">
-                <div>
-
-                </div>
                 {profileImage && <img className="w-64 mr-6 " src={profileImage} alt={name} />}
                 <div>
                   <h2>{name}</h2>
@@ -126,8 +123,8 @@ export default function UserProfile() {
               </div>
             </Module>
           </Flow>
-          <ImagesFlow webId={webId} />
-          <PostsFlow webId={webId} />
+          <ImagesFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
+          <PostsFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
         </Space>
       </Page>
     )

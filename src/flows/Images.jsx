@@ -18,7 +18,7 @@ function ImageModule({ resource, deleteImage }) {
   }
   const modified = resource && getDatetimeOne(resource, dct.modified)
   return (
-    <Module>
+    <Module className="motion-safe:animate-slide-module-in">
       <img src={asUrl(resource)} className="object-contain h-full" alt="no description" />
       <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 prose flex flex-col">
         <h6>Modified: {modified && modified.toString()}</h6>
@@ -47,14 +47,14 @@ function ImageModules({ path = 'private' }) {
   )
 }
 
-export default function ImagesFlow() {
+export default function ImagesFlow(props) {
   const [creating, setCreating] = useState()
   const [showing, setShowing] = useState('private')
   const myWebId = useWebId()
   const imagesContainerUri = useImagesContainerUri(myWebId, creating)
   const { mutate: mutatePhotos } = useContainer(imagesContainerUri)
   return (
-    <Flow>
+    <Flow {...props}>
       <Module>
         <Button onClick={() => { setCreating('private') }}>Upload Private Images</Button>
         <Button onClick={() => { setCreating('public') }}>Upload Public Images</Button>

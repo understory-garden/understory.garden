@@ -7,8 +7,8 @@ export default function HomeSpace() {
   return (
     <Space>
       <MeFlow />
-      <WriteFlow />
-      <ImagesFlow />
+      <WriteFlow className="motion-safe:animate-slide-flow-in" />
+      <ImagesFlow className="motion-safe:animate-slide-flow-in" />
     </Space>
   )
 }

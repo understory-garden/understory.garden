@@ -13,6 +13,10 @@ module.exports = {
         '-16': '-4rem',
 
       },
+      margin: {
+        '-84': '-21rem',
+
+      },
       spacing: {
         '72': '18rem',
         '84': '21rem',
@@ -21,7 +25,12 @@ module.exports = {
       fontSize: {
         'micro': '0.50rem',
         'tiny': '0.625rem'
-      }
+      },
+      animation: {
+        "slide-module-in": 'slideModuleIn .25s ease-in-out',
+        "slide-flow-in": 'slideFlowIn .25s ease-in-out',
+        "slide-nav-in": 'slideNavIn .25s ease-in-out'
+      },
     },
     gradientColors: {
       background: ['#d57eeb', '#fccb90']
@@ -37,7 +46,8 @@ module.exports = {
     visibility: ['responsive', 'hover'],
     width: ['responsive', 'hover'],
     height: ['responsive', 'hover'],
-    inset: ['responsive', 'hover']
+    inset: ['responsive', 'hover'],
+    animation: ['responsive', 'motion-safe', 'motion-reduce']
   },
   plugins: [
     require('tailwindcss-gradients'),

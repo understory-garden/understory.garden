@@ -43,7 +43,7 @@ function PostModules({ path = "private" }) {
   return (
     <>
       {resources && resources.sort(byDctModified).reverse().map(resource => (
-        <Module key={asUrl(resource)} className="pt-10">
+        <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
           <ModuleHeader>
             <div className="flex-grow" />
             <CircleWithCrossIcon className="w-5 h-5 text-white cursor-pointer"
@@ -103,11 +103,11 @@ function CreatePostModule({ path = "private", onCreated }) {
   )
 }
 
-export default function WriteFlow() {
+export default function WriteFlow(props) {
   const [creating, setCreating] = useState()
   const [showing, setShowing] = useState('private')
   return (
-    <Flow>
+    <Flow {...props}>
       <Module>
         <Button onClick={() => { setCreating('private') }}>Create Private Post</Button>
         <Button onClick={() => { setCreating('public') }}>Create Public Post</Button>
