@@ -12,7 +12,7 @@
           "~spaces": "./src/spaces",
           "~flows": "./src/flows",
           "~hooks": "./src/hooks",
-          "@itme/solid-client": "@inrupt/solid-client"
+          "@itme/solid-client": "@itme/solid-client"
         }
       }
     ]
