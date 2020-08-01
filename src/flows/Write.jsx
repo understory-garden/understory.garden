@@ -32,6 +32,10 @@ function Post({ resource }) {
   )
 }
 
+function ttlFiles(resource) {
+  return asUrl(resource).endsWith(".ttl")
+}
+
 function PostModules({ path = "private" }) {
   const myWebId = useWebId()
   const postContainerUri = usePostsContainerUri(myWebId, path)
@@ -42,7 +46,7 @@ function PostModules({ path = "private" }) {
   }
   return (
     <>
-      {resources && resources.sort(byDctModified).reverse().map(resource => (
+      {resources && resources.filter(ttlFiles).sort(byDctModified).reverse().map(resource => (
         <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
           <ModuleHeader>
             <div className="flex-grow" />
