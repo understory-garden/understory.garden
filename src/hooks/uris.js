@@ -1,5 +1,5 @@
 import { space } from "rdf-namespaces"
-import { getUrlOne } from "@inrupt/solid-client";
+import { getUrlOne } from "@itme/solid-client";
 
 import { useProfile, useEnsured } from "./"
 

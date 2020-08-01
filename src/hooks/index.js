@@ -1,6 +1,6 @@
 import useEnsured from './useEnsured'
 import useStorageUri from './useStorageUri'
-import useThing, { useContainer } from './useThing'
+import useThing, { useContainer, useResource, useFile } from './useThing'
 import useWebId from './useWebId'
 
 export function useProfile(webId) {
@@ -13,4 +13,4 @@ export function useMyProfile() {
   return useProfile(myWebId)
 }
 
-export { useEnsured, useStorageUri, useThing, useContainer, useWebId }
+export { useEnsured, useStorageUri, useThing, useContainer, useResource, useFile, useWebId }
