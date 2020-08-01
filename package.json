@@ -13,7 +13,7 @@
     "lint:fix:dry": "npm run lint -- --fix-dry-run"
   },
   "dependencies": {
-    "@itme/solid-client": "0.0.1",
+    "@inrupt/solid-client": "0.0.2-chore1055-rename-lit-pod-184314533-568.0",
     "@tailwindcss/typography": "^0.2.0",
     "formik": "^2.1.5",
     "graphy": "^4.2.1",
