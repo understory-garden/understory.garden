@@ -27,6 +27,7 @@
     "react-loader-spinner": "^3.1.14",
     "react-markdown": "^4.3.1",
     "solid-auth-client": "^2.4.1",
+    "solid-file-client": "^1.0.5",
     "swr": "^0.2.3",
     "tailwindcss-gradients": "^3.0.0"
   },

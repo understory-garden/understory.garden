@@ -8,7 +8,7 @@ import useWebId from "~hooks/useWebId"
 import { AuthProvider, useAuthContext } from '~lib/auth'
 
 
-export const Loader = () => <ReactLoader type="Puff" color="white" />
+export const Loader = (props) => <ReactLoader type="Puff" color="white" {...props} />
 
 export function AuthButton() {
   const { logOut } = useAuthContext()
