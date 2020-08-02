@@ -14,7 +14,7 @@ import { Button, Loader } from "~components/elements"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
-import itme from "~lib/ontology"
+import itme from "~vocabs/itme"
 
 import { byDctModified } from "~lib/sort"
 

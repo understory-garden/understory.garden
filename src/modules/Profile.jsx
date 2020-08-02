@@ -14,7 +14,7 @@ import { Edit } from "~components/icons"
 import { EditableText } from "~components/editable"
 import ImageUploader from "~components/ImageUploader"
 import { otherPath } from "~lib/urls"
-import itme from "~/lib/ontology"
+import itme from "~vocabs/itme"
 
 function ProfileImageUploader({ onSaved, onClose }) {
   const { profile, save: saveProfile } = useMyProfile()
