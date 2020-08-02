@@ -16,7 +16,6 @@ import { newClient } from '~lib/files'
 
 
 function FileSharing({ file }) {
-  console.log(asUrl(file))
   const { file: fileWithAcl, ...rest } = useFile(asUrl(file), { acl: true })
   const publicAccess = fileWithAcl && unstable_getPublicAccess(fileWithAcl)
   return (
