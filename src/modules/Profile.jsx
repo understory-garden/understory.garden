@@ -49,8 +49,7 @@ export default function Profile() {
         {profile ? (
           <>
             <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100">
-              <Edit tooltip="edit profile image"
-                className="absolute right-0 top-0 w-6 h-6 text-gray-900 cursor-pointer"
+              <Edit className="absolute right-0 top-0 w-6 h-6 text-gray-900 cursor-pointer"
                 onClick={() => setEditingImage(true)}
               />
               <h3 className="text-2xl">

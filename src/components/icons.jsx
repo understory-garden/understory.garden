@@ -1,11 +1,11 @@
-function Icon({ tooltip, className = "", viewBox = "0 0 20 20", ...props }) {
+function Icon({ text, className = "", viewBox = "0 0 20 20", ...props }) {
   return (
-    <div className={`with-tooltip ${className}`}>
-      <svg className="fill-current" viewBox={viewBox} {...props} />
-      {tooltip && (
-        <div className="tooltip">
-          {tooltip}
-        </div>
+    <div className={`flex flex-col flex-no-wrap ${className}`}>
+      <svg className="fill-current flex-shrink-0 h-2/3" viewBox={viewBox} {...props} />
+      {text && (
+        <span className="self-center text-micro font-black whitespace-no-wrap h-1/3">
+          {text}
+        </span>
       )}
     </div>
   )
