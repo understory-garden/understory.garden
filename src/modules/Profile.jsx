@@ -14,6 +14,7 @@ import { Edit } from "~components/icons"
 import { EditableText } from "~components/editable"
 import ImageUploader from "~components/ImageUploader"
 import { otherPath } from "~lib/urls"
+import itme from "~/lib/ontology"
 
 function ProfileImageUploader({ onSaved, onClose }) {
   const { profile, save: saveProfile } = useMyProfile()
@@ -38,6 +39,10 @@ export default function Profile() {
   const saveName = async newName => {
     saveProfile(setStringNoLocale(profile, foaf.name, newName))
   }
+  const paymentPointer = profile && getStringNoLocaleOne(profile, itme.paymentPointer)
+  const savePaymentPointer = async newPaymentPointer => {
+    saveProfile(setStringNoLocale(profile, itme.paymentPointer, newPaymentPointer))
+  }
   return (
     <>
       <Module>
@@ -52,6 +57,7 @@ export default function Profile() {
                 hello, <EditableText save={saveName} value={name} placeholder="name">{name}</EditableText>
               </h3>
               <Link href="/u/[handle]" as={otherPath(webId)}><h4>Public Profile</h4></Link>
+              <h3>payment pointer: <EditableText save={savePaymentPointer} value={paymentPointer} placeholder="payment pointer">{paymentPointer}</EditableText></h3>
             </div>
             {profileImage && <img className="h-full m-auto" src={profileImage} alt={name} />}
           </>

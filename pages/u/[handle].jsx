@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { foaf, vcard } from 'rdf-namespaces'
+import { foaf, vcard, schema } from 'rdf-namespaces'
 import {
   getUrlAll, removeUrl, addUrl,
   getStringNoLocaleOne, getUrlOne, asUrl
 } from '@itme/solid-client'
 import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
-import { schema } from "rdf-namespaces"
+import Head from 'next/head'
 
 import { Space, Flow, Module } from "~components/layout"
 import Page from "~components/Page"
@@ -14,8 +14,10 @@ import { Button, Loader } from "~components/elements"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
+import itme from "~lib/ontology"
 
 import { byDctModified } from "~lib/sort"
+
 
 function AddKnows({ webId }) {
   const myWebId = useWebId()
@@ -108,25 +110,31 @@ export default function UserProfile() {
   const { thing: profile } = useThing(webId)
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
   const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
+  const paymentPointer = profile && getStringNoLocaleOne(profile, itme.paymentPointer)
   if (profile) {
     return (
-      <Page>
-        <Space>
-          <Flow>
-            <Module className="p-6 flex-grow">
-              <div className="flex flex-row">
-                {profileImage && <img className="w-64 mr-6 " src={profileImage} alt={name} />}
-                <div>
-                  <h2>{name}</h2>
-                  {(myWebId !== webId) && <AddKnows webId={webId} />}
+      <>
+        <Head>
+          {paymentPointer && (<meta name="monetization" content={paymentPointer} />)}
+        </Head>
+        <Page>
+          <Space>
+            <Flow>
+              <Module className="p-6 flex-grow">
+                <div className="flex flex-row">
+                  {profileImage && <img className="w-64 mr-6 " src={profileImage} alt={name} />}
+                  <div>
+                    <h2>{name}</h2>
+                    {(myWebId !== webId) && <AddKnows webId={webId} />}
+                  </div>
                 </div>
-              </div>
-            </Module>
-          </Flow>
-          <ImagesFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
-          <PostsFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
-        </Space>
-      </Page>
+              </Module>
+            </Flow>
+            <ImagesFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
+            <PostsFlow webId={webId} className="motion-safe:animate-slide-flow-in" />
+          </Space>
+        </Page>
+      </>
     )
   } else {
     return <div><Loader /></div>

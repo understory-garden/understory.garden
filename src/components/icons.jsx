@@ -1,7 +1,7 @@
 function Icon({ tooltip, className = "", viewBox = "0 0 20 20", ...props }) {
   return (
-    <div className="with-tooltip">
-      <svg className={`fill-current ${className}`} viewBox={viewBox} {...props} />
+    <div className={`with-tooltip ${className}`}>
+      <svg className="fill-current" viewBox={viewBox} {...props} />
       {tooltip && (
         <div className="tooltip">
           {tooltip}

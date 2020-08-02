@@ -23,9 +23,9 @@ export function EditableText({ save, placeholder, className, value, children, ..
           </Form>
         </Formik>
       ) : (
-          <span className="cursor-pointer relative" onClick={() => setEditing(true)}>
+          <span className="cursor-pointer inline-flex flex-row" onClick={() => setEditing(true)}>
             {children}
-            <Edit className="absolute -top-1 -right-1 w-2 h-2 text-gray-600" />
+            <Edit className="w-3 h-3 text-gray-900" />
           </span>
         )
       }

@@ -11,6 +11,7 @@ function App({ Component, pageProps }) {
         <title>itme.online</title>
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="https://use.typekit.net/fgi5twt.css" />
+        <meta name="monetization" content="$ilp.uphold.com/bzZRhBkXEbpk" />
       </Head>
       <Component {...pageProps} />
     </>

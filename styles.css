@@ -14,7 +14,7 @@
 }
 
 .nav-button {
-    @apply h-8 py-1 px-2 text-pink-900;
+    @apply h-8 w-8 p-1 text-pink-900;
 }
 
 .nav-button:hover {
