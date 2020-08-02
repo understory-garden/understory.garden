@@ -46,7 +46,6 @@ function Friends() {
 
 }
 
-
 export default () => {
   return (
     <Flow>
