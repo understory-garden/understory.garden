@@ -87,13 +87,13 @@ function CreatePostModule({ path = "private", onCreated }) {
         <Form>
           <div className="mb-4 text-align-center">
             <h3>create a post</h3>
-            <label className="block text-gray-700 text-sm font-bold mb-2" for="title">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
               title
             </label>
             <TextField className="w-full" name="title" autoFocus />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" for="body">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="body">
               body
             </label>
             <TextAreaField name="body" className="w-full" />
