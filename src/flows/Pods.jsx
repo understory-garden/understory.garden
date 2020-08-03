@@ -4,15 +4,14 @@ import { Formik, Form } from 'formik';
 import {
   createThing, setThing, addStringNoLocale, setStringNoLocale, addUrl, createLitDataset,
   saveLitDatasetInContainer, asUrl, getStringNoLocaleOne, getFetchedFrom,
-  getThingOne, removeAll
+  getThingOne, removeAll, getUrlAll
 } from "@itme/solid-client";
-import { schema, rdf, rdfs } from "rdf-namespaces"
+import { rdf, rdfs, vcard } from "rdf-namespaces"
 import { mutate } from "swr"
-import ReactMarkdown from "react-markdown"
 
 import { TextField } from "~components/form"
 import { Flow, Module, ModuleHeader } from "~components/layout"
-import { Button } from "~components/elements"
+import { Button, Avatar } from "~components/elements"
 import { CircleWithCrossIcon } from "~components/icons"
 import { useWebId } from "~hooks"
 import { usePodsContainerUri } from "~hooks/uris"
@@ -24,6 +23,7 @@ import podmap from '~vocabs/podmap'
 function Pod({ resource, deletePod }) {
   const { thing: pod } = useThing(resource && `${asUrl(resource)}#pod`)
   const name = pod && getStringNoLocaleOne(pod, rdfs.label)
+  const members = pod && getUrlAll(pod, vcard.hasMember)
   return (
     <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
       <ModuleHeader>
@@ -34,7 +34,9 @@ function Pod({ resource, deletePod }) {
           onClick={() => deletePod(resource)} />
       </ModuleHeader>
       <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
-
+        {members && members.map(memberWebId => (
+          <Avatar webId={memberWebId} key={memberWebId} />
+        ))}
       </div>
     </Module>
   )

@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { foaf, vcard, schema } from 'rdf-namespaces'
 import {
-  getUrlAll, removeUrl, addUrl,
-  getStringNoLocaleOne, getUrlOne, asUrl
+  getUrlAll, removeUrl, addUrl, fetchLitDataset, saveLitDatasetAt, setThing,
+  getStringNoLocaleOne, getUrlOne, asUrl, getThingOne
 } from '@itme/solid-client'
 import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import { Formik, Form } from 'formik';
+import { mutate } from 'swr'
 
 import { Space, Flow, Module } from "~components/layout"
 import Page from "~components/Page"
 import { Button, Loader } from "~components/elements"
+import { PodPicker } from "~components/form"
 import useWebId from "~hooks/useWebId"
 import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
@@ -30,6 +33,28 @@ function AddKnows({ webId }) {
   const name = profile && getStringNoLocaleOne(profile, foaf.name)
 
   return (myProfile == undefined) ? (<Loader />) : (
+    <Formik
+      initialValues={{ pod: undefined }}
+      onSubmit={async ({ pod: podUri }) => {
+        if (podUri) {
+          var podDataset = await fetchLitDataset(podUri)
+          const podThingUri = `${podUri}#pod`
+          var pod = getThingOne(podDataset, podThingUri)
+          pod = addUrl(pod, vcard.hasMember, webId)
+          podDataset = setThing(podDataset, pod)
+          await saveLitDatasetAt(podUri, podDataset)
+          mutate(podUri)
+          mutate(podThingUri)
+
+        }
+      }}
+    >
+      <Form>
+        <PodPicker name="pod" />
+        <Button type="submit">Add</Button>
+      </Form>
+    </Formik>
+    /*
     <Button onClick={
       async () => {
         setSaving(true)
@@ -39,7 +64,7 @@ function AddKnows({ webId }) {
       disabled={saving}
     >
       {alreadyKnows ? "I don't know" : "I know"} {name}
-    </Button>
+    </Button>*/
   )
 }
 
