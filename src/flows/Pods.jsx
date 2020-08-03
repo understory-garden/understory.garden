@@ -2,8 +2,9 @@ import { useState } from "react"
 
 import { Formik, Form } from 'formik';
 import {
-  createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, asUrl, getStringNoLocaleOne
+  createThing, setThing, addStringNoLocale, setStringNoLocale, addUrl, createLitDataset,
+  saveLitDatasetInContainer, asUrl, getStringNoLocaleOne, getFetchedFrom,
+  getThingOne, removeAll
 } from "@itme/solid-client";
 import { schema, rdf, rdfs } from "rdf-namespaces"
 import { mutate } from "swr"
@@ -15,21 +16,27 @@ import { Button } from "~components/elements"
 import { CircleWithCrossIcon } from "~components/icons"
 import { useWebId } from "~hooks"
 import { usePodsContainerUri } from "~hooks/uris"
-import useThing, { useContainer } from "~hooks/useThing"
+import useThing, { useContainer, useMeta } from "~hooks/useThing"
 import { deleteFile } from '~lib/http'
 import { byDctModified } from '~lib/sort'
 import podmap from '~vocabs/podmap'
 
-function Pods({ resource }) {
-  const { thing: pods } = useThing(resource && `${asUrl(resource)}#pods`)
-  const title = pods && getStringNoLocaleOne(pods, schema.headline)
-  const body = pods && getStringNoLocaleOne(pods, schema.articleBody)
-
+function Pod({ resource, deletePod }) {
+  const { thing: pod } = useThing(resource && `${asUrl(resource)}#pod`)
+  const name = pod && getStringNoLocaleOne(pod, rdfs.label)
   return (
-    <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
-      <h2>{title}</h2>
-      <ReactMarkdown source={body} />
-    </div>
+    <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
+      <ModuleHeader>
+        <div className="flex-grow" >
+          {name}
+        </div>
+        <CircleWithCrossIcon className="w-5 h-5 cursor-pointer"
+          onClick={() => deletePod(resource)} />
+      </ModuleHeader>
+      <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
+
+      </div>
+    </Module>
   )
 }
 
@@ -41,21 +48,23 @@ function PodsModules({ path = "private" }) {
   const myWebId = useWebId()
   const podsContainerUri = usePodsContainerUri(myWebId, path)
   const { resources, mutate: mutatePods } = useContainer(podsContainerUri)
-  const deletePods = async (podsResource) => {
-    await deleteFile(asUrl(podsResource))
+  const { meta: podsContainerMeta, save: saveMeta } = useMeta(podsContainerUri)
+
+  const deletePod = async (podResource) => {
+    await deleteFile(asUrl(podResource))
+    var meta = podsContainerMeta
+    console.log(asUrl(podResource))
+    var podMeta = getThingOne(meta, asUrl(podResource))
+    podMeta = removeAll(podMeta, rdfs.label)
+    meta = setThing(meta, podMeta)
+    await saveMeta(meta)
+
     mutatePods()
   }
   return (
     <>
       {resources && resources.filter(ttlFiles).sort(byDctModified).reverse().map(resource => (
-        <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
-          <ModuleHeader>
-            <div className="flex-grow" />
-            <CircleWithCrossIcon className="w-5 h-5 text-white cursor-pointer"
-              onClick={() => deletePods(resource)} />
-          </ModuleHeader>
-          <Pods resource={resource} />
-        </Module>
+        <Pod resource={resource} key={asUrl(resource)} deletePod={deletePod} />
       ))}
     </>
   )
@@ -64,14 +73,25 @@ function PodsModules({ path = "private" }) {
 function CreatePodsModule({ path = "private", onCreated }) {
   const myWebId = useWebId()
   const podsContainerUri = usePodsContainerUri(myWebId, path)
-
+  const { meta: podsContainerMeta, save: saveMeta } = useMeta(podsContainerUri)
   const createPods = async ({ name }) => {
-    var pods = createThing({ name: 'pods' });
+    // add new pod
+    var pods = createThing({ name: 'pod' });
     pods = addUrl(pods, rdf.type, podmap.Pod)
     pods = addStringNoLocale(pods, rdfs.label, name);
     var podsDataset = createLitDataset()
     podsDataset = setThing(podsDataset, pods)
-    await saveLitDatasetInContainer(podsContainerUri, podsDataset, { slugSuggestion: name })
+    const newPod = await saveLitDatasetInContainer(podsContainerUri, podsDataset, { slugSuggestion: name })
+
+    // add name to meta file
+    const newPodUri = getFetchedFrom(newPod)
+    var meta = podsContainerMeta || createLitDataset()
+    var podMeta = getThingOne(meta, newPodUri)
+    podMeta = setStringNoLocale(podMeta, rdfs.label, name)
+    meta = setThing(meta, podMeta)
+    await saveMeta(meta)
+
+
     mutate(podsContainerUri)
   }
 

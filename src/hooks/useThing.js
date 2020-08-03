@@ -30,11 +30,16 @@ export function useFile(uri, { compare, acl, ...options } = {}) {
   )
 }
 
+export function useMeta(uri, options = {}) {
+  const { resource: meta, ...rest } = useResource(uri && `${uri}.meta`, options)
+  return ({
+    meta, ...rest
+  })
+}
+
 export function useResource(uri, { compare, acl, ...options } = {}) {
   const fetch = acl ? unstable_fetchLitDatasetWithAcl : fetchLitDataset
-
   options.compare = compare || equal
-
   const { data: resource, mutate, ...rest } = useSWR(uri, fetch, options)
   const save = async (newDataset) => {
     mutate(newDataset, false)
