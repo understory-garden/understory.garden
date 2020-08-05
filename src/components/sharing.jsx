@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { Formik, Form } from 'formik';
 import {
-  asUrl, unstable_getPublicAccess, unstable_getAgentAccessAll,
-  unstable_hasResourceAcl,
-  unstable_hasFallbackAcl,
-  unstable_hasAccessibleAcl,
-  unstable_createAcl,
-  unstable_createAclFromFallbackAcl,
-  unstable_getResourceAcl,
-  unstable_setAgentResourceAccess,
-  unstable_saveAclFor,
+  asUrl, getPublicAccess, getAgentAccessAll,
+  hasResourceAcl,
+  hasFallbackAcl,
+  hasAccessibleAcl,
+  createAcl,
+  createAclFromFallbackAcl,
+  getResourceAcl,
+  setAgentResourceAccess,
+  saveAclFor,
 } from '@itme/solid-client'
 
 import { useFile } from "~hooks"
@@ -32,35 +32,38 @@ const permClasses = permissions => {
   return `${color} h-6 w-6`
 }
 
-function getResourceAcl(datasetWithAcl, { initFromFallback = true } = {}) {
-  if (!unstable_hasResourceAcl(datasetWithAcl)) {
-    if (!unstable_hasAccessibleAcl(datasetWithAcl)) {
+function getOrCreateResourceAcl(datasetWithAcl, { initFromFallback = true } = {}) {
+  if (!hasResourceAcl(datasetWithAcl)) {
+    if (!hasAccessibleAcl(datasetWithAcl)) {
       throw new Error(
         "The current user does not have permission to change access rights to this Resource."
       );
     }
     if (initFromFallback) {
-      if (!unstable_hasFallbackAcl(datasetWithAcl)) {
+      if (!hasFallbackAcl(datasetWithAcl)) {
         throw new Error(
           "The current user does not have permission to see who currently has access to this Resource."
         );
       }
-      console.log("initing from fallback")
-      return unstable_createAclFromFallbackAcl(datasetWithAcl);
+      console.log("initing from fallback", datasetWithAcl)
+      debugger
+      const r = createAclFromFallbackAcl(datasetWithAcl);
+      console.log("R", r)
+      return r
     } else {
       // Alternatively, initialise a new empty ACL as follows,
       // but be aware that if you do not give someone Control access,
       // **nobody will ever be able to change Access permissions in the future**:
-      return unstable_createAcl(datasetWithAcl);
+      return createAcl(datasetWithAcl);
     }
   } else {
-    return unstable_getResourceAcl(datasetWithAcl);
+    return getResourceAcl(datasetWithAcl);
   }
 }
 
 function PermIcons({ permissions: p }) {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row">/
       <ReadIcon className={permClasses(p.read)} />
       <WriteIcon className={permClasses(p.write)} />
       <AppendIcon className={permClasses(p.append)} />
@@ -86,18 +89,18 @@ const EditControl = makeEditPerm(ReadIcon, 'read')
 
 
 function EditPerms({ agentUri, resource, permissions }) {
-  console.log("EDIT PERMS", resource)
+  //  console.log("EDIT PERMS", resource)
   async function setPermission(key, value) {
-    console.log("SET PERMS", resource)
-    const resourceAcl = getResourceAcl(resource)
+    //    console.log("SET PERMS", resource)
+    const resourceAcl = getOrCreateResourceAcl(resource)
     console.log("RA", resourceAcl)
-    const updatedAcl = unstable_setAgentResourceAccess(
+    const updatedAcl = setAgentResourceAccess(
       resourceAcl,
       agentUri,
       { ...permissions, [key]: value }
     )
     console.log("RAU", updatedAcl)
-    //await unstable_saveAclFor(resource, updatedAcl);
+    //await saveAclFor(resource, updatedAcl);
 
   }
   return (
@@ -112,7 +115,7 @@ function EditPerms({ agentUri, resource, permissions }) {
 
 function EditablePerms({ agentUri, resource, permissions }) {
   const [editing, setEditing] = useState(false)
-  console.log("EDITABLE", resource)
+  //console.log("EDITABLE", resource)
   return editing ? (
     <>
       <EditPerms agentUri={agentUri} resource={resource} permissions={permissions} />
@@ -132,10 +135,10 @@ const defaultPerms = { read: false, write: false, append: false, control: false 
 export function FileSharing({ file }) {
   const [creatingAgent, setCreatingAgent] = useState()
   const { file: fileWithAcl } = useFile(asUrl(file), { acl: true })
-  const publicAccess = fileWithAcl && unstable_getPublicAccess(fileWithAcl)
-  const accessByAgent = fileWithAcl && unstable_getAgentAccessAll(fileWithAcl);
-  console.log("ACCESS", accessByAgent)
-  console.log("FILS SHARING", fileWithAcl)
+  const publicAccess = fileWithAcl && getPublicAccess(fileWithAcl)
+  const accessByAgent = fileWithAcl && getAgentAccessAll(fileWithAcl);
+  //console.log("ACCESS", accessByAgent)
+  //console.log("FILS SHARING", fileWithAcl)
   return (
     <div className="absolute inset-0 z-40 bg-white bg-opacity-75 flex flex-col">
       <div>

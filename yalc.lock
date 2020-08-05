@@ -5,6 +5,11 @@
       "signature": "33387a5e5acec596d23a67bab462fa97",
       "file": true,
       "replaced": "file:../lit-pod"
+    },
+    "@itme/solid-client": {
+      "signature": "377863b2cec1a255a26b9995f8a82163",
+      "file": true,
+      "replaced": "0.0.1-1"
     }
   }
 }
