@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { dct } from "rdf-namespaces"
 import { vcard } from 'rdf-namespaces'
-import { setUrl, getDatetimeOne, asUrl } from '@itme/solid-client'
+import { setUrl, getDatetime, asUrl } from '@itme/solid-client'
 
 import { Flow, Module } from "~components/layout"
 import { Button, Loader } from "~components/elements"
@@ -38,7 +38,7 @@ function ImageModule({ resource, deleteImage, path, showPublic, showPrivate }) {
     setSaving(false)
     showPrivate()
   }
-  const modified = resource && getDatetimeOne(resource, dct.modified)
+  const modified = resource && getDatetime(resource, dct.modified)
   return (
     <Module className={`${sharing ? 'w-64 h-64' : ''} motion-safe:animate-slide-module-in`}>
       {sharing && (<FileSharing file={resource} />)}

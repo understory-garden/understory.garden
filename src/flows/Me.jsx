@@ -1,5 +1,5 @@
 import {
-  getUrlAll, getUrlOne, getStringNoLocaleOne
+  getUrlAll, getUrl, getStringNoLocale
 } from '@itme/solid-client'
 import { foaf, vcard } from "rdf-namespaces"
 
@@ -12,8 +12,8 @@ import { otherPath } from "~lib/urls"
 
 function Friend({ webId, ...rest }) {
   const { thing: profile } = useThing(webId)
-  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
+  const profileImage = profile && getUrl(profile, vcard.hasPhoto)
+  const name = profile && getStringNoLocale(profile, foaf.name)
   return (
     <div className="relative col-span-3" {...rest}>
       <a href={otherPath(webId)} >

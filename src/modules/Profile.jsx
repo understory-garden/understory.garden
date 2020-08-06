@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { foaf, vcard } from 'rdf-namespaces'
 import {
-  setStringNoLocale, getStringNoLocaleOne, getUrlOne, setUrl
+  setStringNoLocale, getStringNoLocale, getUrl, setUrl
 } from '@itme/solid-client'
 
 import useWebId from "~hooks/useWebId"
@@ -34,12 +34,12 @@ export default function Profile() {
   const [editingImage, setEditingImage] = useState(false)
   const webId = useWebId()
   const { profile, save: saveProfile } = useMyProfile()
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
-  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
+  const name = profile && getStringNoLocale(profile, foaf.name)
+  const profileImage = profile && getUrl(profile, vcard.hasPhoto)
   const saveName = async newName => {
     saveProfile(setStringNoLocale(profile, foaf.name, newName))
   }
-  const paymentPointer = profile && getStringNoLocaleOne(profile, itme.paymentPointer)
+  const paymentPointer = profile && getStringNoLocale(profile, itme.paymentPointer)
   const savePaymentPointer = async newPaymentPointer => {
     saveProfile(setStringNoLocale(profile, itme.paymentPointer, newPaymentPointer))
   }

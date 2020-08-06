@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Formik, Form } from 'formik';
 import {
   createThing, setThing, addStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, asUrl, getStringNoLocaleOne
+  saveLitDatasetInContainer, asUrl, getStringNoLocale
 } from "@itme/solid-client";
 import { schema, rdf, dct } from "rdf-namespaces"
 import { mutate } from "swr"
@@ -21,8 +21,8 @@ import { byDctModified } from '~lib/sort'
 
 function Post({ resource }) {
   const { thing: post } = useThing(resource && `${asUrl(resource)}#post`)
-  const title = post && getStringNoLocaleOne(post, schema.headline)
-  const body = post && getStringNoLocaleOne(post, schema.articleBody)
+  const title = post && getStringNoLocale(post, schema.headline)
+  const body = post && getStringNoLocale(post, schema.articleBody)
 
   return (
     <div className="absolute inset-0 mt-6 p-3 prose overflow-y-scroll">
