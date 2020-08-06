@@ -14,7 +14,7 @@ import {
 
 import { useFile } from "~hooks"
 import { ReadIcon, WriteIcon, AppendIcon, ControlIcon } from '~components/icons'
-import { Button } from '~components/elements'
+import { Button, Avatar, Loader } from '~components/elements'
 import { TextField } from "~components/form"
 
 function permissionsToString(p) {
@@ -45,11 +45,7 @@ function getOrCreateResourceAcl(datasetWithAcl, { initFromFallback = true } = {}
           "The current user does not have permission to see who currently has access to this Resource."
         );
       }
-      console.log("initing from fallback", datasetWithAcl)
-      debugger
-      const r = createAclFromFallbackAcl(datasetWithAcl);
-      console.log("R", r)
-      return r
+      return createAclFromFallbackAcl(datasetWithAcl);
     } else {
       // Alternatively, initialise a new empty ACL as follows,
       // but be aware that if you do not give someone Control access,
@@ -63,7 +59,7 @@ function getOrCreateResourceAcl(datasetWithAcl, { initFromFallback = true } = {}
 
 function PermIcons({ permissions: p }) {
   return (
-    <div className="flex flex-row">/
+    <div className="flex flex-row">
       <ReadIcon className={permClasses(p.read)} />
       <WriteIcon className={permClasses(p.write)} />
       <AppendIcon className={permClasses(p.append)} />
@@ -73,9 +69,10 @@ function PermIcons({ permissions: p }) {
 }
 
 const makeEditPerm = (IconComponent, perm) => ({ permissions: p, setPermission }) => (
-  <div className="flex flex-row">
-    <IconComponent className={permClasses(p[perm])} />
-    <Button onClick={() => setPermission(perm, !p[perm])}>
+  <div className="grid grid-cols-6 mx-6">
+    <IconComponent className={`col-span-1 ${permClasses(p[perm])}`} />
+    <h4 className="col-span-3 flex-grow">{perm}</h4>
+    <Button className="col-span-2" onClick={() => setPermission(perm, !p[perm])}>
       {p[perm] ? "Revoke" : "Grant"}
     </Button>
   </div>
@@ -83,91 +80,101 @@ const makeEditPerm = (IconComponent, perm) => ({ permissions: p, setPermission }
 
 
 const EditRead = makeEditPerm(ReadIcon, 'read')
-const EditWrite = makeEditPerm(ReadIcon, 'read')
-const EditAppend = makeEditPerm(ReadIcon, 'read')
-const EditControl = makeEditPerm(ReadIcon, 'read')
+const EditWrite = makeEditPerm(WriteIcon, 'write')
+const EditAppend = makeEditPerm(AppendIcon, 'append')
+const EditControl = makeEditPerm(ControlIcon, 'control')
 
 
-function EditPerms({ agentUri, resource, permissions }) {
-  //  console.log("EDIT PERMS", resource)
+function PermissionEditor({ agentUri, permissions, resource, mutate, onDone }) {
   async function setPermission(key, value) {
-    //    console.log("SET PERMS", resource)
+    console.log("setting permissions on resource: ", agentUri)
     const resourceAcl = getOrCreateResourceAcl(resource)
-    console.log("RA", resourceAcl)
     const updatedAcl = setAgentResourceAccess(
       resourceAcl,
       agentUri,
       { ...permissions, [key]: value }
     )
-    console.log("RAU", updatedAcl)
-    //await saveAclFor(resource, updatedAcl);
-
+    const savedAclDataset = await saveAclFor(resource, updatedAcl)
+    console.log(savedAclDataset)
+    // TODO figure out why this doesn't like to be passed savedAclDataset
+    mutate(/*savedAclDataset*/);
   }
   return (
-    <div className="flex flex-col">
-      <EditRead setPermission={setPermission} permissions={permissions} />
-      <EditWrite setPermission={setPermission} permissions={permissions} />
-      <EditAppend setPermission={setPermission} permissions={permissions} />
-      <EditControl setPermission={setPermission} permissions={permissions} />
+    <div>
+      <div className="flex flex-col">
+        <EditRead setPermission={setPermission} permissions={permissions} />
+        <EditWrite setPermission={setPermission} permissions={permissions} />
+        <EditAppend setPermission={setPermission} permissions={permissions} />
+        <EditControl setPermission={setPermission} permissions={permissions} />
+      </div>
+      <Button onClick={onDone}>Ok</Button>
     </div>
   )
 }
 
-function EditablePerms({ agentUri, resource, permissions }) {
-  const [editing, setEditing] = useState(false)
-  //console.log("EDITABLE", resource)
-  return editing ? (
-    <>
-      <EditPerms agentUri={agentUri} resource={resource} permissions={permissions} />
-      <Button onClick={() => setEditing(false)}>Ok</Button>
-    </>
-  ) : (
-      <div>
-        <h1>{agentUri}</h1 >
-        <PermIcons permissions={permissions} />
-        <Button onClick={() => setEditing(true)}>Edit</Button>
-      </div >
-    )
-}
+
 
 const defaultPerms = { read: false, write: false, append: false, control: false }
 
 export function FileSharing({ file }) {
   const [creatingAgent, setCreatingAgent] = useState()
-  const { file: fileWithAcl } = useFile(asUrl(file), { acl: true })
+  const [editing, setEditing] = useState()
+  const { file: fileWithAcl, mutate } = useFile(asUrl(file), { acl: true })
   const publicAccess = fileWithAcl && getPublicAccess(fileWithAcl)
   const accessByAgent = fileWithAcl && getAgentAccessAll(fileWithAcl);
-  //console.log("ACCESS", accessByAgent)
-  //console.log("FILS SHARING", fileWithAcl)
+  const editingPermissions = editing && ((editing === "public") ? publicAccess : accessByAgent[editing])
   return (
-    <div className="absolute inset-0 z-40 bg-white bg-opacity-75 flex flex-col">
-      <div>
-        <h1>everybody</h1>
-        {publicAccess && <PermIcons permissions={publicAccess} />}
-      </div>
-      {creatingAgent && (
-        <div>
-          <h1>{creatingAgent}</h1>
-          <EditablePerms agentUri={creatingAgent} resource={fileWithAcl} permissions={defaultPerms} />
-        </div>
-      )}
-      <Formik
-        initialValues={{ agentUri: "" }}
-        onSubmit={async ({ agentUri }) => {
-          setCreatingAgent(agentUri)
-        }}
-      >
-        <Form>
-          <div className="mb-4 text-align-center">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
-              agent uri
-            </label>
-            <TextField className="w-full" name="agentUri" />
-          </div>
-          <Button type="submit">Add</Button>
-        </Form>
-      </Formik>
-
-    </div>
+    <div className="absolute inset-0 z-40 bg-white bg-opacity-75 flex flex-col overflow-y-scroll">
+      {fileWithAcl ? (
+        editing ? (
+          <PermissionEditor agentUri={editing} permissions={editingPermissions} resource={fileWithAcl} mutate={mutate} onDone={() => setEditing(null)} />
+        ) : (
+            <>
+              {publicAccess && (
+                <div className="my-3 flex flex-row justify-evenly itens-center">
+                  <h1>everybody</h1>
+                  {publicAccess && <PermIcons permissions={publicAccess} />}
+                  <Button onClick={() => setEditing("public")}>Edit</Button>
+                </div >
+              )}
+              {accessByAgent && (Object.entries(accessByAgent).map(([agentUri, permissions]) => (
+                <div key={agentUri} className="my-3 flex flex-row justify-evenly items-center">
+                  <Avatar webId={agentUri} />
+                  <PermIcons permissions={permissions} />
+                  <Button onClick={() => setEditing(agentUri)}>Edit</Button>
+                </div >
+              )))
+              }
+              {
+                creatingAgent && (
+                  <div className="my-3 flex flex-row justify-evenly items-center">
+                    <h1>{creatingAgent}</h1>
+                    <PermissionEditor agentUri={creatingAgent} permissions={defaultPerms} resource={fileWithAcl} />
+                  </div>
+                )
+              }
+              <Formik
+                initialValues={{ agentUri: "" }}
+                onSubmit={async ({ agentUri }) => {
+                  setCreatingAgent(agentUri)
+                }}
+              >
+                <Form>
+                  <div className="mb-4 text-align-center">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
+                      agent uri
+                  </label>
+                    <TextField className="w-full" name="agentUri" />
+                  </div>
+                  <Button type="submit">Add</Button>
+                </Form>
+              </Formik>
+            </>
+          )
+      ) : (
+          <Loader />
+        )
+      }
+    </div >
   )
 }
