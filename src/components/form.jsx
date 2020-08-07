@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import {
-  setStringNoLocale, asUrl, getStringNoLocaleOne, getThingOne
+  setStringNoLocale, asUrl, getStringNoLocale, getThing
 } from "@itme/solid-client";
 import { rdfs } from "rdf-namespaces"
 
@@ -29,7 +29,7 @@ function useMyPods(path) {
     pods: resources && resources.map(resource => {
       if (meta) {
         const url = asUrl(resource)
-        const name = getStringNoLocaleOne(getThingOne(meta, url), rdfs.label)
+        const name = getStringNoLocale(getThing(meta, url), rdfs.label)
         return setStringNoLocale(resource, rdfs.label, name)
       } else {
         return resource
@@ -46,7 +46,7 @@ export function PodPicker({ className = '', ...rest }) {
     <Field component="select" className={`${className}`} {...rest}>
       <option>pick a pod</option>
       {pods.map(pod => (
-        <option key={asUrl(pod)} value={asUrl(pod)}>{getStringNoLocaleOne(pod, rdfs.label)}</option>
+        <option key={asUrl(pod)} value={asUrl(pod)}>{getStringNoLocale(pod, rdfs.label)}</option>
       ))}
     </Field>
   )

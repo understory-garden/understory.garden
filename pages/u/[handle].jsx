@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { foaf, vcard, schema } from 'rdf-namespaces'
 import {
   getUrlAll, removeUrl, addUrl, fetchLitDataset, saveLitDatasetAt, setThing,
-  getStringNoLocaleOne, getUrlOne, asUrl, getThingOne
+  getStringNoLocale, getUrl, asUrl, getThing
 } from '@itme/solid-client'
 import ReactMarkdown from "react-markdown"
 import { useRouter } from 'next/router'
@@ -30,7 +30,7 @@ function AddKnows({ webId }) {
   const toggleKnows = alreadyKnows ? removeUrl : addUrl
 
   const { thing: profile } = useThing(webId)
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
+  const name = profile && getStringNoLocale(profile, foaf.name)
 
   return (myProfile == undefined) ? (<Loader />) : (
     <Formik
@@ -39,7 +39,7 @@ function AddKnows({ webId }) {
         if (podUri) {
           var podDataset = await fetchLitDataset(podUri)
           const podThingUri = `${podUri}#pod`
-          var pod = getThingOne(podDataset, podThingUri)
+          var pod = getThing(podDataset, podThingUri)
           pod = addUrl(pod, vcard.hasMember, webId)
           podDataset = setThing(podDataset, pod)
           await saveLitDatasetAt(podUri, podDataset)
@@ -90,8 +90,8 @@ function ImageModule({ resource }) {
 
 function PostModule({ resource }) {
   const { thing: post } = useThing(resource && `${asUrl(resource)}#post`)
-  const title = post && getStringNoLocaleOne(post, schema.headline)
-  const body = post && getStringNoLocaleOne(post, schema.articleBody)
+  const title = post && getStringNoLocale(post, schema.headline)
+  const body = post && getStringNoLocale(post, schema.articleBody)
 
   return (
     <Module className="motion-safe:animate-slide-module-in ">
@@ -133,9 +133,9 @@ export default function UserProfile() {
   const { handle } = router.query
   const webId = handle && handleToWebId(handle)
   const { thing: profile } = useThing(webId)
-  const name = profile && getStringNoLocaleOne(profile, foaf.name)
-  const profileImage = profile && getUrlOne(profile, vcard.hasPhoto)
-  const paymentPointer = profile && getStringNoLocaleOne(profile, itme.paymentPointer)
+  const name = profile && getStringNoLocale(profile, foaf.name)
+  const profileImage = profile && getUrl(profile, vcard.hasPhoto)
+  const paymentPointer = profile && getStringNoLocale(profile, itme.paymentPointer)
   if (profile) {
     return (
       <>

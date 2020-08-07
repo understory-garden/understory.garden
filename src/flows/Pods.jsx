@@ -3,8 +3,8 @@ import { useState } from "react"
 import { Formik, Form } from 'formik';
 import {
   createThing, setThing, addStringNoLocale, setStringNoLocale, addUrl, createLitDataset,
-  saveLitDatasetInContainer, asUrl, getStringNoLocaleOne, getFetchedFrom,
-  getThingOne, removeAll, getUrlAll
+  saveLitDatasetInContainer, asUrl, getStringNoLocale, getFetchedFrom,
+  getThing, removeAll, getUrlAll
 } from "@itme/solid-client";
 import { rdf, rdfs, vcard } from "rdf-namespaces"
 import { mutate } from "swr"
@@ -22,7 +22,7 @@ import podmap from '~vocabs/podmap'
 
 function Pod({ resource, deletePod }) {
   const { thing: pod } = useThing(resource && `${asUrl(resource)}#pod`)
-  const name = pod && getStringNoLocaleOne(pod, rdfs.label)
+  const name = pod && getStringNoLocale(pod, rdfs.label)
   const members = pod && getUrlAll(pod, vcard.hasMember)
   return (
     <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
@@ -56,7 +56,7 @@ function PodsModules({ path = "private" }) {
     await deleteFile(asUrl(podResource))
     var meta = podsContainerMeta
     console.log(asUrl(podResource))
-    var podMeta = getThingOne(meta, asUrl(podResource))
+    var podMeta = getThing(meta, asUrl(podResource))
     podMeta = removeAll(podMeta, rdfs.label)
     meta = setThing(meta, podMeta)
     await saveMeta(meta)
@@ -88,7 +88,7 @@ function CreatePodsModule({ path = "private", onCreated }) {
     // add name to meta file
     const newPodUri = getFetchedFrom(newPod)
     var meta = podsContainerMeta || createLitDataset()
-    var podMeta = getThingOne(meta, newPodUri)
+    var podMeta = getThing(meta, newPodUri)
     podMeta = setStringNoLocale(podMeta, rdfs.label, name)
     meta = setThing(meta, podMeta)
     await saveMeta(meta)

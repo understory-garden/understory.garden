@@ -1,22 +1,22 @@
 import useSWR from 'swr'
 import {
-  fetchLitDataset, getThingOne, saveLitDatasetAt, setThing, getUrlAll,
-  unstable_fetchLitDatasetWithAcl,
-  unstable_fetchFile, unstable_overwriteFile, unstable_fetchFileWithAcl
+  getSolidDataset, getThing, saveLitDatasetAt, setThing, getUrlAll,
+  getSolidDatasetWithAcl,
+  getFile, overwriteFile, getFileWithAcl
 } from '@itme/solid-client'
 import { ldp } from "rdf-namespaces"
 
 import equal from 'fast-deep-equal/es6'
 
 export function useFile(uri, { compare, acl, ...options } = {}) {
-  const fetch = acl ? unstable_fetchFileWithAcl : unstable_fetchFile
+  const fetch = acl ? getFileWithAcl : getFile
 
   options.compare = compare || equal
 
   const { data: file, mutate, ...rest } = useSWR(uri, fetch, options)
   const save = async (blob) => {
     mutate(blob, false)
-    const savedDataset = await unstable_overwriteFile(uri, blob)
+    const savedDataset = await overwriteFile(uri, blob)
     mutate(blob)
     return savedDataset
   }
@@ -38,7 +38,7 @@ export function useMeta(uri, options = {}) {
 }
 
 export function useResource(uri, { compare, acl, ...options } = {}) {
-  const fetch = acl ? unstable_fetchLitDatasetWithAcl : fetchLitDataset
+  const fetch = acl ? getSolidDatasetWithAcl : getSolidDataset
   options.compare = compare || equal
   const { data: resource, mutate, ...rest } = useSWR(uri, fetch, options)
   const save = async (newDataset) => {
@@ -64,7 +64,7 @@ function useThing(uri, options = {}) {
   }
   const documentUri = documentURL && documentURL.toString()
   const { resource, mutate, save: saveResource, ...rest } = useResource(uri, options)
-  const thing = resource && getThingOne(resource, uri)
+  const thing = resource && getThing(resource, uri)
   const save = async (newThing) => {
     const newDataset = setThing(resource, newThing)
     return saveResource(documentUri, newDataset)
@@ -82,10 +82,10 @@ function useThing(uri, options = {}) {
 
 export function useContainer(uri, { compare, ...options } = {}) {
   options.compare = compare || equal
-  const { data, ...rest } = useSWR(uri, fetchLitDataset, options)
+  const { data, ...rest } = useSWR(uri, getSolidDataset, options)
   const resourceUrls = data && getUrlAll(data, ldp.contains)
   const resources = resourceUrls && resourceUrls.map(url => {
-    return getThingOne(data, url)
+    return getThing(data, url)
   })
   return { resources, ...rest }
 
