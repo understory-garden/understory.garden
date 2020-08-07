@@ -41,11 +41,10 @@ function ImageModule({ resource, deleteImage, path, showPublic, showPrivate }) {
   const modified = resource && getDatetime(resource, dct.modified)
   return (
     <Module className={`${sharing ? 'w-64 h-64' : ''} motion-safe:animate-slide-module-in`}>
-      {sharing && (<FileSharing file={resource} />)}
+      {sharing && (<FileSharing file={resource} close={() => setSharing(false)} />)}
       <Loader height="100%" width="100%" className={`${saving ? 'block' : 'hidden'} bg-black bg-opacity-25 absolute inset-0 z-40`} />
       <img src={asUrl(resource)} className="object-contain h-full" alt="no description" />
-      <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 prose flex flex-col">
-        <h6>Modified: {modified && modified.toString()}</h6>
+      <div className="inset-0 p-6 absolute bg-opacity-75 bg-white opacity-0 hover:opacity-100 flex flex-col">
         <Button onClick={deleteImage}>Delete</Button>
         <Button onClick={setProfilePicture}>Make Profile Photo</Button>
         {path === 'private' && (
@@ -54,7 +53,7 @@ function ImageModule({ resource, deleteImage, path, showPublic, showPrivate }) {
         {path === 'public' && (
           <Button onClick={makePrivate}>Make Private</Button>
         )}
-        <Button onClick={() => { setSharing(true) }}>Share</Button>
+        <Button onClick={() => { setSharing(true) }}>Permissions</Button>
         <a href={asUrl(resource)}>Link</a>
       </div>
     </Module>
