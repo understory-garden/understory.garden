@@ -101,75 +101,82 @@ function PermissionEditor({ agentUri, permissions, resource, mutate, onDone }) {
   }
   return (
     <div>
+      <Avatar webId={agentUri} />
       <div className="flex flex-col">
         <EditRead setPermission={setPermission} permissions={permissions} />
         <EditWrite setPermission={setPermission} permissions={permissions} />
         <EditAppend setPermission={setPermission} permissions={permissions} />
         <EditControl setPermission={setPermission} permissions={permissions} />
       </div>
-      <Button onClick={onDone}>Ok</Button>
+      <Button onClick={onDone}>OK</Button>
     </div>
   )
 }
 
-
+function AddNewAgent({ selectAgent, onDone }) {
+  function close() {
+    onDone && onDone()
+  }
+  return (
+    <Formik
+      initialValues={{ agentUri: "" }}
+      onSubmit={async ({ agentUri }) => {
+        selectAgent(agentUri)
+        close()
+      }}
+    >
+      <Form>
+        <div className="mb-4 text-align-center">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
+            agent uri
+          </label>
+          <TextField className="w-full" name="agentUri" />
+        </div>
+        <Button type="submit">Add</Button>
+        <Button onClick={close}>Cancel</Button>
+      </Form>
+    </Formik>
+  )
+}
 
 const defaultPerms = { read: false, write: false, append: false, control: false }
 
-export function FileSharing({ file }) {
-  const [creatingAgent, setCreatingAgent] = useState()
-  const [editing, setEditing] = useState()
-  const { file: fileWithAcl, mutate } = useFile(asUrl(file), { acl: true })
+export function FileSharing({ file, close }) {
+  const [creating, setCreating] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const { file: fileWithAcl, mutate: mutateFile } = useFile(asUrl(file), { acl: true })
   const publicAccess = fileWithAcl && getPublicAccess(fileWithAcl)
   const accessByAgent = fileWithAcl && getAgentAccessAll(fileWithAcl);
-  const editingPermissions = editing && ((editing === "public") ? publicAccess : accessByAgent[editing])
+  const editingPermissions = editing && ((editing === "public") ? publicAccess : (accessByAgent[editing] || defaultPerms))
   return (
     <div className="absolute inset-0 z-40 bg-white bg-opacity-75 flex flex-col overflow-y-scroll">
       {fileWithAcl ? (
-        editing ? (
-          <PermissionEditor agentUri={editing} permissions={editingPermissions} resource={fileWithAcl} mutate={mutate} onDone={() => setEditing(null)} />
+        creating ? (
+          <AddNewAgent selectAgent={(agentUri) => { setEditing(agentUri) }} onDone={() => setCreating(false)} />
         ) : (
-            <>
-              {publicAccess && (
-                <div className="my-3 flex flex-row justify-evenly itens-center">
-                  <h1>everybody</h1>
-                  {publicAccess && <PermIcons permissions={publicAccess} />}
-                  <Button onClick={() => setEditing("public")}>Edit</Button>
-                </div >
-              )}
-              {accessByAgent && (Object.entries(accessByAgent).map(([agentUri, permissions]) => (
-                <div key={agentUri} className="my-3 flex flex-row justify-evenly items-center">
-                  <Avatar webId={agentUri} />
-                  <PermIcons permissions={permissions} />
-                  <Button onClick={() => setEditing(agentUri)}>Edit</Button>
-                </div >
-              )))
-              }
-              {
-                creatingAgent && (
-                  <div className="my-3 flex flex-row justify-evenly items-center">
-                    <h1>{creatingAgent}</h1>
-                    <PermissionEditor agentUri={creatingAgent} permissions={defaultPerms} resource={fileWithAcl} />
-                  </div>
-                )
-              }
-              <Formik
-                initialValues={{ agentUri: "" }}
-                onSubmit={async ({ agentUri }) => {
-                  setCreatingAgent(agentUri)
-                }}
-              >
-                <Form>
-                  <div className="mb-4 text-align-center">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
-                      agent uri
-                  </label>
-                    <TextField className="w-full" name="agentUri" />
-                  </div>
-                  <Button type="submit">Add</Button>
-                </Form>
-              </Formik>
-            </>
+            editing ? (
+              <PermissionEditor agentUri={editing} permissions={editingPermissions} resource={fileWithAcl} mutate={mutateFile} onDone={() => setEditing(null)} />
+            ) : (
+                <>
+                  {publicAccess && (
+                    <div className="my-3 flex flex-row justify-evenly itens-center">
+                      <h1>everybody</h1>
+                      {publicAccess && <PermIcons permissions={publicAccess} />}
+                      <Button onClick={() => setEditing("public")}>Edit</Button>
+                    </div >
+                  )}
+                  {accessByAgent && (Object.entries(accessByAgent).map(([agentUri, permissions]) => (
+                    <div key={agentUri} className="my-3 flex flex-row justify-evenly items-center">
+                      <Avatar webId={agentUri} />
+                      <PermIcons permissions={permissions} />
+                      <Button onClick={() => setEditing(agentUri)}>Edit</Button>
+                    </div >
+                  )))
+                  }
+                  <Button onClick={() => setCreating(true)}>Add</Button>
+                  <Button onClick={() => close()}>Done</Button>
+                </>
+              )
           )
       ) : (
           <Loader />
