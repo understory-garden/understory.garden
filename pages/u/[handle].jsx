@@ -15,7 +15,7 @@ import Page from "~components/Page"
 import { Button, Loader } from "~components/elements"
 import { PodPicker } from "~components/form"
 import useWebId from "~hooks/useWebId"
-import { useImagesContainerUri, usePostsContainerUri } from "~hooks/uris"
+import { useImagesContainerUri, usePostsContainerUri, useItmeStylesheetUri } from "~hooks/uris"
 import useThing, { useContainer } from "~hooks/useThing"
 import itme from "~vocabs/itme"
 
@@ -136,6 +136,7 @@ export default function UserProfile() {
   const name = profile && getStringNoLocale(profile, foaf.name)
   const profileImage = profile && getUrl(profile, vcard.hasPhoto)
   const paymentPointer = profile && getStringNoLocale(profile, itme.paymentPointer)
+  const stylesheetUri = useItmeStylesheetUri(webId)
   if (profile) {
     return (
       <>
@@ -143,6 +144,7 @@ export default function UserProfile() {
           {paymentPointer && (<meta name="monetization" content={paymentPointer} />)}
         </Head>
         <Page>
+          {stylesheetUri && (<link rel="stylesheet" type="text/css" href={stylesheetUri} />)}
           <Space>
             <Flow>
               <Module className="p-6 flex-grow">

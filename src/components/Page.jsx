@@ -8,7 +8,7 @@ export default function Page({ children }) {
   const { logOut } = useAuthContext()
   return (
     <AuthProvider>
-      <div className="bg-gradient-tl-background w-screen min-h-screen">
+      <div className="page w-screen min-h-screen">
         {webId && (
           <nav className="mx-12 mb-2 bg-white bg-opacity-25 module-border border-8 rounded-lg relative -top-2 flex flex-row justify-between motion-safe:animate-slide-nav-in">
             <Link href="/"><HomeIcon className="nav-button module-border border-r-2" text="home" /></Link>
