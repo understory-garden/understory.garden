@@ -21,14 +21,15 @@ import { byDctModified } from '~lib/sort'
 import podmap from '~vocabs/podmap'
 
 function Pod({ resource, deletePod }) {
-  const { thing: pod } = useThing(resource && `${asUrl(resource)}#pod`)
+  const podUri = resource && `${asUrl(resource)}#pod`
+  const { thing: pod } = useThing(podUri)
   const name = pod && getStringNoLocale(pod, rdfs.label)
   const members = pod && getUrlAll(pod, vcard.hasMember)
   return (
-    <Module key={asUrl(resource)} className="pt-10 motion-safe:animate-slide-module-in">
+    <Module key={podUri} className="pt-10 motion-safe:animate-slide-module-in">
       <ModuleHeader>
         <div className="flex-grow" >
-          {name}
+          <a href={podUri}>{name}</a>
         </div>
         <CircleWithCrossIcon className="w-5 h-5 cursor-pointer"
           onClick={() => deletePod(resource)} />

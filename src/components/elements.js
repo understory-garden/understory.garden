@@ -5,7 +5,7 @@ import NextLink from 'next/link'
 import {
   getUrlAll, getUrl, getStringNoLocale
 } from '@itme/solid-client'
-import { foaf, vcard } from "rdf-namespaces"
+import { foaf, vcard, rdfs } from "rdf-namespaces"
 
 import Button from "./Button"
 import useWebId from "~hooks/useWebId"
@@ -49,6 +49,20 @@ export function Avatar({ webId, ...rest }) {
         <img className="h-16 w-16 color-white overflow-hidden rounded-full"
           alt="profile"
           src={profileImage || '/user.svg'} />
+        <div className="p-6 h-16 w-16 top-0 left-0 hover:w-32 hover:h-32 absolute hover:-top-8 hover:-left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition-transform duration-100 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
+          <h4>{name}</h4>
+        </div>
+      </a>
+    </div>
+  )
+}
+
+export function GroupIcon({ uri, ...rest }) {
+  const { thing: group } = useThing(uri)
+  const name = group && getStringNoLocale(group, rdfs.label)
+  return (
+    <div className="relative col-span-3" {...rest}>
+      <a href={otherPath(uri)} >
         <div className="p-6 h-16 w-16 top-0 left-0 hover:w-32 hover:h-32 absolute hover:-top-8 hover:-left-8 rounded-full text-center bg-opacity-75 bg-white opacity-0 hover:opacity-100 align-baseline flex flex-column items-center transition-transform duration-100 ease-in-out transform hover:-translate-y-1 hover:scale-110 ">
           <h4>{name}</h4>
         </div>

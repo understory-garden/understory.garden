@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Formik, Form } from 'formik';
 import {
-  asUrl, getPublicAccess, getAgentAccessAll,
+  asUrl, getPublicAccess, getAgentAccessAll, getGroupAccessAll,
   hasResourceAcl,
   hasFallbackAcl,
   hasAccessibleAcl,
@@ -9,12 +9,13 @@ import {
   createAclFromFallbackAcl,
   getResourceAcl,
   setAgentResourceAccess,
+  setGroupResourceAccess,
   saveAclFor,
 } from '@itme/solid-client'
 
 import { useFile } from "~hooks"
 import { ReadIcon, WriteIcon, AppendIcon, ControlIcon } from '~components/icons'
-import { Button, Avatar, Loader } from '~components/elements'
+import { Button, Avatar, GroupIcon, Loader } from '~components/elements'
 import { TextField } from "~components/form"
 
 function permissionsToString(p) {
@@ -85,23 +86,30 @@ const EditAppend = makeEditPerm(AppendIcon, 'append')
 const EditControl = makeEditPerm(ControlIcon, 'control')
 
 
-function PermissionEditor({ agentUri, permissions, resource, mutate, onDone }) {
+function PermissionEditor({ agentType, uri, permissions, resource, mutate, onDone }) {
+  const agent = agentType === "agent"
+  const group = agentType === "group"
   async function setPermission(key, value) {
-    console.log("setting permissions on resource: ", agentUri)
     const resourceAcl = getOrCreateResourceAcl(resource)
-    const updatedAcl = setAgentResourceAccess(
-      resourceAcl,
-      agentUri,
-      { ...permissions, [key]: value }
-    )
+    const newPermissions = { ...permissions, [key]: value }
+    let updatedAcl;
+    if (agent) {
+      updatedAcl = setAgentResourceAccess(resourceAcl, uri, newPermissions)
+    } else if (group) {
+      updatedAcl = setGroupResourceAccess(resourceAcl, uri, newPermissions)
+    }
     const savedAclDataset = await saveAclFor(resource, updatedAcl)
-    console.log(savedAclDataset)
     // TODO figure out why this doesn't like to be passed savedAclDataset
     mutate(/*savedAclDataset*/);
   }
   return (
     <div>
-      <Avatar webId={agentUri} />
+      {agent && (<Avatar webId={uri} />)}
+      {group && (
+        <div>
+          group: {uri}
+        </div>)
+      }
       <div className="flex flex-col">
         <EditRead setPermission={setPermission} permissions={permissions} />
         <EditWrite setPermission={setPermission} permissions={permissions} />
@@ -118,24 +126,44 @@ function AddNewAgent({ selectAgent, onDone }) {
     onDone && onDone()
   }
   return (
-    <Formik
-      initialValues={{ agentUri: "" }}
-      onSubmit={async ({ agentUri }) => {
-        selectAgent(agentUri)
-        close()
-      }}
-    >
-      <Form>
-        <div className="mb-4 text-align-center">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
-            agent uri
-          </label>
-          <TextField className="w-full" name="agentUri" />
-        </div>
-        <Button type="submit">Add</Button>
-        <Button onClick={close}>Cancel</Button>
-      </Form>
-    </Formik>
+    <div>
+      <Formik
+        initialValues={{ uri: "" }}
+        onSubmit={async ({ uri }) => {
+          selectAgent("agent", uri)
+          close()
+        }}
+      >
+        <Form>
+          <div className="mb-4 text-align-center">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
+              agent uri
+            </label>
+            <TextField className="w-full" name="uri" />
+          </div>
+          <Button name="add" type="submit">Add Agent</Button>
+          <Button onClick={close}>Cancel</Button>
+        </Form>
+      </Formik>
+      <Formik
+        initialValues={{ uri: "" }}
+        onSubmit={async ({ uri }) => {
+          selectAgent("group", uri)
+          close()
+        }}
+      >
+        <Form>
+          <div className="mb-4 text-align-center">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="agentUri">
+              group uri
+            </label>
+            <TextField className="w-full" name="uri" />
+          </div>
+          <Button name="add" type="submit">Add Group</Button>
+          <Button onClick={close}>Cancel</Button>
+        </Form>
+      </Formik>
+    </div>
   )
 }
 
@@ -143,19 +171,33 @@ const defaultPerms = { read: false, write: false, append: false, control: false 
 
 export function FileSharing({ file, close }) {
   const [creating, setCreating] = useState(false)
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState({})
   const { file: fileWithAcl, mutate: mutateFile } = useFile(asUrl(file), { acl: true })
   const publicAccess = fileWithAcl && getPublicAccess(fileWithAcl)
   const accessByAgent = fileWithAcl && getAgentAccessAll(fileWithAcl);
-  const editingPermissions = editing && ((editing === "public") ? publicAccess : (accessByAgent[editing] || defaultPerms))
+  const accessByGroup = fileWithAcl && getGroupAccessAll(fileWithAcl);
+  // TODO: update this line for the new editing values
+  const { agentType: editingType, uri: editingUri } = editing
+  const editingPermissions = editingType && (
+    (editingType === "public") ?
+      (
+        publicAccess
+      ) : (
+        editingType === "agent" ? (
+          accessByAgent[editingUri] || defaultPerms
+        ) : (
+            accessByGroup[editingUri] || defaultPerms
+          )
+      )
+  )
   return (
     <div className="absolute inset-0 z-40 bg-white bg-opacity-75 flex flex-col overflow-y-scroll">
       {fileWithAcl ? (
         creating ? (
-          <AddNewAgent selectAgent={(agentUri) => { setEditing(agentUri) }} onDone={() => setCreating(false)} />
+          <AddNewAgent selectAgent={(agentType, uri) => { setEditing({ agentType, uri }) }} onDone={() => setCreating(false)} />
         ) : (
-            editing ? (
-              <PermissionEditor agentUri={editing} permissions={editingPermissions} resource={fileWithAcl} mutate={mutateFile} onDone={() => setEditing(null)} />
+            editingType ? (
+              <PermissionEditor editingType={editingType} uri={editingUri} permissions={editingPermissions} resource={fileWithAcl} mutate={mutateFile} onDone={() => setEditing({})} />
             ) : (
                 <>
                   {publicAccess && (
@@ -169,7 +211,15 @@ export function FileSharing({ file, close }) {
                     <div key={agentUri} className="my-3 flex flex-row justify-evenly items-center">
                       <Avatar webId={agentUri} />
                       <PermIcons permissions={permissions} />
-                      <Button onClick={() => setEditing(agentUri)}>Edit</Button>
+                      <Button onClick={() => setEditing(["agent", agentUri])}>Edit</Button>
+                    </div >
+                  )))
+                  }
+                  {accessByGroup && (Object.entries(accessByGroup).map(([groupUri, permissions]) => (
+                    <div key={groupUri} className="my-3 flex flex-row justify-evenly items-center">
+                      <GroupIcon uri={groupUri} />
+                      <PermIcons permissions={permissions} />
+                      <Button onClick={() => setEditing(["group", groupUri])}>Edit</Button>
                     </div >
                   )))
                   }
