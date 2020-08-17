@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import {
-  getSolidDataset, getThing, saveLitDatasetAt, setThing, getUrlAll,
+  getSolidDataset, getThing, saveSolidDatasetAt, setThing, getUrlAll,
   getSolidDatasetWithAcl,
   getFile, overwriteFile, getFileWithAcl
 } from '@itme/solid-client'
@@ -43,7 +43,7 @@ export function useResource(uri, { compare, acl, ...options } = {}) {
   const { data: resource, mutate, ...rest } = useSWR(uri, fetch, options)
   const save = async (newDataset) => {
     mutate(newDataset, false)
-    const savedDataset = await saveLitDatasetAt(uri, newDataset)
+    const savedDataset = await saveSolidDatasetAt(uri, newDataset)
     mutate(savedDataset)
     return savedDataset
   }
@@ -58,16 +58,11 @@ export function useResource(uri, { compare, acl, ...options } = {}) {
 }
 
 function useThing(uri, options = {}) {
-  const documentURL = uri && new URL(uri)
-  if (documentURL) {
-    documentURL.hash = ""
-  }
-  const documentUri = documentURL && documentURL.toString()
   const { resource, mutate, save: saveResource, ...rest } = useResource(uri, options)
   const thing = resource && getThing(resource, uri)
   const save = async (newThing) => {
     const newDataset = setThing(resource, newThing)
-    return saveResource(documentUri, newDataset)
+    return saveResource(newDataset)
   }
   return (
     {
