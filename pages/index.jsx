@@ -26,7 +26,7 @@ function LoginUI(){
   }
   return (
     <div className="flex flex-col">
-      <input type="text" className="pl-2 w-2/3 m-auto"
+      <input type="text" className="pl-2 w-2/3 m-auto font-logo text-2xl rounded text-center"
              placeholder="what's your handle?"
              value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
