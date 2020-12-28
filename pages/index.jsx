@@ -6,6 +6,8 @@ import {
 import { FOAF, AS, RDF, RDFS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
 
+import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
+
 import Nav from '../components/nav'
 
 function LoginUI(){
