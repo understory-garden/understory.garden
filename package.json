@@ -9,6 +9,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@headlessui/react": "^0.2.0",
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.2.0",
     "is-url": "^1.2.4",

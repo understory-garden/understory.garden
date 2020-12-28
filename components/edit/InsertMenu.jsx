@@ -2,6 +2,8 @@ import React, { useContext, useState, forwardRef, useCallback, Ref, FunctionComp
 import { Transforms, Element } from 'slate';
 import { useEditor } from 'slate-react';
 import { useWebId } from 'swrlit'
+import { Transition } from '@headlessui/react'
+
 import { useImageUploadUri } from '../../hooks/uris'
 
 import { Menu, MenuItem } from '../menus'
@@ -23,7 +25,6 @@ const InsertItem = forwardRef(({ element, format, onClose, ...props }, ref) => {
 })
 
 const InsertImageItem = forwardRef(({ element, onClose, ...props }, ref) => {
-  const classes = useStyles()
   const webId = useWebId()
   const imageContainerUri = useImageUploadUri(webId)
   const [imagePickerOpen, setImagePickerOpen] = useState(false)
@@ -34,8 +35,7 @@ const InsertImageItem = forwardRef(({ element, onClose, ...props }, ref) => {
         <ImageUploader element={element}
           onClose={onClose}
           open={imagePickerOpen}
-          uploadDirectory={document.imageContainerUri}
-          classes={{ paper: classes.imageUploadPopover }} />
+          uploadDirectory={document.imageContainerUri} />
       )}
     </>
   )
@@ -79,9 +79,10 @@ const InsertMenu = ({ element, onClose, ...props }) => {
       <InsertItem element={element} format="check-list-item" onClose={onClose}>
         todo list
       </InsertItem>
-      <InsertImageItem element={element} onClose={onClose}>
+      {/*<InsertImageItem element={element} onClose={onClose}>
         image
       </InsertImageItem>
+       */}
       <InsertItem element={element} format="table" onClose={onClose}>
         table
       </InsertItem>

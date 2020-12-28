@@ -85,9 +85,9 @@ const Element = (props) => {
 
 export const useNewEditor = () => useMemo(() => withConcepts(
 //  withTables(
-//    withLists(
-//      withChecklists(
-//        withLinks(
+    withLists(
+      withChecklists(
+        withLinks(
 //          withImages(
             withReact(
               withHistory(
@@ -95,9 +95,9 @@ export const useNewEditor = () => useMemo(() => withConcepts(
               )
             )
 //          )
-//        )
-//      )
-//    )
+        )
+      )
+    )
 //  )
 )
                                           , [])
@@ -106,20 +106,21 @@ const Editable = ({ editor, ...props }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const renderElement = useCallback(props => <Element {...props} />, [])
   return <SlateEditable
-    renderLeaf={renderLeaf}
-    renderElement={renderElement}
-    spellCheck
-    placeholder="Click here to add content..."
-    onKeyDown={(event) => {
-      for (const hotkey in HOTKEYS) {
-        if (isHotkey(hotkey, event.nativeEvent)) {
-          event.preventDefault()
-          const mark = HOTKEYS[hotkey]
-          toggleMark(editor, mark)
-        }
-      }
-    }}
-    {...props} />
+           renderLeaf={renderLeaf}
+           renderElement={renderElement}
+           spellCheck
+           placeholder="Click here to add content..."
+           className="prose"
+           onKeyDown={(event) => {
+             for (const hotkey in HOTKEYS) {
+               if (isHotkey(hotkey, event.nativeEvent)) {
+                 event.preventDefault()
+                 const mark = HOTKEYS[hotkey]
+                 toggleMark(editor, mark)
+               }
+             }
+           }}
+           {...props} />
 }
 
 export default Editable
