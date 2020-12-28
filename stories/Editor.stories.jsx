@@ -16,11 +16,17 @@ const Template = (args) => <Editor {...args} />
 
 export const Foo = Template.bind({});
 Foo.args = {
-  body: [{
-    children: [
+  body: [
+    { children: [
       {text: "FOOBAR"}
-    ]
-  }],
+    ]},
+    { children: [
+      {text: "fuzbaz"}
+    ]},
+    { children: [
+      {text: "fleegix"}
+    ]},
+  ],
 };
 
 /*

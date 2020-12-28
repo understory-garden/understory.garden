@@ -11,7 +11,7 @@ import IconButton from '../IconButton';
 import InsertMenu from './InsertMenu'
 import TurnIntoMenu from './TurnIntoMenu'
 
-/*const BlockMenu = ({ element, onClose, ...props }) => {
+const BlockMenu = ({ element, onClose, ...props }) => {
   const editor = useEditor()
   const turnIntoRef = useRef(null)
   const [turnIntoMenuOpen, setTurnIntoMenuOpen] = useState(false)
@@ -58,7 +58,7 @@ import TurnIntoMenu from './TurnIntoMenu'
     </>
   )
 }
-*/
+
 const Block = ({ children, element }) => {
   const editor = useEditor()
   const readOnly = useReadOnly()
@@ -93,8 +93,8 @@ const Block = ({ children, element }) => {
   })
 
   return (
-    <div ref={drop}>
-      {/*!readOnly && (
+    <div className={`block ${isOver ? 'is-over' : ''}`} ref={drop}>
+      {!readOnly && (
         <>
           <BlockMenu element={element} anchorEl={buttonsRef.current}
             open={menuOpen}
@@ -107,21 +107,24 @@ const Block = ({ children, element }) => {
             onExiting={() => {
               ReactEditor.focus(editor)
             }} />
-          <div contentEditable={false} ref={buttonsRef}>
-            <button ref={insertRef}
-              onClick={() => setInsertMenuOpen(!insertMenuOpen)}
-              title="insert">
+          <div contentEditable={false} ref={buttonsRef} className="absolute left-0">
+            <button className="block-sidebar-button"
+                    ref={insertRef}
+                    onClick={() => setInsertMenuOpen(!insertMenuOpen)}
+                    title="insert">
               <AddIcon></AddIcon>
             </button>
-            <button ref={drag}
-              size="small" onClick={() => setMenuOpen(!menuOpen)} className={classes.dragButton}
+            <button
+              className="block-sidebar-button cursor-move"
+              ref={drag}
+              size="small" onClick={() => setMenuOpen(!menuOpen)}
               title="">
               <DragIcon></DragIcon>
             </button>
           </div>
         </>
-      )*/}
-      <div ref={preview}>
+      )}
+      <div ref={preview} className="ml-6">
         {children}
       </div>
     </div>

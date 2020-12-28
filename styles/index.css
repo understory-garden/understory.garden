@@ -11,6 +11,29 @@
   @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
 }
 
+.block {
+  @apply relative pl-4 border-b-2 border-transparent;
+}
+
+.block.is-over {
+  @apply border-blue-300;
+}
+
+.block-sidebar-button {
+  @apply inline-flex items-center border border-transparent text-gray-500 rounded-full invisible;
+}
+
+.block:hover .block-sidebar-button {
+  @apply visible;
+}
+
+.block-sidebar-button:hover {
+  @apply bg-gray-500 text-white visible;
+}
+.block-sidebar-button:focus {
+  @apply outline-none;
+}
+
 /* Start purging... */
 @tailwind utilities;
 /* Stop purging. */

@@ -1,5 +1,7 @@
+import '../styles/index.css'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
