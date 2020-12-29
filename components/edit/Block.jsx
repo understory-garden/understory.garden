@@ -2,6 +2,8 @@ import React, { FunctionComponent, ReactNode, useRef, useState } from 'react'
 import { Element, Transforms } from 'slate';
 import { useEditor, useReadOnly, ReactEditor } from 'slate-react';
 import { useDrag, useDrop } from 'react-dnd'
+import { Transition } from '@headlessui/react'
+
 
 import {Menu, MenuItem} from '../menus';
 
@@ -11,42 +13,50 @@ import IconButton from '../IconButton';
 import InsertMenu from './InsertMenu'
 import TurnIntoMenu from './TurnIntoMenu'
 
-const BlockMenu = ({ element, onClose, ...props }) => {
+const BlockMenu = ({ element, open, className, onClose, ...props }) => {
   const editor = useEditor()
-  const turnIntoRef = useRef(null)
   const [turnIntoMenuOpen, setTurnIntoMenuOpen] = useState(false)
   return (
-    <>
-      <Menu
-        onClose={() => {
-          setTurnIntoMenuOpen(false)
-          onClose()
-        }}
-        {...props}>
-        <MenuItem onClick={() => {
-          Transforms.removeNodes(editor, {
-            at: ReactEditor.findPath(editor, element)
-          })
-        }}>
-          delete
-        </MenuItem>
-        <MenuItem ref={turnIntoRef}
-          onMouseEnter={() => setTurnIntoMenuOpen(true)}
-          onMouseLeave={() => setTurnIntoMenuOpen(false)}
-        >
-          turn into ⩺
-        </MenuItem>
-      </Menu>
-      {turnIntoMenuOpen && (
-        <TurnIntoMenu element={element}
-          onMouseEnter={() => setTurnIntoMenuOpen(true)}
-          anchorEl={turnIntoRef.current}
-          open={turnIntoMenuOpen} onClose={() => {
-            setTurnIntoMenuOpen(false)
-            onClose()
-          }} />
-      )}
-    </>
+    <Transition
+      show={open}
+      enter="transition ease-out duration-100"
+      enterFrom="transform opacity-0 scale-95"
+      enterTo="transform opacity-100 scale-100"
+      leave="transition ease-in duration-75"
+      leaveFrom="transform opacity-100 scale-100"
+      leaveTo="transform opacity-0 scale-95">
+      {
+        (ref) => (
+          <div ref={ref} className={`${className} flex flex-col`} {...props}>
+            <ul className="flex flex-row"
+                  onClose={() => {
+                    setTurnIntoMenuOpen(false)
+                    onClose()
+                  }}>
+              <li className="rounded-md border-solid border-2"
+                onClick={() => {
+                          Transforms.removeNodes(editor, {
+                            at: ReactEditor.findPath(editor, element)
+                          })
+                        }}>
+                delete
+              </li>
+              <li className="rounded-md border-solid border-2"
+                  onClick={() => setTurnIntoMenuOpen(!turnIntoMenuOpen)}>
+                turn into
+              </li>
+            </ul>
+            {turnIntoMenuOpen && (
+              <TurnIntoMenu element={element}
+                            onMouseEnter={() => setTurnIntoMenuOpen(true)}
+                            open={turnIntoMenuOpen} onClose={() => {
+                              setTurnIntoMenuOpen(false)
+                              onClose()
+                            }} />
+            )}
+          </div>
+        )}
+    </Transition>
   )
 }
 

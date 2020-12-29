@@ -2,10 +2,6 @@ import ReactDOM from 'react-dom'
 
 import { Transition } from '@headlessui/react'
 
-export const Portal = ({ children }) => {
-  return ReactDOM.createPortal(children, document.body)
-}
-
 export const Menu = ({open, ...props}) => (
   <Transition
     show={open}
