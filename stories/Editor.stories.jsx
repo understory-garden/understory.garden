@@ -32,16 +32,17 @@ Foo.args = {
 export const Image = Template.bind({});
 Image.args = {
   body: [
-    { "type": "image",
-      "children": [
+    { type: "image",
+      children: [
         {
           "text": ""
         }
       ],
-      "url": "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
-      "originalUrl": "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
-      "alt": "asdf",
-      "mime": "image/jpg"}
+      url: "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
+      originalUrl: "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
+      alt: "asdf",
+      width: 400,
+      mime: "image/jpg"}
   ],
 };
 

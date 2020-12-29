@@ -110,7 +110,6 @@ const Editable = ({ editor, ...props }) => {
            renderElement={renderElement}
            spellCheck
            placeholder="Click here to add content..."
-           className="prose"
            onKeyDown={(event) => {
              for (const hotkey in HOTKEYS) {
                if (isHotkey(hotkey, event.nativeEvent)) {

@@ -20,26 +20,26 @@ const ImageElement = ({ attributes, children, element }) => {
     <div {...attributes}>
       <div contentEditable={false} className="select-none flex">
         <img ref={image}
-          alt={element.alt || ""}
-          src={element.url}
+             alt={element.alt || ""}
+             src={element.url}
+             style={{width}}
         />
         <div className="flex flex-col flex-shrink-0">
-          <EditIcon fontSize="small"
-                    onClick={() => setEditing(true)} />
+          <EditIcon onClick={() => setEditing(true)} />
           <div className="flex-grow-1"
-            draggable={true}
-            onDragStart={e => {
-              Transforms.select(editor, path)
-              setDragStartImageWidth(image && image.current && image.current.clientWidth)
-              setDragStart(e.clientX)
-            }}
-            onDrag={e => {
-              if (dragStartImageWidth && dragStart) {
-                const newWidth = dragStartImageWidth + (e.clientX - dragStart)
-                if (width !== newWidth) {
-                  Transforms.setNodes(editor, { width: newWidth }, { at: path })
-                }
-              }
+               draggable={true}
+               onDragStart={e => {
+                 Transforms.select(editor, path)
+                 setDragStartImageWidth(image && image.current && image.current.clientWidth)
+                 setDragStart(e.clientX)
+               }}
+               onDrag={e => {
+                 if (dragStartImageWidth && dragStart) {
+                   const newWidth = dragStartImageWidth + (e.clientX - dragStart)
+                   if (width !== newWidth) {
+                     Transforms.setNodes(editor, { width: newWidth }, { at: path })
+                   }
+                 }
             }}>
             <ArrowRight />
           </div>
