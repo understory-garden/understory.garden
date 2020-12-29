@@ -12,18 +12,6 @@
   @apply relative pl-4 border-b-2 border-transparent;
 }
 
-.block h1 {
-  @apply text-5xl;
-}
-
-.block h2 {
-    @apply text-3xl;
-}
-
-.block h3 {
-    @apply text-xl;
-}
-
 .block.is-over {
   @apply border-blue-300;
 }

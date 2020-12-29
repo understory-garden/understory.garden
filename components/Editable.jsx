@@ -49,11 +49,11 @@ const Element = (props) => {
     case 'block-quote':
       return <Block element={element}><blockquote {...attributes}>{children}</blockquote></Block>
     case 'heading-one':
-      return <Block element={element}><h1 {...attributes}>{children}</h1></Block>
+      return <Block element={element}><h1 className="text-3xl" {...attributes}>{children}</h1></Block>
     case 'heading-two':
-      return <Block element={element}><h2 {...attributes}>{children}</h2></Block>
+      return <Block element={element}><h2 className="text-2xl" {...attributes}>{children}</h2></Block>
     case 'heading-three':
-      return <Block element={element}><h3 {...attributes}>{children}</h3></Block>
+      return <Block element={element}><h3 className="text-xl" {...attributes}>{children}</h3></Block>
     case 'bulleted-list':
       return <Block element={element}><ul className="list-disc list-inside" {...attributes}>{children}</ul></Block>
     case 'numbered-list':

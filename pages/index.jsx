@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
 import {
   setStringNoLocale, getStringNoLocale, getUrl, setUrl
 } from '@inrupt/solid-client'
 import { FOAF, AS, RDF, RDFS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
+import { useRouter } from 'next/router'
 
 import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
 
@@ -47,14 +48,20 @@ function LoginUI(){
   )
 }
 
-export function useStorageContainer(webId) {
-  const { profile } = useProfile(webId)
-  return profile && getUrl(profile, WS.storage)
-}
-
-export function useFacebabyContainerUri(webId, path = 'public') {
-  const storageContainer = useStorageContainer(webId)
-  return useEnsured(storageContainer && `${storageContainer}${path}/itme/facebaby/`)
+function NewNoteForm(){
+  const router = useRouter()
+  const [noteName, setNoteName] = useState("")
+  const onCreate = useCallback(function onCreate(){
+    router.push(`/notes/${encodeURIComponent(noteName)}`)
+  })
+  return (
+    <div className="flex flex-row m-auto justify-center">
+      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Note Name" />
+      <button className="btn text-white" onClick={onCreate}>
+        Create Note
+      </button>
+    </div>
+  )
 }
 
 export default function IndexPage() {
@@ -86,6 +93,7 @@ export default function IndexPage() {
           <h1 className="text-6xl text-center bold font-logo text-white">
             ANY QUESTIONS?
           </h1>
+          <NewNoteForm/>
         </div>
       ) : (
         (loggedIn === false) ? (

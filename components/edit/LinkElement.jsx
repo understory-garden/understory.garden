@@ -70,7 +70,7 @@ import { setLinkUrl, removeLink } from '../../utils/editor';
   )
 }
 */
-const LinkElement: FunctionComponent<ElementProps> = ({ attributes, children, element }) => {
+const LinkElement = ({ attributes, children, element }) => {
   const selected = useSelected()
   const editor = useEditor()
   const selectionCollapsed = !!(editor.selection && Range.isCollapsed(editor.selection))

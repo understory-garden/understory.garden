@@ -73,7 +73,7 @@ const Block = ({ children, element }) => {
   })
   const [{ isOver }, drop] = useDrop({
     accept: "block",
-    drop: (item: any) => {
+    drop: (item) => {
       const sourcePath = ReactEditor.findPath(editor, item.element)
       const sourceIndex = sourcePath[sourcePath.length - 1]
       const targetPath = ReactEditor.findPath(editor, element)

@@ -9,7 +9,7 @@ import {
 import IconButton from '../IconButton';
 
 
-const Table: FunctionComponent<ElementProps> = ({ attributes, children, element }) => {
+const Table = ({ attributes, children, element }) => {
   const editor = useEditor()
   const classes = useStyles()
   const blockClasses = useBlockStyles()

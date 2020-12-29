@@ -49,7 +49,7 @@ const ImageElement = ({ attributes, children, element }) => {
       {editing && (
         <ImageEditor element={element}
                      onClose={() => setEditing(false)}
-                     onSave={(savedUrl: string) => {
+                     onSave={(savedUrl) => {
                        const u = new URL(savedUrl)
                        u.searchParams.set("updated", Date.now().toString())
                        Transforms.setNodes(editor, { url: u.toString() }, { at: path })

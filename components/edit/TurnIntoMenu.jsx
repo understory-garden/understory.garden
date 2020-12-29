@@ -27,19 +27,8 @@ const TurnIntoItem = forwardRef(({ element, icon, iconBg="bg-blue-600", children
 
 const TurnIntoMenu = ({ element, onClose, className, ...props }) => {
   return (
-    <Menu
-      getContentAnchorEl={null}
-      anchorOrigin={{
-        vertical: 'center',
-        horizontal: 'right',
-      }}
-      transformOrigin={{
-        vertical: 'center',
-        horizontal: 'left',
-      }}
-      onClose={onClose}
-      className={`mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-4 lg:grid-cols-5 ${className}`}
-      {...props}>
+    <Menu className={`mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-4 lg:grid-cols-5 ${className}`}
+          onClose={onClose} {...props}>
       <TurnIntoItem element={element} format="paragraph" onClose={onClose} icon="abc">
         text
         </TurnIntoItem>
