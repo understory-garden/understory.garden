@@ -18,15 +18,6 @@ const BlockMenu = ({ element, onClose, ...props }) => {
   return (
     <>
       <Menu
-        getContentAnchorEl={null}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
         onClose={() => {
           setTurnIntoMenuOpen(false)
           onClose()
@@ -62,9 +53,7 @@ const BlockMenu = ({ element, onClose, ...props }) => {
 const Block = ({ children, element }) => {
   const editor = useEditor()
   const readOnly = useReadOnly()
-  const buttonsRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const insertRef = useRef(null)
   const [insertMenuOpen, setInsertMenuOpen] = useState(false)
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: "block", element },
@@ -91,25 +80,18 @@ const Block = ({ children, element }) => {
       isOver: !!monitor.isOver(),
     }),
   })
-  console.log("BLOCK EL", element)
+//  console.log("BLOCK EL", element)
   return (
     <div className={`block ${isOver ? 'is-over' : ''}`} ref={drop}>
       {!readOnly && (
         <>
-          <BlockMenu element={element} anchorEl={buttonsRef.current}
-            open={menuOpen}
-            onClose={() => setMenuOpen(false)} />
-          <InsertMenu element={element} anchorEl={insertRef.current}
-            open={insertMenuOpen}
-            onClose={() => {
-              setInsertMenuOpen(false)
-            }}
-            onExiting={() => {
-              ReactEditor.focus(editor)
-            }} />
-          <div contentEditable={false} ref={buttonsRef} className="absolute left-0">
+          <BlockMenu contentEditable={false}
+                     className="select-none"
+                     element={element}
+                     open={menuOpen}
+                     onClose={() => setMenuOpen(false)} />
+          <div contentEditable={false} className="absolute left-0">
             <button className="block-sidebar-button"
-                    ref={insertRef}
                     onClick={() => setInsertMenuOpen(!insertMenuOpen)}
                     title="insert">
               <AddIcon></AddIcon>
@@ -127,6 +109,15 @@ const Block = ({ children, element }) => {
       <div ref={preview} className="ml-6">
         {children}
       </div>
+      {!readOnly && (
+        <InsertMenu element={element}
+                    contentEditable={false}
+                    className="select-none"
+                    open={insertMenuOpen}
+                    onClose={() => {
+                      setInsertMenuOpen(false)
+                    }} />
+      )}
     </div>
   )
 }

@@ -57,7 +57,7 @@ const Element = (props) => {
     case 'bulleted-list':
       return <Block element={element}><ul {...attributes}>{children}</ul></Block>
     case 'numbered-list':
-      return <Block element={element}><ol {...attributes}>{children}</ol></Block>
+      return <Block element={element}><ol className="list-decimal list-inside" {...attributes}>{children}</ol></Block>
     case 'list-item':
       return <li {...attributes}>{children}</li>
 //    case 'image':
