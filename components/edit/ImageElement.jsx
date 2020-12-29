@@ -2,14 +2,11 @@ import React, { useRef, useState, FunctionComponent } from 'react'
 import { Transforms } from 'slate';
 import { useSelected, useFocused, useEditor, ReactEditor } from 'slate-react';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import EditIcon from '@material-ui/icons/Edit';
-import ArrowRight from '@material-ui/icons/ArrowRight';
+import {EditIcon, ArrowRight} from '../icons';
 
 import { ImageEditor } from '../ImageUploader';
 
-const ImageElement: FunctionComponent<ElementProps> = ({ attributes, children, element }) => {
+const ImageElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   const image = useRef(null)
   const [editing, setEditing] = useState(false)
@@ -21,20 +18,15 @@ const ImageElement: FunctionComponent<ElementProps> = ({ attributes, children, e
   const path = ReactEditor.findPath(editor, element)
   return (
     <div {...attributes}>
-      <Box contentEditable={false} display="flex">
+      <div contentEditable={false} className="select-none flex">
         <img ref={image}
           alt={element.alt || ""}
           src={element.url}
-          className={classes.image}
         />
-        <Box flexShrink={0}
-          display="flex"
-          flexDirection="column"
+        <div className="flex flex-col flex-shrink-0">
           <EditIcon fontSize="small"
-            className={classes.editImageIcon}
-            onClick={() => setEditing(true)} />
-          <Box className={classes.imageWidthDragHandle}
-            flexGrow={1}
+                    onClick={() => setEditing(true)} />
+          <div className="flex-grow-1"
             draggable={true}
             onDragStart={e => {
               Transforms.select(editor, path)
@@ -50,18 +42,20 @@ const ImageElement: FunctionComponent<ElementProps> = ({ attributes, children, e
               }
             }}>
             <ArrowRight />
-          </Box>
-        </Box>
-      </Box>
+          </div>
+        </div>
+      </div>
       {children}
-      <ImageEditor open={editing} element={element}
-        onClose={() => setEditing(false)}
-        onSave={(savedUrl: string) => {
-          const u = new URL(savedUrl)
-          u.searchParams.set("updated", Date.now().toString())
-          Transforms.setNodes(editor, { url: u.toString() }, { at: path })
-          setEditing(false)
-        }} />
+      {editing && (
+        <ImageEditor element={element}
+                     onClose={() => setEditing(false)}
+                     onSave={(savedUrl: string) => {
+                       const u = new URL(savedUrl)
+                       u.searchParams.set("updated", Date.now().toString())
+                       Transforms.setNodes(editor, { url: u.toString() }, { at: path })
+                       setEditing(false)
+                     }} />
+      )}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import '../styles/index.css'
+import "cropperjs/dist/cropper.css";
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 

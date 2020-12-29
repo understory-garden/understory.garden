@@ -13,9 +13,9 @@ export const Menu = ({open, ...props}) => (
     leaveTo="transform opacity-0 scale-95">
     {
       (ref) => (
-        <ul ref={ref} {...props}/>
+        <div ref={ref} {...props}/>
       )}
   </Transition>
 )
 
-export const MenuItem = (props) => <li {...props}/>
+export const MenuItem = (props) => <div {...props}/>

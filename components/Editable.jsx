@@ -13,7 +13,7 @@ import {
 import ChecklistItemElement from './edit/ChecklistItemElement'
 import LinkElement from './edit/LinkElement'
 //import ConceptElement from './edit/ConceptElement'
-//import ImageElement from './edit/ImageElement'
+import ImageElement from './edit/ImageElement'
 import Block from './edit/Block'
 import Table from "./edit/Table"
 
@@ -55,13 +55,13 @@ const Element = (props) => {
     case 'heading-three':
       return <Block element={element}><h3 {...attributes}>{children}</h3></Block>
     case 'bulleted-list':
-      return <Block element={element}><ul {...attributes}>{children}</ul></Block>
+      return <Block element={element}><ul className="list-disc list-inside" {...attributes}>{children}</ul></Block>
     case 'numbered-list':
       return <Block element={element}><ol className="list-decimal list-inside" {...attributes}>{children}</ol></Block>
     case 'list-item':
       return <li {...attributes}>{children}</li>
-//    case 'image':
-//      return <Block element={element}><ImageElement {...props} /></Block>
+    case 'image':
+      return <Block element={element}><ImageElement {...props} /></Block>
     case 'link':
       return <LinkElement {...props} />
 //    case 'concept':

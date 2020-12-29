@@ -3,27 +3,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import Cropper from 'react-cropper';
 
 import { Loader } from './elements';
-import { Module } from './layout'
 
 const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
   const [saving, setSaving] = useState()
-  const cropper = useRef()
+  const cropperRef = useRef()
   const save = async () => {
     setSaving(true)
-    await onSave(cropper.current.getCroppedCanvas())
+    await onSave(cropperRef.current.cropper.getCroppedCanvas())
     setSaving(false)
   }
   return (
-    <Module onClose={onClose} {...props}>
+    <div onClose={onClose} {...props}>
       <Cropper
-        ref={cropper}
+        ref={cropperRef}
         src={src}
         crossOrigin="use-credentials"
         className="h-48"
       />
       <div className="flex flex-row">
         <button onClick={() => {
-          cropper.current.rotate(90)
+          cropperRef.current.cropper.rotate(90)
         }}>
           rotate
         </button>
@@ -40,7 +39,7 @@ const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
             </>
           )}
       </div>
-    </Module >
+    </div >
   )
 }
 
@@ -145,7 +144,7 @@ export default function ImageUploader({ onClose, onUpload, uploadDirectory, ...p
             }} />
 
         ) : (
-            <Module {...props}>
+            <div {...props}>
               {previewSrc && (
                 <img src={previewSrc} className="h-32 object-contain" alt="your new profile" />
               )}
@@ -174,7 +173,7 @@ export default function ImageUploader({ onClose, onUpload, uploadDirectory, ...p
                 type="file"
                 onChange={onFileChanged}
               />
-            </Module>
+            </div>
           )
       }
     </>

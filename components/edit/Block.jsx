@@ -90,7 +90,6 @@ const Block = ({ children, element }) => {
       isOver: !!monitor.isOver(),
     }),
   })
-//  console.log("BLOCK EL", element)
   return (
     <div className={`block ${isOver ? 'is-over' : ''}`} ref={drop}>
       {!readOnly && (

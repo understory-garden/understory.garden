@@ -1,4 +1,5 @@
 import '../styles/index.css'
+import "cropperjs/dist/cropper.css";
 import { AuthenticationProvider } from 'swrlit'
 import Head from 'next/head'
 import { DndProvider } from 'react-dnd'

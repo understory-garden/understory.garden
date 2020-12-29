@@ -29,6 +29,22 @@ Foo.args = {
   ],
 };
 
+export const Image = Template.bind({});
+Image.args = {
+  body: [
+    { "type": "image",
+      "children": [
+        {
+          "text": ""
+        }
+      ],
+      "url": "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
+      "originalUrl": "https://images.unsplash.com/photo-1516222338250-863216ce01ea",
+      "alt": "asdf",
+      "mime": "image/jpg"}
+  ],
+};
+
 /*
 export const Secondary = Template.bind({});
 Secondary.args = {
