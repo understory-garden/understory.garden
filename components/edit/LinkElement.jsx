@@ -73,15 +73,11 @@ import { setLinkUrl, removeLink } from '../../utils/editor';
 const LinkElement = ({ attributes, children, element }) => {
   const selected = useSelected()
   const editor = useEditor()
-  const selectionCollapsed = !!(editor.selection && Range.isCollapsed(editor.selection))
-  const aRef = useRef(null)
-  const [editingLink, setEditingLink] = useState(false)
-  const open = (!!aRef.current) && (editingLink || (selected && selectionCollapsed))
   return (
     <>
-      <Link {...attributes} href={element.url} ref={aRef}>
+      <a {...attributes} className={`${selected && "bg-red-500"}`} href={element.url} onBlur={() => console.log("A ON BLUR")}>
         {children}
-      </Link>
+      </a>
     </>
   )
 }

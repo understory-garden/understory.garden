@@ -180,9 +180,13 @@ export const insertImage = (editor, attributes, at=editor.selection) => {
   Transforms.insertNodes(editor, image, {at})
 }
 
+export const activeLink = (editor, at=editor.selection || editor.shadowSelection) => {
+  const [link] = Editor.nodes(editor, {at,  match: n => n.type === 'link' })
+  return link
+}
+
 export const isLinkActive = editor => {
-  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
-  return !!link
+  return !!activeLink(editor)
 }
 
 const unwrapLink = editor => {
