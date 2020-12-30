@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Slate } from 'slate-react'
 
 import Editable, { useNewEditor } from "./Editable";
+import EditorToolbar from "./EditorToolbar"
 
 export default function Editor ({ body }){
 
@@ -14,6 +16,7 @@ export default function Editor ({ body }){
         value={value}
         onChange={newValue => setValue(newValue)}
       >
+        <EditorToolbar/>
         <Editable readOnly={readOnly} editor={editor} />
       </Slate>
     </div>

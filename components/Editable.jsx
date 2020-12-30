@@ -83,24 +83,26 @@ const Element = (props) => {
   }
 }
 
-export const useNewEditor = () => useMemo(() => withConcepts(
-//  withTables(
+export const useNewEditor = () => useMemo(
+  () => withConcepts(
+    //  withTables(
     withLists(
       withChecklists(
         withLinks(
-//          withImages(
-            withReact(
-              withHistory(
-                createEditor()
-              )
+          //          withImages(
+          withReact(
+            withHistory(
+              createEditor()
             )
-//          )
+          )
+          //          )
         )
       )
     )
-//  )
+    //  )
+  ),
+  []
 )
-                                          , [])
 
 const Editable = ({ editor, ...props }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
