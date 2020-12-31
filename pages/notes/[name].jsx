@@ -4,6 +4,7 @@ import { Slate, withReact } from 'slate-react'
 import { useWebId, useEnsured, useResource, useThing } from 'swrlit'
 import { createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown } from '@inrupt/solid-client'
 
+import EditorToolbar from "../../components/EditorToolbar"
 import Editable, { useNewEditor } from "../../components/Editable";
 import { useNoteContainerUri } from '../../hooks/uris'
 
@@ -52,6 +53,7 @@ export default function NotePage(){
           value={value}
           onChange={newValue => setValue(newValue)}
         >
+          <EditorToolbar/>
           <Editable readOnly={false} editor={editor} />
         </Slate>
       )}

@@ -5,6 +5,7 @@ import { useSelected, useEditor } from 'slate-react';
 import copy from 'copy-to-clipboard';
 
 import IconButton from '../IconButton';
+import { ExternalLinkIcon } from "../icons"
 import { setLinkUrl, removeLink } from '../../utils/editor';
 
 
@@ -75,8 +76,11 @@ const LinkElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   return (
     <>
-      <a {...attributes} className={`${selected && "bg-red-500"}`} href={element.url} onBlur={() => console.log("A ON BLUR")}>
+      <a {...attributes} className={`underline text-blue-500 ${selected && "bg-blue-100"}`} href={element.url} >
         {children}
+      </a>
+      <a href={element.url} contentEditable={false}>
+        <ExternalLinkIcon className="inline" />
       </a>
     </>
   )
