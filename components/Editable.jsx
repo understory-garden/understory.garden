@@ -83,8 +83,8 @@ const Element = (props) => {
   }
 }
 
-export const useNewEditor = (webId) => useMemo(
-  () => withConcepts(webId)(
+export const useNewEditor = () => useMemo(
+  () => withConcepts(
     //  withTables(
     withShortcuts(
       withLists(

@@ -326,7 +326,7 @@ export const isConceptActive = editor => {
   return !!activeConcept(editor)
 }
 
-export const insertConcept = (editor, name, webId) => {
+export const insertConcept = (editor, name) => {
   if (editor.selection) {
     wrapConcept(editor, name.endsWith("]]") ? name.slice(0, -2) : name)
   }
@@ -337,7 +337,7 @@ function conceptNameFromText(text){
   return match && match[1]
 }
 
-export const withConcepts = webId => editor => {
+export const withConcepts = editor => {
   const { isInline, insertText, deleteBackward } = editor
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
@@ -372,7 +372,7 @@ export const withConcepts = webId => editor => {
         }
         Transforms.delete(editor, {distance: 1, unit: 'char', reverse: true})
         console.log("ITS REALLY INSERTING")
-        insertConcept(editor, afterText, webId)
+        insertConcept(editor, afterText)
       } else {
         insertText(text)
       }

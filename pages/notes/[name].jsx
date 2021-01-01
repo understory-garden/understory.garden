@@ -7,9 +7,12 @@ import { createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown } fr
 import EditorToolbar from "../../components/EditorToolbar"
 import Editable, { useNewEditor } from "../../components/Editable";
 import { useNoteContainerUri } from '../../hooks/uris'
+import { ExternalLinkIcon } from '../../components/icons'
 
 const noteBody = "https://face.baby/vocab#noteBody"
 const emptyBody = [{ children: [{text: ""}]}]
+
+const thingName = "concept"
 
 export default function NotePage(){
   const router = useRouter()
@@ -17,7 +20,8 @@ export default function NotePage(){
 
   const webId = useWebId()
   const noteContainerUri = useNoteContainerUri(webId)
-  const noteUri = noteContainerUri && `${noteContainerUri}${encodeURIComponent(name)}.ttl#concept`
+  const noteDocUri = noteContainerUri && `${noteContainerUri}${encodeURIComponent(name)}.ttl`
+  const noteUri = noteDocUri && `${noteDocUri}#${thingName}`
   const { error, resource, thing: note, save, isValidating } = useThing(noteUri)
   const bodyJSON = note && getStringNoLocale(note, noteBody)
   const errorStatus = error && error.status
@@ -25,14 +29,19 @@ export default function NotePage(){
   useEffect(function setValueFromNote(){
     if (bodyJSON) {
       setValue(JSON.parse(bodyJSON))
-    } else if (errorStatus == 404){
-      setValue(emptyBody)
+    } else if (resource){
+      if (errorStatus == 404){
+        setValue(emptyBody)
+      } else {
+        console.log("resource loaded, not 404, but no body")
+        setValue(emptyBody)
+      }
     }
   }, [bodyJSON, errorStatus])
 
 
   const onClickCallback = async function saveNote(){
-    var newNote = note || createThing({name: "it"})
+    var newNote = note || createThing({name: thingName})
     newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
     try {
       const result = await save(newNote)
@@ -42,10 +51,14 @@ export default function NotePage(){
   }
 
   const editor = useNewEditor()
-
   return (
     <div>
-      <h1 className="text-5xl">{name}</h1>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-5xl">{name}</h1>
+        <a href={noteDocUri} target="_blank" rel="noopener">
+          <ExternalLinkIcon />
+        </a>
+      </div>
       <button onClick={onClickCallback}>save</button>
       {(value !== undefined) && (
         <Slate
