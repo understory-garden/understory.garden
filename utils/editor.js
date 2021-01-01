@@ -342,7 +342,6 @@ export const withConcepts = editor => {
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
   editor.insertText = text => {
-    console.log("active, text", isConceptActive(editor), text)
     if (isConceptActive(editor)){
       const [originalConcept] = activeConcept(editor)
       insertText(text)
@@ -352,26 +351,21 @@ export const withConcepts = editor => {
         setConceptProps(editor, originalConcept, name)
       }
     } else if (text === "["){
-      const [start] = Range.edges(editor.selection)
+      const start = Range.start(editor.selection)
 
-      const charBefore = Editor.before(editor, start, { unit: 'character' });
-      const before = charBefore && Editor.before(editor, charBefore);
-      const beforeRange = before && Editor.range(editor, before, start);
+      const wordBefore = Editor.before(editor, start, { unit: 'character' });
+      const beforeRange = wordBefore && Editor.range(editor, wordBefore, start);
       const beforeText = beforeRange && Editor.string(editor, beforeRange)
 
       const wordAfter = Editor.after(editor, start, { unit: 'word' })
       const afterRange = Editor.range(editor, start, wordAfter)
       const afterText = Editor.string(editor, afterRange)
 
-      console.log("BEFORE TEXT", beforeText, start, charBefore)
-
-      if ((beforeText === "[") && (start.path[0] === charBefore.path[0])){
-        console.log("INSERTING CONCEPT")
+      if (wordBefore && (beforeText === "[") &&(start.path[0] === wordBefore.path[0])){
         if (afterText){
           Transforms.delete(editor, {distance: 1, unit: 'word'})
         }
         Transforms.delete(editor, {distance: 1, unit: 'char', reverse: true})
-        console.log("ITS REALLY INSERTING")
         insertConcept(editor, afterText)
       } else {
         insertText(text)
