@@ -342,6 +342,7 @@ export const withConcepts = webId => editor => {
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
   editor.insertText = text => {
+    console.log("active, text", isConceptActive(editor), text)
     if (isConceptActive(editor)){
       const [originalConcept] = activeConcept(editor)
       insertText(text)
@@ -362,13 +363,15 @@ export const withConcepts = webId => editor => {
       const afterRange = Editor.range(editor, start, wordAfter)
       const afterText = Editor.string(editor, afterRange)
 
-      const charBeforeOnSameLine = (start.path[0] === charBefore.path[0])
+      console.log("BEFORE TEXT", beforeText, start, charBefore)
 
-      if ((beforeText === "[") && charBeforeOnSameLine){
+      if ((beforeText === "[") && (start.path[0] === charBefore.path[0])){
+        console.log("INSERTING CONCEPT")
         if (afterText){
           Transforms.delete(editor, {distance: 1, unit: 'word'})
         }
         Transforms.delete(editor, {distance: 1, unit: 'char', reverse: true})
+        console.log("ITS REALLY INSERTING")
         insertConcept(editor, afterText, webId)
       } else {
         insertText(text)
