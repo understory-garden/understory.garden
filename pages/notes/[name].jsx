@@ -17,7 +17,7 @@ export default function NotePage(){
 
   const webId = useWebId()
   const noteContainerUri = useNoteContainerUri(webId)
-  const noteUri = noteContainerUri && `${noteContainerUri}${encodeURIComponent(name)}.ttl#it`
+  const noteUri = noteContainerUri && `${noteContainerUri}${encodeURIComponent(name)}.ttl#concept`
   const { error, resource, thing: note, save, isValidating } = useThing(noteUri)
   const bodyJSON = note && getStringNoLocale(note, noteBody)
   const errorStatus = error && error.status

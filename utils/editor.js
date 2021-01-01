@@ -283,16 +283,16 @@ export const setLinkUrl = (editor, link, url) => {
   Transforms.setNodes(editor, {url}, {at: path})
 }
 
-export const setConceptProps = (editor, concept, name, uri) => {
+export const setConceptProps = (editor, concept, name) => {
   const path = ReactEditor.findPath(editor, concept)
-  Transforms.setNodes(editor, {name, uri}, {at: path})
+  Transforms.setNodes(editor, {name}, {at: path})
 }
 
 const unwrapConcept = editor => {
   Transforms.unwrapNodes(editor, { match: n => n.type === 'concept' })
 }
 
-const wrapConcept = (editor, name, uri) => {
+const wrapConcept = (editor, name) => {
   if (isConceptActive(editor)) {
     unwrapConcept(editor)
   }
@@ -302,8 +302,7 @@ const wrapConcept = (editor, name, uri) => {
   const concept = {
     type: 'concept',
     name,
-    uri,
-    children: isCollapsed ? [{ text: name }] : [],
+    children: isCollapsed ? [{ text: `[[${name}]]` }] : [],
   }
 
   if (isCollapsed) {
@@ -318,21 +317,84 @@ export const removeConcept = (editor) => {
   unwrapConcept(editor)
 }
 
-export const isConceptActive = editor => {
+export const activeConcept = editor => {
   const [concept] = Editor.nodes(editor, { match: n => n.type === 'concept' })
-  return !!concept
+  return concept
 }
 
-export const insertConcept = (editor, name, uri) => {
+export const isConceptActive = editor => {
+  return !!activeConcept(editor)
+}
+
+export const insertConcept = (editor, name, webId) => {
   if (editor.selection) {
-    wrapConcept(editor, name, uri)
+    wrapConcept(editor, name.endsWith("]]") ? name.slice(0, -2) : name)
   }
 }
 
-export const withConcepts = editor => {
-  const { isInline } = editor
+function conceptNameFromText(text){
+  const match = text.match(/^\[\[(.*)\]\]$/)
+  return match && match[1]
+}
+
+export const withConcepts = webId => editor => {
+  const { isInline, insertText, deleteBackward } = editor
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
+  editor.insertText = text => {
+    if (isConceptActive(editor)){
+      const [originalConcept] = activeConcept(editor)
+      insertText(text)
+      const [updatedConcept] = activeConcept(editor)
+      const name = conceptNameFromText(updatedConcept.children[0].text)
+      if (name){
+        setConceptProps(editor, originalConcept, name)
+      }
+    } else if (text === "["){
+      const [start] = Range.edges(editor.selection)
+
+      const charBefore = Editor.before(editor, start, { unit: 'character' });
+      const before = charBefore && Editor.before(editor, charBefore);
+      const beforeRange = before && Editor.range(editor, before, start);
+      const beforeText = beforeRange && Editor.string(editor, beforeRange)
+
+      const wordAfter = Editor.after(editor, start, { unit: 'word' })
+      const afterRange = Editor.range(editor, start, wordAfter)
+      const afterText = Editor.string(editor, afterRange)
+
+      const charBeforeOnSameLine = (start.path[0] === charBefore.path[0])
+
+      if ((beforeText === "[") && charBeforeOnSameLine){
+        if (afterText){
+          Transforms.delete(editor, {distance: 1, unit: 'word'})
+        }
+        Transforms.delete(editor, {distance: 1, unit: 'char', reverse: true})
+        insertConcept(editor, afterText, webId)
+      } else {
+        insertText(text)
+      }
+    } else {
+      insertText(text)
+    }
+  }
+
+  editor.deleteBackward = (...args) => {
+    if (isConceptActive(editor)){
+      const [originalConcept, path] = activeConcept(editor)
+      deleteBackward(...args)
+      const [updatedConcept] = activeConcept(editor)
+      const name = conceptNameFromText(updatedConcept.children[0].text)
+      if (name){
+        setConceptProps(editor, originalConcept, name)
+      } else {
+        Transforms.delete(editor, path, {unit: 'block'})
+        removeConcept(editor)
+      }
+    } else {
+      deleteBackward(...args)
+    }
+  }
+
   disallowEmpty("concept", editor)
 
   return editor
@@ -478,4 +540,105 @@ export const insertionPoint = (editor, element) => {
   return (
     [...path.slice(0, -1), path.slice(-1)[0] + 1]
   )
+}
+
+const SHORTCUTS = {
+  '*': 'list-item',
+  '-': 'list-item',
+  '+': 'list-item',
+  '>': 'block-quote',
+  '#': 'heading-one',
+  '##': 'heading-two',
+  '###': 'heading-three',
+  '####': 'heading-four',
+  '#####': 'heading-five',
+  '######': 'heading-six'
+}
+
+export const withShortcuts = editor => {
+  const { deleteBackward, insertText } = editor
+
+  editor.insertText = text => {
+    const { selection } = editor
+
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+      const { anchor } = selection
+      const block = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
+      const path = block ? block[1] : []
+      const start = Editor.start(editor, path)
+      const range = { anchor, focus: start }
+      const beforeText = Editor.string(editor, range)
+      const type = SHORTCUTS[beforeText]
+
+      if (type) {
+        Transforms.select(editor, range)
+        Transforms.delete(editor)
+        const newProperties = {
+          type,
+        }
+        Transforms.setNodes(editor, newProperties, {
+          match: n => Editor.isBlock(editor, n),
+        })
+
+        if (type === 'list-item') {
+          const list = { type: 'bulleted-list', children: [] }
+          Transforms.wrapNodes(editor, list, {
+            match: n =>
+              !Editor.isEditor(n) &&
+              Element.isElement(n) &&
+              n.type === 'list-item',
+          })
+        }
+
+        return
+      }
+    }
+
+    insertText(text)
+  }
+
+  editor.deleteBackward = (...args) => {
+    const { selection } = editor
+
+    if (selection && Range.isCollapsed(selection)) {
+      const match = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
+
+      if (match) {
+        const [block, path] = match
+        const start = Editor.start(editor, path)
+
+        if (
+          !Editor.isEditor(block) &&
+          Element.isElement(block) &&
+          block.type !== 'paragraph' &&
+          Point.equals(selection.anchor, start)
+        ) {
+          const newProperties = {
+            type: 'paragraph',
+          }
+          Transforms.setNodes(editor, newProperties)
+
+          if (block.type === 'list-item') {
+            Transforms.unwrapNodes(editor, {
+              match: n =>
+                !Editor.isEditor(n) &&
+                Element.isElement(n) &&
+                n.type === 'bulleted-list',
+              split: true,
+            })
+          }
+
+          return
+        }
+      }
+
+      deleteBackward(...args)
+    }
+  }
+
+  return editor
 }

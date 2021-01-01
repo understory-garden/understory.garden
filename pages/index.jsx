@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
 import {
-  setStringNoLocale, getStringNoLocale, getUrl, setUrl
+  setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid
 } from '@inrupt/solid-client'
 import { FOAF, AS, RDF, RDFS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
