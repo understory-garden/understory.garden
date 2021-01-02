@@ -346,10 +346,13 @@ export const withConcepts = editor => {
     if (isConceptActive(editor)){
       const [originalConcept] = activeConcept(editor)
       insertText(text)
-      const [updatedConcept] = activeConcept(editor)
-      const name = conceptNameFromText(updatedConcept.children[0].text)
-      if (name){
-        setConceptProps(editor, originalConcept, name)
+      const updatedConceptInfo = activeConcept(editor)
+      if (updatedConceptInfo) {
+        const [updatedConcept] = updatedConceptInfo
+        const name = conceptNameFromText(updatedConcept.children[0].text)
+        if (name){
+          setConceptProps(editor, originalConcept, name)
+        }
       }
     } else if (text === "["){
       const start = Range.start(editor.selection)

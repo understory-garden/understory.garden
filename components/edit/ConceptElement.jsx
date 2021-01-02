@@ -7,14 +7,14 @@ const ConceptElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   const conceptPrefix = "/notes/"
   return (
-    <>
-      <a {...attributes} className={`underline text-blue-500 ${selected && "bg-blue-100"}`} href={element.url} >
+    <span {...attributes}>
+      <span className={`underline text-blue-500 ${selected && "bg-blue-100"}`}>
         {children}
-      </a>
-      <a href={`${conceptPrefix}${element.name}`} contentEditable={false}>
+      </span>
+      <a href={`${conceptPrefix}${element.name}`} contentEditable={false} className="select-none">
         <ExternalLinkIcon className="inline" />
       </a>
-    </>
+    </span>
   )
 }
 export default ConceptElement
