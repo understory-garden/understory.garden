@@ -365,8 +365,9 @@ export const withConcepts = editor => {
         if (afterText){
           Transforms.delete(editor, {distance: 1, unit: 'word'})
         }
-        Transforms.delete(editor, {distance: 1, unit: 'char', reverse: true})
+        Transforms.delete(editor, {distance: 1, unit: 'character', reverse: true})
         insertConcept(editor, afterText)
+        Transforms.move(editor, {distance: 2, unit: "character", reverse: true})
       } else {
         insertText(text)
       }
