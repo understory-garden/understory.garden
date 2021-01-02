@@ -328,7 +328,7 @@ export const isConceptActive = editor => {
 
 export const insertConcept = (editor, name) => {
   if (editor.selection) {
-    wrapConcept(editor, name.endsWith("]]") ? name.slice(0, -2) : name)
+    wrapConcept(editor, name)
     Transforms.move(editor, {distance: 2, unit: "character", reverse: true})
   }
 }
@@ -354,7 +354,7 @@ export const withConcepts = editor => {
     } else if (text === "["){
       const start = Range.start(editor.selection)
 
-      const wordBefore = Editor.before(editor, start, { unit: 'character' });
+      const wordBefore = Editor.before(editor, start, { unit: 'word' });
       const beforeRange = wordBefore && Editor.range(editor, wordBefore, start);
       const beforeText = beforeRange && Editor.string(editor, beforeRange)
 
@@ -362,12 +362,15 @@ export const withConcepts = editor => {
       const afterRange = Editor.range(editor, start, wordAfter)
       const afterText = Editor.string(editor, afterRange)
 
-      if (wordBefore && (beforeText === "[") && (start.path[0] === wordBefore.path[0])){
+      if (wordBefore && (beforeText.endsWith("["))){
         if (afterText){
           Transforms.delete(editor, {distance: 1, unit: 'word'})
         }
         Transforms.delete(editor, {distance: 1, unit: 'character', reverse: true})
-        insertConcept(editor, afterText)
+        insertConcept(editor, afterText.endsWith("]]") ? afterText.slice(0, -2) : afterText)
+      } else if (wordAfter && (afterText.startsWith("["))){
+        Transforms.delete(editor, {distance: 1, unit: 'word'})
+        insertConcept(editor, afterText.endsWith("]]") ? afterText.slice(1, -2) : afterText.slice(1))
       } else {
         insertText(text)
       }
