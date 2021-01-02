@@ -101,7 +101,7 @@ function LinkButton(){
 
 export default function EditorToolbar({className, ...props}){
   return (
-    <div className={`flex flex-col ${className}`} {...props}>
+    <div className={`flex flex-col ${className || ''}`} {...props}>
       <div>
         <MarkButton title="Bold" format="bold"><FormatBold/></MarkButton>
         <MarkButton title="Italic" format="italic"><FormatItalic/></MarkButton>

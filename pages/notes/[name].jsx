@@ -13,6 +13,7 @@ import { useNoteContainerUri } from '../../hooks/uris'
 import { useConceptIndex } from '../../hooks/concepts'
 import { ExternalLinkIcon } from '../../components/icons'
 import { getConceptNodes } from '../../utils/slate'
+import { Transition } from '@headlessui/react'
 
 const noteBody = "https://face.baby/vocab#noteBody"
 const referencesConcept = "https://face.baby/vocab#refs"
@@ -68,8 +69,10 @@ export default function NotePage(){
     }
   }
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <div className="flex flex-row justify-between">
         <h1 className="text-5xl">{name}</h1>
         <a href={noteDocUri} target="_blank" rel="noopener">
@@ -77,16 +80,51 @@ export default function NotePage(){
         </a>
       </div>
       <button onClick={saveCallback}>save</button>
-      {(value !== undefined) && (
-        <Slate
-          editor={editor}
-          value={value}
-          onChange={newValue => setValue(newValue)}
-        >
-          <EditorToolbar/>
-          <Editable readOnly={false} editor={editor} />
-        </Slate>
-      )}
+
+      <section className="relative max-w-full flex flex-grow" aria-labelledby="slide-over-heading">
+        <div className="w-full flex flex-col flex-grow">
+          {(value !== undefined) && (
+            <Slate
+              editor={editor}
+              value={value}
+              onChange={newValue => setValue(newValue)}
+            >
+              <EditorToolbar/>
+              <Editable readOnly={false} editor={editor} className="flex-grow" />
+            </Slate>
+          )}
+        </div>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="h-2 text-sm">
+          {sidebarOpen ? ">>" : "<<"}
+        </button>
+        <Transition
+          show={sidebarOpen}
+          enter="transform transition ease-in-out duration-500 sm:duration-700"
+          enterFrom="translate-x-full"
+          enterTo="translate-x-0"
+          leave="transform transition ease-in-out duration-500 sm:duration-700"
+          leaveFrom="translate-x-0"
+          leaveTo="translate-x-full">
+          {
+            (ref) => (
+              <div className="w-screen max-w-md flex-grow" ref={ref}>
+                <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+                  <div className="px-4 sm:px-6">
+                    <div className="flex items-start justify-between">
+                      <h2 id="slide-over-heading" className="text-lg font-medium text-gray-900">
+                        Panel title
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="mt-6 relative flex-1 px-4 sm:px-6">
+                    LINKZ
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        </Transition>
+      </section>
     </div>
   )
 }
