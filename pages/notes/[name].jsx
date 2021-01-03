@@ -16,7 +16,7 @@ import Editable, { useNewEditor } from "../../components/Editable";
 import { useConceptContainerUri } from '../../hooks/uris'
 import { useConceptIndex } from '../../hooks/concepts'
 import { ExternalLinkIcon } from '../../components/icons'
-import { getConceptNodes } from '../../utils/slate'
+import { getConceptNodes, getConceptNameFromNode } from '../../utils/slate'
 import { Transition } from '@headlessui/react'
 
 const noteBody = "https://face.baby/vocab#noteBody"
@@ -39,9 +39,10 @@ function conceptNameFromUri(uri){
 }
 
 function LinkToConcept({uri}){
-  const name = conceptNameFromUri(uri)
+  const nameInUri = conceptNameFromUri(uri)
+  const name = decodeURIComponent(nameInUri)
   return (
-    <Link href={`/notes/${encodeURIComponent(name)}`}>
+    <Link href={`/notes/${nameInUri}`}>
       <a className="text-blue-500 underline">[[{name}]]</a>
     </Link>
   )
@@ -105,7 +106,8 @@ export default function NotePage(){
   const saveCallback = async function saveNote(){
     var newNote = note || createThing({name: thingName})
     newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
-    const concepts = getConceptNodes(editor).map(([concept]) => `${conceptContainerUri}${concept.name}.ttl#${thingName}`)
+    const concepts = getConceptNodes(editor).map(
+      ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
     const newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
     const newConceptIndex = setThing(conceptIndex || createSolidDataset(), newConceptReferences)
     try {
@@ -140,6 +142,14 @@ export default function NotePage(){
               <Editable readOnly={false} editor={editor} className="flex-grow" />
             </Slate>
           )}
+          {/*
+          <div>
+            <pre>
+              {JSON.stringify(editor.selection, null, 2)}
+              {JSON.stringify(value, null, 2)}
+            </pre>
+          </div>
+           */}
         </div>
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="h-2 text-sm">
           {sidebarOpen ? ">>" : "<<"}

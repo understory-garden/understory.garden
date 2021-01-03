@@ -12,3 +12,7 @@ export function getConceptNodesMatchingName(node, name){
     return (n.type === 'concept') && (n.name === name)
   })
 }
+
+export function getConceptNameFromNode(node){
+  return Node.string(node)
+}

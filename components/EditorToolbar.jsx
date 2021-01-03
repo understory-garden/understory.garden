@@ -8,7 +8,7 @@ import ReactModal from 'react-modal';
 import {
   isMarkActive, toggleMark, isBlockActive, toggleBlock, insertImage,
   isLinkActive, activeLink, insertLink, removeLink, setLinkUrl,
-  isConceptActive, insertConcept
+  isConceptActive, insertConcept, removeConcept
 } from '../utils/editor'
 
 const MarkButton = ({ format, ...props }) => {
@@ -98,6 +98,26 @@ function LinkButton(){
   )
 }
 
+function ConceptLink(){
+  const editor = useSlate()
+  const onUpdateConcept = () => {
+    if (isConceptActive(editor)){
+      removeConcept(editor)
+    } else {
+      insertConcept(editor)
+    }
+  }
+  return (
+    <IconButton
+      title="Concept"
+      active={isConceptActive(editor)}
+      onClick={onUpdateConcept}
+    >
+      [[
+    </IconButton>
+  )
+}
+
 
 export default function EditorToolbar({className, ...props}){
   return (
@@ -107,6 +127,7 @@ export default function EditorToolbar({className, ...props}){
         <MarkButton title="Italic" format="italic"><FormatItalic/></MarkButton>
         <MarkButton title="Underline" format="underline"> <FormatUnderlined/></MarkButton>
         <LinkButton/>
+        <ConceptLink/>
       </div>
     </div>
   )

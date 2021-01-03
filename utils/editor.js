@@ -292,7 +292,7 @@ const unwrapConcept = editor => {
   Transforms.unwrapNodes(editor, { match: n => n.type === 'concept' })
 }
 
-const wrapConcept = (editor, name) => {
+const wrapConcept = (editor) => {
   if (isConceptActive(editor)) {
     unwrapConcept(editor)
   }
@@ -301,10 +301,8 @@ const wrapConcept = (editor, name) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
   const concept = {
     type: 'concept',
-    name,
-    children: isCollapsed ? [{ text: `[[${name}]]` }] : [],
+    children: isCollapsed ? [{ text: '' }] : []
   }
-
   if (isCollapsed) {
     Transforms.insertNodes(editor, concept)
   } else {
@@ -326,34 +324,25 @@ export const isConceptActive = editor => {
   return !!activeConcept(editor)
 }
 
-export const insertConcept = (editor, name) => {
+export const insertConcept = (editor) => {
   if (editor.selection) {
-    wrapConcept(editor, name)
-    Transforms.move(editor, {distance: 2, unit: "character", reverse: true})
+    wrapConcept(editor)
   }
 }
 
 function conceptNameFromText(text){
-  const match = text.match(/^\[\[(.*)\]\]$/)
-  return match && match[1]
+  return text
 }
 
 export const withConcepts = editor => {
   const { isInline, insertText, deleteBackward } = editor
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
+
   editor.insertText = text => {
-    if (isConceptActive(editor)){
-      const [originalConcept] = activeConcept(editor)
-      insertText(text)
-      const updatedConceptInfo = activeConcept(editor)
-      if (updatedConceptInfo) {
-        const [updatedConcept] = updatedConceptInfo
-        const name = conceptNameFromText(updatedConcept.children[0].text)
-        if (name){
-          setConceptProps(editor, originalConcept, name)
-        }
-      }
+    if (isConceptActive(editor)) {
+      const { path, offset } = editor.selection.anchor
+      editor.apply({ type: 'insert_text', path, offset, text })
     } else if (text === "["){
       const start = Range.start(editor.selection)
 
@@ -366,14 +355,10 @@ export const withConcepts = editor => {
       const afterText = Editor.string(editor, afterRange)
 
       if (wordBefore && (beforeText.endsWith("["))){
-        if (afterText){
-          Transforms.delete(editor, {distance: 1, unit: 'word'})
-        }
         Transforms.delete(editor, {distance: 1, unit: 'character', reverse: true})
-        insertConcept(editor, afterText.endsWith("]]") ? afterText.slice(0, -2) : afterText)
-      } else if (wordAfter && (afterText.startsWith("["))){
-        Transforms.delete(editor, {distance: 1, unit: 'word'})
-        insertConcept(editor, afterText.endsWith("]]") ? afterText.slice(1, -2) : afterText.slice(1))
+        const start = Range.start(editor.selection)
+        Transforms.setPoint(editor, Editor.after(editor, start, { unit: 'word' }), {edge: 'focus'})
+        insertConcept(editor)
       } else {
         insertText(text)
       }
@@ -399,7 +384,7 @@ export const withConcepts = editor => {
     }
   }
 
-  disallowEmpty("concept", editor)
+  //disallowEmpty("concept", editor)
 
   return editor
 }
