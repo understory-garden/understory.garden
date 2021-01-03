@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback} from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { Slate, withReact } from 'slate-react'
 import { useWebId, useEnsured, useResource, useThing } from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
-  addUrl, setThing, createSolidDataset, getThing
+  addUrl, setThing, createSolidDataset, getThing, getUrlAll
 } from '@inrupt/solid-client'
+import { namedNode } from "@rdfjs/dataset";
+
 
 import EditorToolbar from "../../components/EditorToolbar"
 import Editable, { useNewEditor } from "../../components/Editable";
@@ -30,6 +33,45 @@ function createConceptReferencesFor(noteUri, conceptUris){
   return conceptReferences
 }
 
+function conceptNameFromUri(uri){
+  return uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'))
+}
+
+function LinkToConcept({uri}){
+  const name = conceptNameFromUri(uri)
+  return (
+    <Link href={`/notes/${encodeURIComponent(name)}`}>
+      <a className="text-blue-500 underline">[[{name}]]</a>
+    </Link>
+  )
+}
+
+function LinksTo({referencesThing}){
+  const conceptUris = getUrlAll(referencesThing, referencesConcept)
+  return (
+    <ul>
+      {conceptUris && conceptUris.map(uri => (
+        <li key={uri}>
+          <LinkToConcept uri={uri}/>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function LinksFrom({conceptIndex, conceptUri}){
+  const linkingConcepts = conceptIndex.match(null, null, namedNode(conceptUri))
+  return (
+    <ul>
+      {linkingConcepts && Array.from(linkingConcepts).map(({subject}) => (
+        <li key={subject.value}>
+          <LinkToConcept uri={subject.value}/>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export default function NotePage(){
   const router = useRouter()
   const { query: { name } } = router
@@ -42,6 +84,7 @@ export default function NotePage(){
   const bodyJSON = note && getStringNoLocale(note, noteBody)
   const errorStatus = error && error.status
   const [value, setValue] = useState(undefined)
+
   useEffect(function setValueFromNote(){
     if (bodyJSON) {
       setValue(JSON.parse(bodyJSON))
@@ -81,7 +124,7 @@ export default function NotePage(){
       </div>
       <button onClick={saveCallback}>save</button>
 
-      <section className="relative max-w-full flex flex-grow" aria-labelledby="slide-over-heading">
+      <section className="relative w-screen flex flex-grow" aria-labelledby="slide-over-heading">
         <div className="w-full flex flex-col flex-grow">
           {(value !== undefined) && (
             <Slate
@@ -107,7 +150,7 @@ export default function NotePage(){
           leaveTo="translate-x-full">
           {
             (ref) => (
-              <div className="w-screen max-w-md flex-grow" ref={ref}>
+              <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
                 <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
                   <div className="px-4 sm:px-6">
                     <div className="flex items-start justify-between">
@@ -116,8 +159,19 @@ export default function NotePage(){
                       </h2>
                     </div>
                   </div>
-                  <div className="mt-6 relative flex-1 px-4 sm:px-6">
-                    LINKZ
+                  <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                    <div>
+                      <h3>Links to</h3>
+                      {conceptReferences && (
+                        <LinksTo referencesThing={conceptReferences}/>
+                      )}
+                    </div>
+                    <div>
+                      <h3>Linked from</h3>
+                      {conceptIndex && (
+                        <LinksFrom conceptIndex={conceptIndex} conceptUri={noteUri}/>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
