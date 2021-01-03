@@ -17,7 +17,7 @@ export function useImageUploadUri(webId) {
   return useEnsured(facebabyContainerUri && `${facebabyContainerUri}images/`)
 }
 
-export function useNoteContainerUri(webId) {
+export function useConceptContainerUri(webId) {
   const facebabyContainerUri = useFacebabyContainerUri(webId)
-  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}notes/`)
+  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}concepts/`)
 }

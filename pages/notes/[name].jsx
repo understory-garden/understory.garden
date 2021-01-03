@@ -13,7 +13,7 @@ import { namedNode } from "@rdfjs/dataset";
 
 import EditorToolbar from "../../components/EditorToolbar"
 import Editable, { useNewEditor } from "../../components/Editable";
-import { useNoteContainerUri } from '../../hooks/uris'
+import { useConceptContainerUri } from '../../hooks/uris'
 import { useConceptIndex } from '../../hooks/concepts'
 import { ExternalLinkIcon } from '../../components/icons'
 import { getConceptNodes } from '../../utils/slate'
@@ -78,10 +78,10 @@ export default function NotePage(){
   const { query: { name } } = router
 
   const webId = useWebId()
-  const noteContainerUri = useNoteContainerUri(webId)
-  const noteDocUri = noteContainerUri && `${noteContainerUri}${encodeURIComponent(name)}.ttl`
-  const noteUri = noteDocUri && `${noteDocUri}#${thingName}`
-  const { error, resource, thing: note, save, isValidating } = useThing(noteUri)
+  const conceptContainerUri = useConceptContainerUri(webId)
+  const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
+  const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
+  const { error, resource, thing: note, save, isValidating } = useThing(conceptUri)
   const bodyJSON = note && getStringNoLocale(note, noteBody)
   const errorStatus = error && error.status
   const [value, setValue] = useState(undefined)
@@ -100,13 +100,13 @@ export default function NotePage(){
   }, [bodyJSON, errorStatus])
 
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
-  const conceptReferences = conceptIndex && getThing(conceptIndex, noteUri)
+  const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){
     var newNote = note || createThing({name: thingName})
     newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
-    const concepts = getConceptNodes(editor).map(([concept]) => `${noteContainerUri}${concept.name}.ttl#${thingName}`)
-    const newConceptReferences = createConceptReferencesFor(noteUri, concepts)
+    const concepts = getConceptNodes(editor).map(([concept]) => `${conceptContainerUri}${concept.name}.ttl#${thingName}`)
+    const newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
     const newConceptIndex = setThing(conceptIndex || createSolidDataset(), newConceptReferences)
     try {
       await save(newNote)
@@ -122,7 +122,7 @@ export default function NotePage(){
     <div className="h-screen flex flex-col">
       <div className="flex flex-row justify-between">
         <h1 className="text-5xl">{name}</h1>
-        <a href={noteDocUri} target="_blank" rel="noopener">
+        <a href={conceptDocUri} target="_blank" rel="noopener">
           <ExternalLinkIcon />
         </a>
       </div>
@@ -173,7 +173,7 @@ export default function NotePage(){
                     <div>
                       <h3>Linked from</h3>
                       {conceptIndex && (
-                        <LinksFrom conceptIndex={conceptIndex} conceptUri={noteUri}/>
+                        <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
                       )}
                     </div>
                   </div>
