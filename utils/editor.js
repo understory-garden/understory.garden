@@ -1,4 +1,4 @@
-import { Editor, Transforms, Range, Point, Element, Text, Path } from 'slate';
+import { Editor, Transforms, Range, Point, Element, Text, Path, Node } from 'slate';
 import { ReactEditor} from 'slate-react';
 
 import imageExtensions from 'image-extensions'
@@ -289,39 +289,33 @@ export const setConceptProps = (editor, concept, name) => {
 }
 
 const unwrapConcept = editor => {
-  Transforms.unwrapNodes(editor, { match: n => n.type === 'concept' })
+  const [_, path] = activeConceptEntry(editor)
+  Editor.withoutNormalizing(editor, () => {
+    Transforms.delete(editor, {at: Editor.start(editor, path), unit: 'character', distance: 2})
+    Transforms.delete(editor, {at: Editor.end(editor, path), unit: 'character', distance: 2, reverse: true})
+  })
+  // normalization will delete the concept now that it doesn't have the right text content
 }
 
-const wrapConcept = (editor) => {
-  if (isConceptActive(editor)) {
-    unwrapConcept(editor)
-  }
-
-  const { selection } = editor
-  const isCollapsed = selection && Range.isCollapsed(selection)
-  const concept = {
-    type: 'concept',
-    children: isCollapsed ? [{ text: '' }] : []
-  }
-  if (isCollapsed) {
-    Transforms.insertNodes(editor, concept)
-  } else {
-    Transforms.wrapNodes(editor, concept, { split: true })
-    Transforms.collapse(editor, { edge: 'end' })
-  }
+const wrapConcept = (editor, {at = editor.selection} = {}) => {
+  // MUST do end first or else cursor will be in the wrong spot
+  Transforms.insertText(editor, "]]", {at: Range.end(at)})
+  Transforms.insertText(editor, "[[", {at: Range.start(at)})
+  // normalization will turn this into a concept
 }
 
 export const removeConcept = (editor) => {
+
   unwrapConcept(editor)
 }
 
-export const activeConcept = editor => {
+export const activeConceptEntry = editor => {
   const [concept] = Editor.nodes(editor, { match: n => n.type === 'concept' })
   return concept
 }
 
 export const isConceptActive = editor => {
-  return !!activeConcept(editor)
+  return !!activeConceptEntry(editor)
 }
 
 export const insertConcept = (editor) => {
@@ -330,61 +324,48 @@ export const insertConcept = (editor) => {
   }
 }
 
-function conceptNameFromText(text){
-  return text
+const conceptRegex = /\[\[(.*)\]\]/
+
+function hasConceptParent(editor, path){
+  const parent = Node.get(editor, path.slice(0, -1))
+  if (parent.type === "concept"){
+    return true
+  } else {
+    return false
+  }
 }
 
 export const withConcepts = editor => {
-  const { isInline, insertText, deleteBackward } = editor
+  const { isInline, insertText, deleteBackward, normalizeNode } = editor
 
   editor.isInline = element => (element.type === 'concept') ? true : isInline(element)
 
-  editor.insertText = text => {
-    if (isConceptActive(editor)) {
-      const { path, offset } = editor.selection.anchor
-      editor.apply({ type: 'insert_text', path, offset, text })
-    } else if (text === "["){
-      const start = Range.start(editor.selection)
-
-      const wordBefore = Editor.before(editor, start, { unit: 'word' });
-      const beforeRange = wordBefore && Editor.range(editor, wordBefore, start);
-      const beforeText = beforeRange && Editor.string(editor, beforeRange)
-
-      const wordAfter = Editor.after(editor, start, { unit: 'word' })
-      const afterRange = Editor.range(editor, start, wordAfter)
-      const afterText = Editor.string(editor, afterRange)
-
-      if (wordBefore && (beforeText.endsWith("["))){
-        Transforms.delete(editor, {distance: 1, unit: 'character', reverse: true})
-        const start = Range.start(editor.selection)
-        Transforms.setPoint(editor, Editor.after(editor, start, { unit: 'word' }), {edge: 'focus'})
-        insertConcept(editor)
-      } else {
-        insertText(text)
+  editor.normalizeNode = entry => {
+    const [node, path] = entry
+    if (Text.isText(node) && !hasConceptParent(editor, path)){
+      const conceptMatch = node.text.match(conceptRegex)
+      if (conceptMatch){
+        const {index, 0: match, 1: name} = conceptMatch
+        const at = {anchor: {path, offset: index}, focus: {path, offset: index + match.length}}
+        Transforms.wrapNodes(editor, {type: "concept", children: []}, { at, split: true })
+        return
       }
-    } else {
-      insertText(text)
-    }
-  }
-
-  editor.deleteBackward = (...args) => {
-    if (isConceptActive(editor)){
-      const [originalConcept, path] = activeConcept(editor)
-      deleteBackward(...args)
-      const [updatedConcept] = activeConcept(editor)
-      const name = conceptNameFromText(updatedConcept.children[0].text)
-      if (name){
-        setConceptProps(editor, originalConcept, name)
+    } else if (node.type === "concept"){
+      const conceptMatch = Node.string(node).match(conceptRegex)
+      if (conceptMatch){
+        const [_, name] = conceptMatch
+        if (node.name !== name){
+          Transforms.setNodes(editor, {name}, {at: path})
+          return
+        }
       } else {
-        Transforms.delete(editor, path, {unit: 'block'})
-        removeConcept(editor)
+        Transforms.unwrapNodes(editor, { match: n => n.type === 'concept' })
+        return
       }
-    } else {
-      deleteBackward(...args)
     }
-  }
 
-  //disallowEmpty("concept", editor)
+    normalizeNode(entry)
+  }
 
   return editor
 }

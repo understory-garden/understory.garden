@@ -14,5 +14,5 @@ export function getConceptNodesMatchingName(node, name){
 }
 
 export function getConceptNameFromNode(node){
-  return Node.string(node)
+  return node.name
 }
