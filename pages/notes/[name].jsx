@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback} from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { Transforms } from 'slate'
 import { Slate, withReact } from 'slate-react'
 import { useWebId, useEnsured, useResource, useThing } from 'swrlit'
 import {
@@ -85,6 +86,11 @@ export default function NotePage(){
   const errorStatus = error && error.status
   const [value, setValue] = useState(undefined)
 
+  const editor = useNewEditor()
+  useEffect(function resetSelectionOnNameChange(){
+    editor.selection = null
+  }, [name])
+
   useEffect(function setValueFromNote(){
     if (bodyJSON) {
       setValue(JSON.parse(bodyJSON))
@@ -95,8 +101,6 @@ export default function NotePage(){
 
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
   const conceptReferences = conceptIndex && getThing(conceptIndex, noteUri)
-
-  const editor = useNewEditor()
 
   const saveCallback = async function saveNote(){
     var newNote = note || createThing({name: thingName})
