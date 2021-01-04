@@ -151,7 +151,7 @@ export default function NotePage(){
           </div>
            */}
         </div>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="h-2 text-sm">
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="h-2 text-2xl text-pink-900 font-bold">
           {sidebarOpen ? ">>" : "<<"}
         </button>
         <Transition
@@ -165,11 +165,11 @@ export default function NotePage(){
           {
             (ref) => (
               <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+                <div className="h-full flex flex-col py-6 shadow-xl overflow-y-scroll">
                   <div className="px-4 sm:px-6">
                     <div className="flex items-start justify-between">
-                      <h2 id="slide-over-heading" className="text-lg font-medium text-gray-900">
-                        Panel title
+                      <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                        Links
                       </h2>
                     </div>
                   </div>
