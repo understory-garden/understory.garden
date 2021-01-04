@@ -10,10 +10,13 @@ export default function Nav() {
   return (
     <nav>
       <ul className="flex justify-between items-center p-8">
+        <Link href="/">
+          <a className="font-bold">home</a>
+        </Link>
         <ul className="flex justify-between items-center space-x-4">
           {loggedIn && (
             <li>
-              <button className="text-white" onClick={logout}>log out</button>
+              <button onClick={logout}>log out</button>
             </li>
           )}
         </ul>

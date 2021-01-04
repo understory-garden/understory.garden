@@ -6,21 +6,23 @@ import { Slate, withReact } from 'slate-react'
 import { useWebId, useEnsured, useResource, useThing } from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
-  addUrl, setThing, createSolidDataset, getThing, getUrlAll
+  addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-
+import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import { Transition } from '@headlessui/react'
 
 import EditorToolbar from "../../components/EditorToolbar"
 import Editable, { useNewEditor } from "../../components/Editable";
+import { ExternalLinkIcon } from '../../components/icons'
+import Nav from '../../components/nav'
+
 import { useConceptContainerUri } from '../../hooks/uris'
 import { useConceptIndex } from '../../hooks/concepts'
-import { ExternalLinkIcon } from '../../components/icons'
-import { getConceptNodes, getConceptNameFromNode } from '../../utils/slate'
-import { Transition } from '@headlessui/react'
 
-const noteBody = "https://face.baby/vocab#noteBody"
-const referencesConcept = "https://face.baby/vocab#refs"
+import { getConceptNodes, getConceptNameFromNode } from '../../utils/slate'
+import { conceptNameFromUri } from '../../model/concept'
+import { noteBody,  refs } from '../../vocab'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -29,16 +31,12 @@ const thingName = "concept"
 function createConceptReferencesFor(noteUri, conceptUris){
   var conceptReferences = createThing({url: noteUri})
   for (const uri of conceptUris){
-    conceptReferences = addUrl(conceptReferences, referencesConcept, uri)
+    conceptReferences = addUrl(conceptReferences, refs, uri)
   }
   return conceptReferences
 }
 
-function conceptNameFromUri(uri){
-  return uri.substring(uri.lastIndexOf('/') + 1, uri.lastIndexOf('.'))
-}
-
-function LinkToConcept({uri}){
+function LinkToConcept({uri, ...props}){
   const nameInUri = conceptNameFromUri(uri)
   const name = decodeURIComponent(nameInUri)
   return (
@@ -49,7 +47,7 @@ function LinkToConcept({uri}){
 }
 
 function LinksTo({referencesThing}){
-  const conceptUris = getUrlAll(referencesThing, referencesConcept)
+  const conceptUris = getUrlAll(referencesThing, refs)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -104,11 +102,12 @@ export default function NotePage(){
   const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){
-    var newNote = note || createThing({name: thingName})
+    let newNote = note || createThing({name: thingName})
     newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
     const concepts = getConceptNodes(editor).map(
       ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
-    const newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
+    let newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
+    newConceptReferences = setDatetime(newConceptReferences, DCTERMS.modified, new Date())
     const newConceptIndex = setThing(conceptIndex || createSolidDataset(), newConceptReferences)
     try {
       await save(newNote)
@@ -121,7 +120,8 @@ export default function NotePage(){
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-black text-white">
+      <Nav />
       <div className="flex flex-row justify-between">
         <h1 className="text-5xl">{name}</h1>
         <a href={conceptDocUri} target="_blank" rel="noopener">

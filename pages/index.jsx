@@ -1,15 +1,20 @@
 import { useState, useCallback } from 'react'
 import { useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
 import {
-  setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid
+  setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid, getThingAll, asUrl,
+  getDatetime
 } from '@inrupt/solid-client'
-import { FOAF, AS, RDF, RDFS } from '@inrupt/vocab-common-rdf'
+import { FOAF, AS, RDF, RDFS, DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
+import { useConceptIndex } from '../hooks/concepts'
 import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
+import { conceptNameFromUri } from '../model/concept'
 
 import Nav from '../components/nav'
+
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -64,6 +69,40 @@ function NewNoteForm(){
   )
 }
 
+function Note({concept}){
+  const uri = asUrl(concept)
+  const nameInUri = conceptNameFromUri(uri)
+  const name = decodeURIComponent(nameInUri)
+
+  return (
+    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200">
+      <Link href={`/notes/${nameInUri}`}>
+        <a>
+          <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
+            <h3 className="text-gray-900 text-xl font-medium truncate text-center">
+              {name}
+            </h3>
+          </div>
+        </a>
+      </Link>
+    </li>
+  )
+}
+
+
+
+function Notes(){
+  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
+  const concepts = conceptIndex && getThingAll(conceptIndex).sort(
+    (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
+  )
+  return (
+    <ul className="grid grid-cols-3 gap-6 sm:grid-cols-6 lg:grid-cols-9">
+      {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept}/>)}
+    </ul>
+  )
+}
+
 export default function IndexPage() {
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
@@ -76,12 +115,12 @@ export default function IndexPage() {
   const webId = useWebId()
   const appContainerUri = useFacebabyContainerUri(webId)
   return (
-    <div className="bg-black h-screen">
+    <div className="bg-black text-white h-screen">
       <Nav />
       { (loggedIn === true) ? (
         <div>
           {name && (
-            <h5 className="text-4xl text-center text-white font-logo">you are {name}</h5>
+            <h5 className="text-4xl text-center font-logo">you are {name}</h5>
           )}
           <div className="flex flex-row m-auto justify-center">
             <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Name" />
@@ -90,10 +129,8 @@ export default function IndexPage() {
             </button>
           </div>
 
-          <h1 className="text-6xl text-center bold font-logo text-white">
-            ANY QUESTIONS?
-          </h1>
-          <NewNoteForm/>
+          <NewNoteForm />
+          <Notes />
         </div>
       ) : (
         (loggedIn === false) ? (
