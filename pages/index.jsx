@@ -61,7 +61,7 @@ function NewNoteForm(){
   })
   return (
     <div className="flex flex-row m-auto justify-center">
-      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Note Name" />
+      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
       <button className="btn text-white" onClick={onCreate}>
         Create Note
       </button>
@@ -123,8 +123,8 @@ export default function IndexPage() {
             <h5 className="text-4xl text-center font-logo">you are {name}</h5>
           )}
           <div className="flex flex-row m-auto justify-center">
-            <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Name" />
-            <button className="btn text-white" onClick={onSave}>
+            <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+            <button className="btn" onClick={onSave}>
               Set Name
             </button>
           </div>
