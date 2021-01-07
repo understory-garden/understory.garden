@@ -36,6 +36,9 @@ const InsertItem = forwardRef(({ element, icon, iconBg="bg-pink-600", children, 
 
 const InsertMenu = ({ element, onClose, className, ...props }) => {
   const [imagePickerOpen, setImagePickerOpen] = useState(false)
+  const webId = useWebId()
+  const uploadDirectory = useImageUploadUri(webId)
+
   return (
     <Menu
       onClose={onClose}
@@ -44,9 +47,12 @@ const InsertMenu = ({ element, onClose, className, ...props }) => {
       {imagePickerOpen ? (
         <ImageUploader className={className}
                        element={element}
-                       onClose={() => setImagePickerOpen(false)}
+                       onClose={() => {
+                         onClose()
+                         setImagePickerOpen(false)
+                       }}
                        open={imagePickerOpen}
-                       uploadDirectory={""}
+                       uploadDirectory={uploadDirectory}
                        {...props}
         />
       ) : (

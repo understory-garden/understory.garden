@@ -90,13 +90,13 @@ export const useNewEditor = () => useMemo(
       withLists(
         withChecklists(
           withLinks(
-            //          withImages(
-            withReact(
-              withHistory(
-                createEditor()
+            withImages(
+              withReact(
+                withHistory(
+                  createEditor()
+                )
               )
             )
-            //          )
           )
         )
       )

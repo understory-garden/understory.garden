@@ -18,6 +18,16 @@ const ImageElement = ({ attributes, children, element }) => {
   const path = ReactEditor.findPath(editor, element)
   return (
     <div {...attributes}>
+      {editing ? (
+        <ImageEditor element={element}
+                     onClose={() => setEditing(false)}
+                     onSave={(savedUrl) => {
+                       const u = new URL(savedUrl)
+                       u.searchParams.set("updated", Date.now().toString())
+                       Transforms.setNodes(editor, { url: u.toString() }, { at: path })
+                       setEditing(false)
+                     }} />
+      ) : (
       <div contentEditable={false} className="select-none flex">
         <img ref={image}
              alt={element.alt || ""}
@@ -45,17 +55,8 @@ const ImageElement = ({ attributes, children, element }) => {
           </div>
         </div>
       </div>
-      {children}
-      {editing && (
-        <ImageEditor element={element}
-                     onClose={() => setEditing(false)}
-                     onSave={(savedUrl) => {
-                       const u = new URL(savedUrl)
-                       u.searchParams.set("updated", Date.now().toString())
-                       Transforms.setNodes(editor, { url: u.toString() }, { at: path })
-                       setEditing(false)
-                     }} />
       )}
+      {children}
     </div>
   )
 }
