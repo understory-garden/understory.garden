@@ -12,8 +12,9 @@ import Link from 'next/link'
 import { useConceptIndex } from '../hooks/concepts'
 import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
 import { conceptNameFromUri } from '../model/concept'
-
+import { profilePath } from '../utils/uris'
 import Nav from '../components/nav'
+import Notes from '../components/Notes'
 
 
 function LoginUI(){
@@ -69,40 +70,6 @@ function NewNoteForm(){
   )
 }
 
-function Note({concept}){
-  const uri = asUrl(concept)
-  const nameInUri = conceptNameFromUri(uri)
-  const name = decodeURIComponent(nameInUri)
-
-  return (
-    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200">
-      <Link href={`/notes/${nameInUri}`}>
-        <a>
-          <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
-            <h3 className="text-gray-900 text-xl font-medium truncate text-center">
-              {name}
-            </h3>
-          </div>
-        </a>
-      </Link>
-    </li>
-  )
-}
-
-
-
-function Notes(){
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
-  const concepts = conceptIndex && getThingAll(conceptIndex).sort(
-    (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
-  )
-  return (
-    <ul className="grid grid-cols-3 gap-6 sm:grid-cols-6 lg:grid-cols-9">
-      {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept}/>)}
-    </ul>
-  )
-}
-
 export default function IndexPage() {
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
@@ -120,8 +87,15 @@ export default function IndexPage() {
       { (loggedIn === true) ? (
         <div>
           {name && (
-            <h5 className="text-4xl text-center font-logo">you are {name}</h5>
+            <h3 className="text-4xl text-center font-logo">you are {name}</h3>
           )}
+          <h5 className="text-xl text-center font-logo">
+            <Link href={`${profilePath(webId)}`}>
+              <a>
+                public profile
+              </a>
+            </Link>
+          </h5>
           <div className="flex flex-row m-auto justify-center">
             <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
             <button className="btn" onClick={onSave}>

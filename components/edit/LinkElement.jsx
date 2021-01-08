@@ -1,4 +1,4 @@
-import React, { useState, useRef, FunctionComponent } from 'react'
+import React, { useState, useRef } from 'react'
 import { Transforms, Range, Element } from 'slate';
 import { useSelected, useEditor } from 'slate-react';
 

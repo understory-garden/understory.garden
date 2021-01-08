@@ -1,3 +1,4 @@
+import { useContext } from 'react'
 import { useSelected, useEditor } from 'slate-react';
 import { useWebId } from 'swrlit'
 import Link from 'next/link'
@@ -5,12 +6,13 @@ import { Popover } from 'react-tiny-popover'
 
 import { ExternalLinkIcon } from "../icons"
 import { getConceptNameFromNode } from '../../utils/slate'
+import NoteContext from '../../contexts/NoteContext'
 
 const ConceptElement = ({ attributes, children, element }) => {
   const selected = useSelected()
   const editor = useEditor()
-  const conceptPrefix = "/notes/"
-  const noteUrl = `${conceptPrefix}${encodeURIComponent(getConceptNameFromNode(element))}`
+  const { path } = useContext(NoteContext)
+  const noteUrl = `${path}/${encodeURIComponent(getConceptNameFromNode(element))}`
   return (
     <Popover isOpen={selected}
              positions={['bottom', 'right', 'top', 'left']}
