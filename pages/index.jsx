@@ -15,7 +15,7 @@ import { conceptNameFromUri } from '../model/concept'
 import { profilePath } from '../utils/uris'
 import Nav from '../components/nav'
 import Notes from '../components/Notes'
-
+import Follows from '../components/Follows'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -81,6 +81,7 @@ export default function IndexPage() {
 
   const webId = useWebId()
   const appContainerUri = useFacebabyContainerUri(webId)
+
   return (
     <div className="bg-black text-white h-screen">
       <Nav />
@@ -89,6 +90,12 @@ export default function IndexPage() {
           {name && (
             <h3 className="text-4xl text-center font-logo">you are {name}</h3>
           )}
+          <div className="flex flex-row m-auto justify-center">
+            <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+            <button className="btn" onClick={onSave}>
+              Set Name
+            </button>
+          </div>
           <h5 className="text-xl text-center font-logo">
             <Link href={`${profilePath(webId)}`}>
               <a>
@@ -96,13 +103,8 @@ export default function IndexPage() {
               </a>
             </Link>
           </h5>
-          <div className="flex flex-row m-auto justify-center">
-            <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
-            <button className="btn" onClick={onSave}>
-              Set Name
-            </button>
-          </div>
 
+          <Follows />
           <NewNoteForm />
           <Notes />
         </div>
