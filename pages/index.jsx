@@ -61,9 +61,9 @@ function NewNoteForm(){
     router.push(`/notes/${encodeURIComponent(noteName)}`)
   })
   return (
-    <div className="flex flex-row m-auto justify-center">
+    <div className="flex flex-row m-auto justify-center my-12">
       <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
-      <button className="btn text-white" onClick={onCreate}>
+      <button className="btn" onClick={onCreate}>
         Create Note
       </button>
     </div>
@@ -86,15 +86,17 @@ export default function IndexPage() {
     <div className="bg-black text-white h-screen">
       <Nav />
       { (loggedIn === true) ? (
-        <div>
-          {name && (
-            <h3 className="text-4xl text-center font-logo">you are {name}</h3>
-          )}
-          <div className="flex flex-row m-auto justify-center">
-            <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
-            <button className="btn" onClick={onSave}>
-              Set Name
-            </button>
+        <div className="px-6">
+          <div className="flex flex-row justify-between py-6">
+            {name && (
+              <h3 className="text-4xl text-center font-logo">you are {name}</h3>
+            )}
+            <div className="flex flex-row justify-center">
+              <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+              <button className="btn" onClick={onSave}>
+                Set Name
+              </button>
+            </div>
           </div>
           <h5 className="text-xl text-center font-logo">
             <Link href={`${profilePath(webId)}`}>
@@ -106,7 +108,7 @@ export default function IndexPage() {
 
           <Follows />
           <NewNoteForm />
-          <Notes />
+          <Notes webId={webId}/>
         </div>
       ) : (
         (loggedIn === false) ? (

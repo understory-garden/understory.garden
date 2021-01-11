@@ -7,7 +7,7 @@ module.exports = {
       },
     },
     fontFamily: {
-//      sans: ['catnip', 'sans-serif'],
+      sans: ['westsac', 'sans-serif'],
       logo: ['westsac', 'sans-serif'],
       mono: ['fira-mono', 'monospace']
     },

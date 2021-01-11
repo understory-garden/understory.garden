@@ -31,8 +31,8 @@ function Note({concept}){
   )
 }
 
-export default function Notes({path = "/notes"}){
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
+export default function Notes({path = "/notes", webId}){
+  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const concepts = conceptIndex && getThingAll(conceptIndex).sort(
     (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
   )

@@ -2,11 +2,19 @@
 
 /* Write your own custom base styles here */
 
+a {
+    @apply text-purple-300;
+}
+
 /* Start purging... */
 @tailwind components;
 /* Stop purging. */
 
 /* Write your own custom component styles here */
+
+.btn {
+    @apply bg-purple-100 text-gray-800 text-xl rounded-lg px-3;
+}
 
 .block {
   @apply relative pl-4 border-b-2 border-transparent;

@@ -30,7 +30,7 @@ export default function ProfilePage(){
       <button onClick={follow}>
         follow
       </button>
-      <Notes path={profilePath(webId)}/>
+      <Notes path={profilePath(webId)} webId={webId}/>
     </div>
   )
 }
