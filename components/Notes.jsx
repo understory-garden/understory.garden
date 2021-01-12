@@ -17,7 +17,7 @@ function Note({concept}){
   const { path } = useContext(NoteContext)
 
   return (
-    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200">
+    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200 overflow-x-scroll">
       <Link href={`${path}/${nameInUri}`}>
         <a>
           <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
