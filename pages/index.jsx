@@ -63,7 +63,7 @@ function NewNoteForm(){
     router.push(`/notes/${encodeURIComponent(noteName)}`)
   })
   return (
-    <div className="flex flex-row m-auto justify-center my-12">
+    <div className="flex flex-row m-auto my-12">
       <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
       <button className="btn" onClick={onCreate}>
         Create Note
@@ -107,10 +107,13 @@ export default function IndexPage() {
               </a>
             </Link>
           </h5>
-
-          <Follows />
-          <NewNoteForm />
-          <Notes webId={webId}/>
+          <div className="flex">
+            <div className="mr-6">
+              <NewNoteForm />
+              <Notes webId={webId}/>
+            </div>
+            <Follows />
+          </div>
         </div>
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
