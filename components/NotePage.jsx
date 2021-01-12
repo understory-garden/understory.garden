@@ -11,6 +11,7 @@ import {
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
+import { useDebounce } from 'use-debounce';
 
 import EditorToolbar from "./EditorToolbar"
 import Editable, { useNewEditor } from "./Editable";
@@ -76,6 +77,24 @@ function LinksFrom({conceptIndex, conceptUri}){
   )
 }
 
+function createNote(){
+  return createThing({name: thingName})
+}
+
+function createOrUpdateNote(note, value){
+  let newNote = note || createNote()
+  newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
+  return newNote
+}
+
+function createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri){
+  const concepts = getConceptNodes(editor).map(
+    ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
+  let newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
+  newConceptReferences = setDatetime(newConceptReferences, DCTERMS.modified, new Date())
+  return setThing(conceptIndex || createSolidDataset(), newConceptReferences)
+}
+
 export default function NotePage({name, webId, path="/notes"}){
   const conceptContainerUri = useConceptContainerUri(webId)
   const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
@@ -84,6 +103,9 @@ export default function NotePage({name, webId, path="/notes"}){
   const bodyJSON = note && getStringNoLocale(note, noteBody)
   const errorStatus = error && error.status
   const [value, setValue] = useState(undefined)
+  const [debouncedValue] = useDebounce(value, 1500);
+  const [saving, setSaving] = useState(false)
+  const saved = ((value === undefined) || (bodyJSON === JSON.stringify(value)))
 
   const editor = useNewEditor()
   useEffect(function resetSelectionOnNameChange(){
@@ -92,30 +114,38 @@ export default function NotePage({name, webId, path="/notes"}){
 
   useEffect(function setValueFromNote(){
     if (bodyJSON) {
-      setValue(JSON.parse(bodyJSON))
+      const v = JSON.parse(bodyJSON)
+      setValue(v)
     } else if (errorStatus == 404){
       setValue(emptyBody)
     }
   }, [bodyJSON, errorStatus])
 
+
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){
-    let newNote = note || createThing({name: thingName})
-    newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
-    const concepts = getConceptNodes(editor).map(
-      ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
-    let newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
-    newConceptReferences = setDatetime(newConceptReferences, DCTERMS.modified, new Date())
-    const newConceptIndex = setThing(conceptIndex || createSolidDataset(), newConceptReferences)
+    const newNote = createOrUpdateNote(note, value)
+    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri)
+    setSaving(true)
     try {
       await save(newNote)
       await saveConceptIndex(newConceptIndex)
     } catch (e) {
       console.log("error saving note", e)
+    } finally {
+      setSaving(false)
     }
   }
+
+  useEffect(function saveAfterDebounce(){
+    if (debouncedValue){
+      if (JSON.stringify(debouncedValue) !== bodyJSON){
+        saveCallback()
+      }
+    }
+  }, [debouncedValue])
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -134,7 +164,20 @@ export default function NotePage({name, webId, path="/notes"}){
             source
           </a>
         </div>
-        <button onClick={saveCallback}>save</button>
+        <div className="flex justify-center">
+        {saving ? (
+          <h3 className="text-yellow-200">saving...</h3>
+        ) : (
+          saved ? (
+            <h3>saved</h3>
+          ) : (
+            <div>
+              <h3 className="text-red-500">unsaved</h3>
+              <button onClick={saveCallback}>save</button>
+            </div>
+          )
+        )}
+        </div>
 
         <section className="relative w-screen flex flezx-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
