@@ -98,7 +98,7 @@ export default function NotePage({name, webId, path="/notes"}){
     }
   }, [bodyJSON, errorStatus])
 
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex()
+  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){
