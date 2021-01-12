@@ -37,11 +37,11 @@ export default function ProfilePage(){
         )}
         {(follows && !isMyProfile) && (
           alreadyFollowing ? (
-            <button onClick={unfollow}>
+            <button className="btn" onClick={unfollow}>
               unfollow
             </button>
           ) : (
-            <button onClick={follow}>
+            <button className="btn" onClick={follow}>
               follow
             </button>
           )

@@ -51,7 +51,7 @@ function LoginUI(){
           hm, I don't recognize that handle
         </p>
       )}
-      <button className="bg-black text-white mt-6 text-3xl font-logo" onClick={logIn}>log in</button>
+      <button className="mt-6 text-3xl font-logo" onClick={logIn}>log in</button>
     </div>
   )
 }

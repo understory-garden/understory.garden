@@ -6,10 +6,6 @@ a {
     @apply text-purple-300;
 }
 
-button {
-    @apply bg-purple-100 text-gray-800 text-xl rounded-lg px-3;
-}
-
 /* Start purging... */
 @tailwind components;
 /* Stop purging. */
