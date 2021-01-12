@@ -9,7 +9,7 @@ export default function Nav() {
   const { logout } = useAuthentication()
   return (
     <nav>
-      <ul className="flex justify-between items-center p-8">
+      <ul className="flex justify-between items-center pb-6">
         <Link href="/">
           <a className="font-bold">home</a>
         </Link>

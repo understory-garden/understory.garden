@@ -152,9 +152,9 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
 
   return (
     <NoteContext.Provider value={{path}}>
-      <div className="h-screen flex flex-col bg-black text-white">
+      <div className="h-screen flex flex-col bg-black text-white p-6">
         <Nav />
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between mb-3">
           <h1 className="text-5xl">{name}</h1>
           {readOnly ? (
             (myWebId === webId) && (
@@ -175,23 +175,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
             source
           </a>
         </div>
-        {!readOnly && (
-          <div className="flex justify-center">
-            {saving ? (
-              <h3 className="text-yellow-200">saving...</h3>
-            ) : (
-              saved ? (
-                <h3>saved</h3>
-              ) : (
-                <div>
-                  <h3 className="text-red-500">unsaved</h3>
-                  <button onClick={saveCallback}>save</button>
-                </div>
-              )
-            )}
-          </div>
-        )}
-        <section className="relative w-screen flex flezx-grow" aria-labelledby="slide-over-heading">
+        <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
             {(value !== undefined) && (
               <Slate
@@ -199,8 +183,54 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 value={value}
                 onChange={newValue => setValue(newValue)}
               >
-                {!readOnly && <EditorToolbar/>}
-                <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
+                {!readOnly && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3"/>}
+                <div className="flex-grow flex flex-row">
+                  <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
+                  <div className="relative">
+                    <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                            className="h-2 text-2xl text-pink-900 font-bold absolute">
+                      {sidebarOpen ? ">>" : "<<"}
+                    </button>
+                    <Transition
+                      show={sidebarOpen}
+                      enter="transform transition ease-in-out duration-500 sm:duration-700"
+                      enterFrom="translate-x-full"
+                      enterTo="translate-x-0"
+                      leave="transform transition ease-in-out duration-500 sm:duration-700"
+                      leaveFrom="translate-x-0"
+                      leaveTo="translate-x-full">
+                      {
+                        (ref) => (
+                          <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                            <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                              <div className="px-6 sm:px-6">
+                                <div className="flex items-start justify-between">
+                                  <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                    Links
+                                  </h2>
+                                </div>
+                              </div>
+                              <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                                <div>
+                                  <h3>Links to</h3>
+                                  {conceptReferences && (
+                                    <LinksTo referencesThing={conceptReferences}/>
+                                  )}
+                                </div>
+                                <div>
+                                  <h3>Linked from</h3>
+                                  {conceptIndex && (
+                                    <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      }
+                    </Transition>
+                  </div>
+                </div>
               </Slate>
             )}
             {/*
@@ -212,47 +242,6 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                </div>
              */}
           </div>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="h-2 text-2xl text-pink-900 font-bold">
-            {sidebarOpen ? ">>" : "<<"}
-          </button>
-          <Transition
-            show={sidebarOpen}
-            enter="transform transition ease-in-out duration-500 sm:duration-700"
-            enterFrom="translate-x-full"
-            enterTo="translate-x-0"
-            leave="transform transition ease-in-out duration-500 sm:duration-700"
-            leaveFrom="translate-x-0"
-            leaveTo="translate-x-full">
-            {
-              (ref) => (
-                <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                  <div className="h-full flex flex-col py-6 shadow-xl overflow-y-scroll">
-                    <div className="px-4 sm:px-6">
-                      <div className="flex items-start justify-between">
-                        <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                          Links
-                        </h2>
-                      </div>
-                    </div>
-                    <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                      <div>
-                        <h3>Links to</h3>
-                        {conceptReferences && (
-                          <LinksTo referencesThing={conceptReferences}/>
-                        )}
-                      </div>
-                      <div>
-                        <h3>Linked from</h3>
-                        {conceptIndex && (
-                          <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            }
-          </Transition>
         </section>
       </div>
     </NoteContext.Provider>

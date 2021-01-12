@@ -137,15 +137,31 @@ function ConceptLink(){
 }
 
 
-export default function EditorToolbar({className, ...props}){
+export default function EditorToolbar({className, saving, saved, save, ...props}){
   return (
-    <div className={`flex flex-col ${className || ''}`} {...props}>
+    <div className={`flex justify-between ${className || ''}`} {...props}>
       <div>
         <MarkButton title="Bold" format="bold"><FormatBold/></MarkButton>
         <MarkButton title="Italic" format="italic"><FormatItalic/></MarkButton>
         <MarkButton title="Underline" format="underline"> <FormatUnderlined/></MarkButton>
         <LinkButton/>
         <ConceptLink/>
+      </div>
+      <div>
+        <div className="flex justify-center">
+          {saving ? (
+            <h3 className="text-yellow-200">saving...</h3>
+          ) : (
+            saved ? (
+              <h3>saved</h3>
+            ) : (
+              <>
+                <h3 className="text-red-500">unsaved</h3>
+                <button onClick={save}>save</button>
+              </>
+            )
+          )}
+        </div>
       </div>
     </div>
   )
