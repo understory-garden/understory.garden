@@ -24,6 +24,8 @@ function LoginUI(){
   async function logIn(){
     setBadHandle(false)
     try {
+
+
       await loginHandle(handle);
     } catch (e) {
       console.log("error:", e)
@@ -111,7 +113,7 @@ export default function IndexPage() {
           <Notes webId={webId}/>
         </div>
       ) : (
-        (loggedIn === false) ? (
+        ((loggedIn === false) || (loggedIn === null)) ? (
           <>
             <div className="py-20">
               <h1 className="text-6xl text-center bold font-logo text-white">
