@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { useSelected, useEditor } from 'slate-react';
+import { useSelected, useEditor, useReadOnly } from 'slate-react';
 import { useWebId } from 'swrlit'
 import Link from 'next/link'
 import { Popover } from 'react-tiny-popover'
@@ -11,9 +11,14 @@ import NoteContext from '../../contexts/NoteContext'
 const ConceptElement = ({ attributes, children, element }) => {
   const selected = useSelected()
   const editor = useEditor()
+  const readOnly = useReadOnly()
   const { path } = useContext(NoteContext)
   const noteUrl = `${path}/${encodeURIComponent(getConceptNameFromNode(element))}`
-  return (
+  return readOnly ? (
+    <Link href={noteUrl}>
+      <a className="text-blue-500">{children}</a>
+    </Link>
+  ) : (
     <Popover isOpen={selected}
              positions={['bottom', 'right', 'top', 'left']}
              content={

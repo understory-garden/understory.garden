@@ -24,7 +24,7 @@ import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
 
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
-import { publicNotePath } from '../utils/uris'
+import { publicNotePath, privateNotePath } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
 import { noteBody,  refs } from '../vocab'
 
@@ -95,7 +95,8 @@ function createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, c
   return setThing(conceptIndex || createSolidDataset(), newConceptReferences)
 }
 
-export default function NotePage({name, webId, path="/notes"}){
+export default function NotePage({name, webId, path="/notes", readOnly=false}){
+  const myWebId = useWebId()
   const conceptContainerUri = useConceptContainerUri(webId)
   const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
   const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
@@ -155,30 +156,41 @@ export default function NotePage({name, webId, path="/notes"}){
         <Nav />
         <div className="flex flex-row justify-between">
           <h1 className="text-5xl">{name}</h1>
-          <Link href={publicNotePath(webId, name)}>
-            <a>
-              public link
-            </a>
-          </Link>
+          {readOnly ? (
+            (myWebId === webId) && (
+              <Link href={privateNotePath(name)}>
+                <a>
+                  edit link
+                </a>
+              </Link>
+            )
+          ) : (
+            <Link href={publicNotePath(webId, name)}>
+              <a>
+                public link
+              </a>
+            </Link>
+          )}
           <a href={conceptDocUri} target="_blank" rel="noopener">
             source
           </a>
         </div>
-        <div className="flex justify-center">
-        {saving ? (
-          <h3 className="text-yellow-200">saving...</h3>
-        ) : (
-          saved ? (
-            <h3>saved</h3>
-          ) : (
-            <div>
-              <h3 className="text-red-500">unsaved</h3>
-              <button onClick={saveCallback}>save</button>
-            </div>
-          )
+        {!readOnly && (
+          <div className="flex justify-center">
+            {saving ? (
+              <h3 className="text-yellow-200">saving...</h3>
+            ) : (
+              saved ? (
+                <h3>saved</h3>
+              ) : (
+                <div>
+                  <h3 className="text-red-500">unsaved</h3>
+                  <button onClick={saveCallback}>save</button>
+                </div>
+              )
+            )}
+          </div>
         )}
-        </div>
-
         <section className="relative w-screen flex flezx-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
             {(value !== undefined) && (
@@ -187,8 +199,8 @@ export default function NotePage({name, webId, path="/notes"}){
                 value={value}
                 onChange={newValue => setValue(newValue)}
               >
-                <EditorToolbar/>
-                <Editable readOnly={false} editor={editor} className="flex-grow" />
+                {!readOnly && <EditorToolbar/>}
+                <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
               </Slate>
             )}
             {/*

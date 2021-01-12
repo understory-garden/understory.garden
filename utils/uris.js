@@ -25,3 +25,7 @@ export function profilePath(webId){
 export function publicNotePath(webId, name){
   return `${profilePath(webId)}/${encodeURIComponent(name)}`
 }
+
+export function privateNotePath(name){
+  return `/notes/${encodeURIComponent(name)}`
+}

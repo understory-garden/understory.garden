@@ -106,14 +106,15 @@ export const useNewEditor = () => useMemo(
   []
 )
 
-const Editable = ({ editor, ...props }) => {
+const Editable = ({ editor, readOnly, ...props }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const renderElement = useCallback(props => <Element {...props} />, [])
   return <SlateEditable
            renderLeaf={renderLeaf}
            renderElement={renderElement}
+           readOnly={readOnly}
            spellCheck
-           placeholder="Click here to add content..."
+           placeholder={readOnly ? "" : "Click here to add content..."}
            onKeyDown={(event) => {
              for (const hotkey in HOTKEYS) {
                if (isHotkey(hotkey, event.nativeEvent)) {
