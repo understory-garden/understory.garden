@@ -19,6 +19,10 @@ p {
 
 /* Write your own custom component styles here */
 
+.page {
+    @apply bg-black text-gray-100 h-screen overflow-y-scroll p-6;
+}
+
 .btn {
     @apply bg-purple-100 text-gray-800 text-xl rounded-lg px-3;
 }

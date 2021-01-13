@@ -29,7 +29,7 @@ export default function ProfilePage(){
   const follows = useFollows()
   const alreadyFollowing = follows && follows.includes(webId)
   return (
-    <div className="bg-black text-white h-screen p-6">
+    <div className="page">
       <Nav />
       <div className="flex justify-between mb-6">
         {name && (

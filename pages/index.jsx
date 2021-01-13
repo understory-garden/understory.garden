@@ -85,7 +85,7 @@ export default function IndexPage() {
   const appContainerUri = useFacebabyContainerUri(webId)
 
   return (
-    <div className="bg-black text-white h-screen p-6">
+    <div className="page">
       <Nav />
       { (loggedIn === true) ? (
         <div className="px-6">
