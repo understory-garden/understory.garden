@@ -107,8 +107,8 @@ export default function IndexPage() {
               </a>
             </Link>
           </h5>
-          <div className="flex">
-            <div className="mr-6">
+          <div className="flex justify-between">
+            <div className="mr-6 flex-grow">
               <NewNoteForm />
               <Notes webId={webId}/>
             </div>
