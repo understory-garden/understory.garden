@@ -6,6 +6,13 @@ a {
     @apply text-purple-300;
 }
 
+blockquote {
+    @apply m-2 p-2 bg-gray-800 ;
+}
+
+p {
+    @apply text-lg;
+}
 /* Start purging... */
 @tailwind components;
 /* Stop purging. */

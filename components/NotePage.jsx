@@ -152,7 +152,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
 
   return (
     <NoteContext.Provider value={{path}}>
-      <div className="h-screen flex flex-col bg-black text-white p-6">
+      <div className="h-screen flex flex-col bg-black text-white p-6 overflow-y-scroll">
         <Nav />
         <div className="flex flex-row justify-between mb-3">
           <h1 className="text-5xl">{name}</h1>
