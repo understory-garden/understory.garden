@@ -11,7 +11,7 @@ export default function Nav() {
     <nav>
       <ul className="flex justify-between items-center pb-6">
         <Link href="/">
-          <a className="font-bold">home</a>
+          <a className="font-bold text-3xl">👶</a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
           {loggedIn && (
