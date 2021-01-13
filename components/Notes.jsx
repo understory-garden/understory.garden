@@ -38,7 +38,7 @@ export default function Notes({path = "/notes", webId}){
   )
   return (
     <NoteContext.Provider value={{path}}>
-      <ul className="grid grid-cols-3 gap-6 sm:grid-cols-6 lg:grid-cols-9">
+      <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept}/>)}
       </ul>
     </NoteContext.Provider>
