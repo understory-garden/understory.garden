@@ -3,10 +3,11 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
 import { Slate, withReact } from 'slate-react'
-import { useWebId, useEnsured, useResource, useThing } from 'swrlit'
+import { useWebId, useEnsured, useResource, useThing, useAuthentication } from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
-  addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime
+  addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
+  removeThing
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
@@ -142,7 +143,10 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
 
   useEffect(function saveAfterDebounce(){
     if (debouncedValue){
-      if (JSON.stringify(debouncedValue) !== bodyJSON){
+      const isInitialNoteState = (
+        (debouncedValue === emptyBody) && (bodyJSON === undefined)
+      )
+      if ((JSON.stringify(debouncedValue) !== bodyJSON) && !isInitialNoteState){
         saveCallback()
       }
     }
@@ -150,9 +154,23 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const { fetch } = useAuthentication()
+  const router = useRouter()
+  async function deleteCallback(){
+    if (confirm(`Are you sure you want to delete ${name} ?`)){
+      // don't wait for this to return: we don't care
+      fetch(conceptUri, { method: 'DELETE' })
+      // do wait for this to return so it doesn't show up on the homepage
+      if (conceptReferences){
+        await saveConceptIndex(removeThing(conceptIndex, conceptReferences))
+      }
+      router.push("/")
+    }
+  }
+
   return (
     <NoteContext.Provider value={{path}}>
-      <div className="h-screen flex flex-col bg-black text-white p-6 overflow-y-scroll">
+      <div className="flex flex-col page">
         <Nav />
         <div className="flex flex-row justify-between mb-3">
           <h1 className="text-5xl">{name}</h1>
@@ -223,6 +241,14 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                                     <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
                                   )}
                                 </div>
+                              </div>
+                              <div className="px-6 mt-6">
+                                <h2 className="text-xl">
+                                  Actions
+                                </h2>
+                                <button className="btn" onClick={deleteCallback}>
+                                  delete
+                                </button>
                               </div>
                             </div>
                           </div>
