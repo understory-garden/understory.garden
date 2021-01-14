@@ -19,6 +19,10 @@ p {
 
 /* Write your own custom component styles here */
 
+.image-icon:hover {
+    @apply text-gray-500 cursor-pointer;
+}
+
 .page {
     @apply bg-black text-gray-100 h-screen overflow-y-scroll p-6;
 }

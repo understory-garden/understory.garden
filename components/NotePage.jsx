@@ -7,10 +7,10 @@ import { useWebId, useEnsured, useResource, useThing, useAuthentication } from '
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing
+  removeThing, getUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
 
@@ -167,31 +167,34 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
       router.push("/")
     }
   }
-
+  const coverImage = note && getUrl(note, FOAF.img)
   return (
-    <NoteContext.Provider value={{path}}>
+    <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
         <Nav />
-        <div className="flex flex-row justify-between mb-3">
-          <h1 className="text-5xl">{name}</h1>
-          {readOnly ? (
-            (myWebId === webId) && (
-              <Link href={privateNotePath(name)}>
+        <div className="relative h-24 sm:h-48 overflow-y-hidden">
+          {coverImage && <img className="w-full" src={coverImage}/>}
+          <div className="flex flex-row justify-between absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black">
+            <h1 className="text-5xl">{name}</h1>
+            {readOnly ? (
+              (myWebId === webId) && (
+                <Link href={privateNotePath(name)}>
+                  <a>
+                    edit link
+                  </a>
+                </Link>
+              )
+            ) : (
+              <Link href={publicNotePath(webId, name)}>
                 <a>
-                  edit link
+                  public link
                 </a>
               </Link>
-            )
-          ) : (
-            <Link href={publicNotePath(webId, name)}>
-              <a>
-                public link
-              </a>
-            </Link>
-          )}
-          <a href={conceptDocUri} target="_blank" rel="noopener">
-            source
-          </a>
+            )}
+            <a href={conceptDocUri} target="_blank" rel="noopener">
+              source
+            </a>
+          </div>
         </div>
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
