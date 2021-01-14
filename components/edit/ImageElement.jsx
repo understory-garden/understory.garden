@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react'
 import { Transforms } from 'slate';
-import { useSelected, useFocused, useEditor, ReactEditor } from 'slate-react';
+import { useSelected, useFocused, useEditor, useReadOnly, ReactEditor } from 'slate-react';
 import { setUrl } from '@inrupt/solid-client'
 import { FOAF } from '@inrupt/vocab-common-rdf'
 
@@ -12,6 +12,7 @@ import NoteContext from '../../contexts/NoteContext'
 const ImageElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   const image = useRef(null)
+  const readOnly = useReadOnly()
   const [editing, setEditing] = useState(false)
   const [dragStart, setDragStart] = useState(null)
   const [dragStartImageWidth, setDragStartImageWidth] = useState(null)
@@ -35,33 +36,36 @@ const ImageElement = ({ attributes, children, element }) => {
                        setEditing(false)
                      }} />
       ) : (
-      <div contentEditable={false} className="select-none flex">
-        <img ref={image}
+      <div contentEditable={false} className="select-none flex flex-row">
+        <img className="self-start"
+             ref={image}
              alt={element.alt || ""}
              src={element.url}
              style={{width}}
         />
-        <div className="flex flex-col flex-shrink-0">
-          <EditIcon className="image-icon" onClick={() => setEditing(true)} />
-          <CoverImageIcon className="image-icon" onClick={() => setAsCoverImage()} />
-          <div className="flex-grow-1 image-icon"
-               draggable={true}
-               onDragStart={e => {
-                 Transforms.select(editor, path)
-                 setDragStartImageWidth(image && image.current && image.current.clientWidth)
-                 setDragStart(e.clientX)
-               }}
-               onDrag={e => {
-                 if (dragStartImageWidth && dragStart) {
-                   const newWidth = dragStartImageWidth + (e.clientX - dragStart)
-                   if (width !== newWidth) {
-                     Transforms.setNodes(editor, { width: newWidth }, { at: path })
+        {!readOnly && (
+          <div className="flex flex-col flex-shrink-0">
+            <EditIcon className="image-icon" onClick={() => setEditing(true)} />
+            <CoverImageIcon className="image-icon" onClick={() => setAsCoverImage()} />
+            <div className="flex-grow-1 image-icon"
+                 draggable={true}
+                 onDragStart={e => {
+                   Transforms.select(editor, path)
+                   setDragStartImageWidth(image && image.current && image.current.clientWidth)
+                   setDragStart(e.clientX)
+                 }}
+                 onDrag={e => {
+                   if (dragStartImageWidth && dragStart) {
+                     const newWidth = dragStartImageWidth + (e.clientX - dragStart)
+                     if (width !== newWidth) {
+                       Transforms.setNodes(editor, { width: newWidth }, { at: path })
+                     }
                    }
-                 }
-            }}>
-            <ArrowRight />
+                 }}>
+              <ArrowRight />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       )}
       {children}
