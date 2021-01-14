@@ -8,7 +8,7 @@ export default function Nav() {
   const loggedIn = useLoggedIn()
   const { logout } = useAuthentication()
   return (
-    <nav>
+    <nav className="pt-6">
       <ul className="flex justify-between items-center pb-6">
         <Link href="/">
           <a className="font-bold text-3xl">👶</a>

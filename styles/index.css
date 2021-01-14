@@ -24,7 +24,7 @@ p {
 }
 
 .page {
-    @apply bg-black text-gray-100 h-screen overflow-y-scroll p-6;
+    @apply bg-black text-gray-100 h-screen overflow-y-scroll px-6 pb-12;
 }
 
 .btn {

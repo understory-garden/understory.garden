@@ -204,7 +204,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 value={value}
                 onChange={newValue => setValue(newValue)}
               >
-                {!readOnly && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3"/>}
+                {!readOnly && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3 pt-2 sticky top-0 bg-black z-40"/>}
                 <div className="flex-grow flex flex-row">
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
