@@ -28,7 +28,7 @@ const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
         className="h-48"
       />
       <div className="flex flex-row">
-        <button onClick={() => {
+        <button className="btn mr-3" onClick={() => {
           cropperRef.current.cropper.rotate(90)
         }}>
           rotate
@@ -37,10 +37,10 @@ const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
           <Loader />
         ) : (
             <>
-              <button onClick={save}>
+              <button className="btn mr-3" onClick={save}>
                 save
               </button>
-              <button onClick={onClose}>
+              <button className="btn" onClick={onClose}>
                 cancel
             </button>
             </>
@@ -74,7 +74,7 @@ const blobReducer = newBlobReducer()
 const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => new Promise((resolve, reject) => {
   const myFetch = passedFetch || fetch
   canvas.toBlob(async (blob) => {
-    const scaledBlob = await blobReducer.toBlob(blob, {max: 1000})
+    const scaledBlob = await blobReducer.toBlob(blob, {max: 600})
     const response = await myFetch(uri, {
       method: 'PUT',
       force: true,
@@ -148,13 +148,17 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
   const insert = async () => {
     const editedUri = `${uploadDirectory}${nameForFile(file)}`
     const originalUri = uriForOriginal(editedUri)
-    uploadFromFile(file, originalUri)
-    const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
-    onUpload && onUpload(response, file.type)
-    const insertAt = insertionPoint(editor, element)
-    insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
-    Transforms.select(editor, insertAt)
-onClose && onClose()
+    try {
+      uploadFromFile(file, originalUri)
+      const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
+      onUpload && onUpload(response, file.type)
+      const insertAt = insertionPoint(editor, element)
+      insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
+      Transforms.select(editor, insertAt)
+      onClose && onClose()
+    } catch (e){
+      alert("problem uploading your image - it's probably too big. please scale it down and try again.")
+    }
   }
 
   useEffect(() => {
@@ -197,15 +201,15 @@ onClose && onClose()
                 <img src={previewSrc} className="h-32 object-contain" alt="your new profile" />
               )}
               <div className="flex flex-row">
-                <button onClick={() => inputRef.current.click()}>
+                <button className="btn mr-3" onClick={() => inputRef.current.click()}>
                   pick a file
                 </button>
                 {croppedCanvas &&
                   <>
-                    <button onClick={() => setEditing(true)}>
+                    <button className="btn mr-3" onClick={() => setEditing(true)}>
                       edit
                    </button>
-                    <button onClick={insert}>
+                    <button className="btn mr-3" onClick={insert}>
                       insert
                    </button>
                   </>

@@ -14,6 +14,7 @@ import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
 import { conceptNameFromUri } from '../model/concept'
 import { profilePath } from '../utils/uris'
 import Nav from '../components/nav'
+import { Loader } from '../components/elements'
 import Notes from '../components/Notes'
 import Follows from '../components/Follows'
 import Feed from '../components/Feed'
@@ -22,16 +23,18 @@ import TabButton from '../components/TabButton'
 function LoginUI(){
   const [handle, setHandle] = useState("")
   const [badHandle, setBadHandle] = useState(false)
+  const [loggingIn, setLoggingIn] = useState(false)
   const { loginHandle, logout } = useAuthentication()
   async function logIn(){
     setBadHandle(false)
+    setLoggingIn(true)
     try {
-
-
       await loginHandle(handle);
     } catch (e) {
       console.log("error:", e)
       setBadHandle(true)
+    } finally {
+      setLoggingIn(false)
     }
   }
   function onChange(e){
@@ -53,7 +56,11 @@ function LoginUI(){
           hm, I don't recognize that handle
         </p>
       )}
-      <button className="mt-6 text-3xl font-logo" onClick={logIn}>log in</button>
+      {loggingIn ? (
+        <Loader/>
+      ) : (
+        <button className="mt-6 text-3xl font-logo" onClick={logIn}>log in</button>
+      )}
     </div>
   )
 }
@@ -67,7 +74,7 @@ function NewNoteForm(){
   return (
     <div className="flex flex-row m-auto my-6">
       <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
-      <button className="btn" onClick={onCreate}>
+      <button className="btn" onClick={onCreate} disabled={noteName === ""}>
         Create Note
       </button>
     </div>
