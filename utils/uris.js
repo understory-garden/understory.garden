@@ -29,3 +29,11 @@ export function publicNotePath(webId, name){
 export function privateNotePath(name){
   return `/notes/${encodeURIComponent(name)}`
 }
+
+export function noteUriToName(noteUri){
+  return decodeURIComponent(noteUri.split("/").slice(-1)[0].split(".")[0])
+}
+
+export function noteUriToWebId(noteUri){
+  return `https://${new URL(noteUri).hostname}/profile/card#me`
+}

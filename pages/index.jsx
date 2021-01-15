@@ -16,6 +16,7 @@ import { profilePath } from '../utils/uris'
 import Nav from '../components/nav'
 import Notes from '../components/Notes'
 import Follows from '../components/Follows'
+import Feed from '../components/Feed'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -63,12 +64,20 @@ function NewNoteForm(){
     router.push(`/notes/${encodeURIComponent(noteName)}`)
   })
   return (
-    <div className="flex flex-row m-auto my-12">
+    <div className="flex flex-row m-auto my-6">
       <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
       <button className="btn" onClick={onCreate}>
         Create Note
       </button>
     </div>
+  )
+}
+
+function TabButton({name, activeName, setTab, ...rest}){
+  return (
+    <button className={`tab-btn ${(name === activeName) && 'active'}`}
+            onClick={() => setTab(name)}
+            {...rest} />
   )
 }
 
@@ -83,9 +92,9 @@ export default function IndexPage() {
 
   const webId = useWebId()
   const appContainerUri = useFacebabyContainerUri(webId)
-
+  const [tab, setTab] = useState("feed")
   return (
-    <div className="page">
+    <div className="page" id="page">
       <Nav />
       { (loggedIn === true) ? (
         <div className="px-6">
@@ -110,9 +119,30 @@ export default function IndexPage() {
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
               <NewNoteForm />
-              <Notes webId={webId}/>
+              <div className="flex mb-6">
+                <TabButton name="feed" activeName={tab} setTab={setTab}>
+                  feed
+                </TabButton>
+                <TabButton name="notes" activeName={tab} setTab={setTab}>
+                  notes
+                </TabButton>
+                <TabButton name="following" activeName={tab} setTab={setTab}>
+                  following
+                </TabButton>
+              </div>
+              {tab === "notes" ? (
+                <Notes webId={webId}/>
+              ) : (tab === "feed" ? (
+                <Feed/>
+              ) : (tab === "following" ? (
+                <Follows />
+              ) : (
+                <div className="font-logo">
+                  you are in a maze of twisty passages, all alike
+                </div>
+              )
+              ))}
             </div>
-            <Follows />
           </div>
         </div>
       ) : (

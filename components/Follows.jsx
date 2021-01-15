@@ -22,9 +22,8 @@ export function Follow({follow}){
 export default function Follows(){
   const follows = useFollows()
   return (
-    <div>
-      <h3>Following</h3>
-      {follows && (
+    <div className="px-6">
+      {(follows && (follows.length > 0)) ? (
         <ul>
           {
             follows.map(follow => (
@@ -34,6 +33,8 @@ export default function Follows(){
             ))
           }
         </ul>
+      ) : (
+        "you don't follow anyone yet"
       )}
     </div>
   )
