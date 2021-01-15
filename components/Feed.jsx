@@ -9,6 +9,7 @@ import { profilePath, publicNotePath, noteUriToName, noteUriToWebId } from '../u
 
 const feedItems = [
   "https://www.loves.face.baby/public/itme/facebaby/concepts/soul%20monetization.ttl#concept",
+  "https://www.loves.face.baby/public/itme/facebaby/concepts/%E2%98%A0%EF%B8%8F.ttl#concept",
   "https://www.loves.face.baby/public/itme/facebaby/concepts/The%20Face%20Baby.ttl#concept"
 ]
 

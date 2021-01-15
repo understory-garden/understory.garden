@@ -6,6 +6,7 @@ import { useEditor } from 'slate-react';
 import { fetch } from 'solid-auth-fetcher'
 import { v1 as uuid } from 'uuid';
 import Cropper from 'react-cropper';
+import newBlobReducer from 'image-blob-reduce'
 
 import { insertionPoint, insertImage } from '../utils/editor';
 import { Loader } from './elements';
@@ -68,9 +69,12 @@ const extForFile = file => {
   }
 }
 
+const blobReducer = newBlobReducer()
+
 const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => new Promise((resolve, reject) => {
   const myFetch = passedFetch || fetch
   canvas.toBlob(async (blob) => {
+    const scaledBlob = await blobReducer.toBlob(blob, {max: 1000})
     const response = await myFetch(uri, {
       method: 'PUT',
       force: true,
@@ -78,7 +82,7 @@ const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => ne
         'content-type': type,
         credentials: 'include'
       },
-      body: blob
+      body: scaledBlob
     });
     if (response.ok) {
       resolve(response)

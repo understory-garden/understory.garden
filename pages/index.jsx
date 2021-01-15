@@ -85,6 +85,7 @@ export default function IndexPage() {
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
+  const profileImage = profile && getUrl(profile, FOAF.img)
   const [newName, setNewName] = useState("")
   async function onSave(){
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
@@ -98,24 +99,30 @@ export default function IndexPage() {
       <Nav />
       { (loggedIn === true) ? (
         <div className="px-6">
-          <div className="flex flex-row justify-between py-6">
-            {name && (
-              <h3 className="text-4xl text-center font-logo">you are {name}</h3>
-            )}
-            <div className="flex flex-row justify-center">
-              <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
-              <button className="btn" onClick={onSave}>
-                Set Name
-              </button>
+          <div className="flex flex-row py-6 justify-between">
+            <div className="flex flex-row">
+              {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
+              <div className="flex flex-col mr-12">
+                {name && (
+                  <h3 className="text-4xl text-center font-logo mb-3">{name}</h3>
+                )}
+                <div className="flex flex-row justify-center">
+                  <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+                <button className="btn" onClick={onSave}>
+                  Set Name
+                </button>
+                </div>
+              </div>
             </div>
-          </div>
-          <h5 className="text-xl text-center font-logo">
-            <Link href={`${profilePath(webId)}`}>
-              <a>
-                public profile
-              </a>
-            </Link>
-          </h5>
+            <h5 className="text-xl text-center font-logo">
+              <Link href={`${profilePath(webId)}`}>
+                <a>
+                  public profile
+                </a>
+              </Link>
+            </h5>
+
+            </div>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
               <NewNoteForm />

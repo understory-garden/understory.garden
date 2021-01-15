@@ -3,8 +3,9 @@ import { Transforms } from 'slate';
 import { useSelected, useFocused, useEditor, useReadOnly, ReactEditor } from 'slate-react';
 import { setUrl } from '@inrupt/solid-client'
 import { FOAF } from '@inrupt/vocab-common-rdf'
+import { useMyProfile } from 'swrlit'
 
-import { EditIcon, ArrowRight, CoverImageIcon } from '../icons';
+import { EditIcon, ArrowRight, CoverImageIcon, ProfileImageIcon } from '../icons';
 
 import { ImageEditor } from '../ImageUploader';
 import NoteContext from '../../contexts/NoteContext'
@@ -23,6 +24,10 @@ const ImageElement = ({ attributes, children, element }) => {
   const { note, save } = useContext(NoteContext)
   async function setAsCoverImage(){
     await save(setUrl(note, FOAF.img, element.url))
+  }
+  const { profile, save: saveProfile } = useMyProfile()
+  async function setAsProfileImage(){
+    await saveProfile(setUrl(profile, FOAF.img, element.url))
   }
   return (
     <div {...attributes}>
@@ -47,6 +52,7 @@ const ImageElement = ({ attributes, children, element }) => {
           <div className="flex flex-col flex-shrink-0">
             <EditIcon className="image-icon" onClick={() => setEditing(true)} />
             <CoverImageIcon className="image-icon" onClick={() => setAsCoverImage()} />
+            <ProfileImageIcon className="image-icon" onClick={() => setAsProfileImage()} />
             <div className="flex-grow-1 image-icon"
                  draggable={true}
                  onDragStart={e => {

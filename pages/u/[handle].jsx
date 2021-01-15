@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { FOAF } from '@inrupt/vocab-common-rdf'
 import { sioc as SIOC } from 'rdf-namespaces'
-import { getStringNoLocale, addUrl, removeUrl } from '@inrupt/solid-client'
+import { getStringNoLocale, addUrl, removeUrl, getUrl } from '@inrupt/solid-client'
 import { useProfile, useMyProfile, useWebId } from 'swrlit'
 
 import { handleToWebId, profilePath } from "../../utils/uris"
@@ -17,6 +17,7 @@ export default function ProfilePage(){
   const name = profile && getStringNoLocale(profile, FOAF.name)
 
   const { profile: myProfile, save: saveProfile } = useMyProfile()
+  const profileImage = profile && getUrl(profile, FOAF.img)
 
   async function follow(){
     await saveProfile(addUrl(myProfile, SIOC.follows, webId))
@@ -31,7 +32,8 @@ export default function ProfilePage(){
   return (
     <div className="page">
       <Nav />
-      <div className="flex justify-between mb-6">
+      <div className="flex flex-row mb-6">
+        {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
         {name && (
           <h3 className="text-4xl text-center font-logo">{name}</h3>
         )}
