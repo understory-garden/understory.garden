@@ -14,6 +14,7 @@ import ChecklistItemElement from './edit/ChecklistItemElement'
 import LinkElement from './edit/LinkElement'
 import ConceptElement from './edit/ConceptElement'
 import ImageElement from './edit/ImageElement'
+import VideoElement from './edit/VideoElement'
 import Block from './edit/Block'
 import Table from "./edit/Table"
 
@@ -62,6 +63,8 @@ const Element = (props) => {
       return <li {...attributes}>{children}</li>
     case 'image':
       return <Block element={element}><ImageElement {...props} /></Block>
+    case 'video':
+      return <Block element={element}><VideoElement {...props} /></Block>
     case 'link':
       return <LinkElement {...props} />
     case 'concept':
