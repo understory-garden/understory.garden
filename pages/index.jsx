@@ -17,6 +17,7 @@ import Nav from '../components/nav'
 import Notes from '../components/Notes'
 import Follows from '../components/Follows'
 import Feed from '../components/Feed'
+import TabButton from '../components/TabButton'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -73,14 +74,6 @@ function NewNoteForm(){
   )
 }
 
-function TabButton({name, activeName, setTab, ...rest}){
-  return (
-    <button className={`tab-btn ${(name === activeName) && 'active'}`}
-            onClick={() => setTab(name)}
-            {...rest} />
-  )
-}
-
 export default function IndexPage() {
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
@@ -114,15 +107,23 @@ export default function IndexPage() {
                 </div>
               </div>
             </div>
-            <h5 className="text-xl text-center font-logo">
-              <Link href={`${profilePath(webId)}`}>
-                <a>
-                  public profile
-                </a>
-              </Link>
-            </h5>
-
+            <div className="flex flex-col">
+              <h5 className="text-xl text-center font-logo mb-6">
+                <Link href={`${profilePath(webId)}`}>
+                  <a>
+                    public profile
+                  </a>
+                </Link>
+              </h5>
+              <h5 className="text-xl text-center font-logo">
+                <Link href={`${profilePath(webId)}/message`}>
+                  <a>
+                    send message
+                  </a>
+                </Link>
+              </h5>
             </div>
+          </div>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
               <NewNoteForm />

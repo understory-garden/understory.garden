@@ -1,6 +1,6 @@
 import { WS } from '@inrupt/vocab-solid-common'
 import { getUrl } from '@inrupt/solid-client'
-import { useProfile, useEnsured } from 'swrlit'
+import { useProfile, useEnsured, useWebId } from 'swrlit'
 
 export function useStorageContainer(webId) {
   const { profile } = useProfile(webId)
@@ -20,4 +20,10 @@ export function useImageUploadUri(webId) {
 export function useConceptContainerUri(webId) {
   const facebabyContainerUri = useFacebabyContainerUri(webId)
   return useEnsured(facebabyContainerUri && `${facebabyContainerUri}concepts/`)
+}
+
+export function useArchiveContainerUri() {
+  const webId = useWebId()
+  const facebabyContainerUri = useFacebabyContainerUri(webId, "private")
+  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}archive/`)
 }
