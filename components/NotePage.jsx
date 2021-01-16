@@ -252,10 +252,12 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                   </a>
                 </Link>
               )}
+              {/*
               <a href={conceptDocUri} target="_blank" rel="noopener">
                 source
               </a>
-              <ReportIcon className="cursor-pointer flex-none"
+               */}
+              <ReportIcon className="cursor-pointer flex-none w-6"
                           onClick={() => setReporting(true)}/>
               <ReactModal isOpen={reporting} >
                 <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
