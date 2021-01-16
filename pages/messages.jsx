@@ -9,6 +9,7 @@ import { LDP, RDFS, DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
 import { fetch } from 'solid-auth-fetcher'
 import Link from 'next/link'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import Linkify from 'react-linkify'
 
 import Nav from '../components/nav'
 import TabButton from '../components/TabButton'
@@ -39,7 +40,7 @@ function Message({resource, onDelete}){
   return (
     <div className="m-6 bg-gray-800 p-6">
       <h3 className="text-center text-3xl mb-3">
-        {title}
+          {title}
       </h3>
       {author && (
         <h4>
@@ -52,7 +53,9 @@ function Message({resource, onDelete}){
         </h4>
       )}
       <p>
-        {body}
+        <Linkify>
+          {body}
+        </Linkify>
       </p>
       <div className="flex flex-row mt-6">
         <Link href={`${profilePath(authorWebId)}/message`}>
