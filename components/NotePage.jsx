@@ -210,7 +210,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     }
   }, [debouncedValue])
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const { fetch } = useAuthentication()
   const router = useRouter()
