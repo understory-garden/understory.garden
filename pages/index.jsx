@@ -136,13 +136,6 @@ export default function IndexPage() {
                   </a>
                 </Link>
               </h5>
-              <h5 className="text-xl text-center font-logo">
-                <Link href={`${profilePath(webId)}/message`}>
-                  <a>
-                    send message
-                  </a>
-                </Link>
-              </h5>
             </div>
           </div>
           <div className="flex justify-between">

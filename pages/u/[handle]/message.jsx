@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { useRouter } from 'next/router'
-import { useMyProfile, useProfile, useContainer, useEnsured } from 'swrlit'
+import { useMyProfile, useProfile, useContainer, useEnsured, useWebId } from 'swrlit'
 import {
   setUrl, getUrl, getStringNoLocale, setStringNoLocale, createThing, setThing,
   saveSolidDatasetInContainer, createSolidDataset
@@ -17,6 +17,7 @@ export default function MessagePage () {
   const router = useRouter()
   const { query: { handle } } = router
   const webId = handleToWebId(handle)
+  const myWebId = useWebId()
   const { profile } = useProfile(webId)
   const inboxUri = profile && getUrl(profile, LDP.inbox)
   const name = profile && getStringNoLocale(profile, FOAF.name)
@@ -28,7 +29,7 @@ export default function MessagePage () {
     var msg = createThing({name: "message"})
     msg = setStringNoLocale(msg, RDFS.label, title)
     msg = setStringNoLocale(msg, RDFS.comment, message)
-    msg = setUrl(msg, DCTERMS.creator, webId)
+    msg = setUrl(msg, DCTERMS.creator, myWebId)
     const data = setThing(createSolidDataset(), msg)
     await saveSolidDatasetInContainer(inboxUri, data, {fetch})
     setTitle("")

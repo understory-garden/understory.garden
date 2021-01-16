@@ -3,6 +3,7 @@ import { FOAF } from '@inrupt/vocab-common-rdf'
 import { sioc as SIOC } from 'rdf-namespaces'
 import { getStringNoLocale, addUrl, removeUrl, getUrl } from '@inrupt/solid-client'
 import { useProfile, useMyProfile, useWebId } from 'swrlit'
+import Link from 'next/link'
 
 import { handleToWebId, profilePath } from "../../utils/uris"
 import Notes from '../../components/Notes'
@@ -39,6 +40,13 @@ export default function ProfilePage(){
             <h3 className="text-4xl text-center font-logo">{name}</h3>
           )}
         </div>
+        <h5 className="text-xl text-center font-logo">
+          <Link href={`${profilePath(webId)}/message`}>
+            <a>
+              send message
+            </a>
+          </Link>
+        </h5>
         {(follows && !isMyProfile) && (
           alreadyFollowing ? (
             <button className="btn py-1" onClick={unfollow}>
