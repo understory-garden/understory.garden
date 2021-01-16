@@ -96,8 +96,9 @@ export default function IndexPage() {
   const [tab, setTab] = useState("feed")
   return (
     <div className="page" id="page">
-      <Nav />
       { (loggedIn === true) ? (
+        <>
+          <Nav />
         <div className="px-6">
           <div className="flex flex-row py-6 justify-between">
             <div className="flex flex-row">
@@ -160,13 +161,25 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
+          </>
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
           <>
-            <div className="py-20">
-              <h1 className="text-6xl text-center bold font-logo text-white">
-                FACE
-              </h1>
+            <div className="py-20 relative">
+              <div className="m-auto">
+                <div className="p-6 text-xl text-red-800 font-bold opacity-95 bg-gray-500 absolute transform -rotate-6">
+                  THE WEIRD WIZE WIZARDS WERE HERE - COME THROUGH THE&nbsp;
+                  <Link href="/u/www.loves.face.baby/face.baby%20back%20door">
+                    <a>
+                      BACK DOOR!
+                    </a>
+                  </Link>
+
+                </div>
+                <h1 className="text-6xl text-center bold font-logo text-white">
+                  FACE
+                </h1>
+              </div>
               <h1 className="text-6xl text-center bold font-logo text-white">
                 BABY
               </h1>
