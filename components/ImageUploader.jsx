@@ -75,7 +75,7 @@ const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => ne
   const myFetch = passedFetch || fetch
   canvas.toBlob(async (blob) => {
     console.log("scaling blob")
-    const scaledBlob = await blobReducer.toBlob(blob, {max: 1000})
+    //const scaledBlob = await blobReducer.toBlob(blob, {max: 1000})
     console.log("scaled blob")
     const response = await myFetch(uri, {
       method: 'PUT',
@@ -84,7 +84,7 @@ const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => ne
         'content-type': type,
         credentials: 'include'
       },
-      body: scaledBlob
+      body: blob //scaledBlob
     });
     if (response.ok) {
       resolve(response)
