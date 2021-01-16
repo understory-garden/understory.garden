@@ -22,18 +22,20 @@ export default function Nav() {
           <a className="font-bold text-3xl">👶</a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
-          <Link href="/messages">
-            <a className="text-white">
-              <div className="relative">
-                <MailIcon className="w-12"/>
-                {hasMessages && (
-                  <div className="absolute top-0 right-0 block h-5 w-5 rounded-full ring-2 ring-white bg-red-400 pl-2 leading-3 pt-0.5">
-                    { resources.length }
-                  </div>
-                )}
-              </div>
-            </a>
-          </Link>
+          {loggedIn && (
+            <Link href="/messages">
+              <a className="text-white">
+                <div className="relative">
+                  <MailIcon className="w-12"/>
+                  {hasMessages && (
+                    <div className="absolute top-0 right-0 block h-5 w-5 rounded-full ring-2 ring-white bg-red-400 pl-2 leading-3 pt-0.5">
+                      { resources.length }
+                    </div>
+                  )}
+                </div>
+              </a>
+            </Link>
+          )}
           {profileImage && <img src={profileImage} className="rounded-full h-12 w-12 object-cover" />}
           {loggedIn && (
             <li>
