@@ -234,7 +234,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
         <Nav />
         <div className={`relative overflow-y-hidden flex-none ${coverImage ? "h-36 sm:h-48" : "h-36"}`}>
           {coverImage && <img className="w-full" src={coverImage}/>}
-          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black flex flex-col">
+          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black flex flex-col justify-between">
             <div className="flex flex-row justify-between">
               <h1 className="text-5xl">{name}</h1>
               {readOnly ? (
@@ -257,20 +257,21 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 source
               </a>
                */}
-              <ReportIcon className="cursor-pointer flex-none w-6"
-                          onClick={() => setReporting(true)}/>
+              <div className="text-lg">
+                by&nbsp;
+                <Link href={profilePath(webId)}>
+                  <a>
+                    {authorName}
+                  </a>
+                </Link>
+              </div>
               <ReactModal isOpen={reporting} >
                 <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
               </ReactModal>
             </div>
-            <div className="text-lg">
-              by&nbsp;
-              <Link href={profilePath(webId)}>
-                <a>
-                  {authorName}
-                </a>
-              </Link>
-            </div>
+            <button className="btn w-20 mt-12" onClick={() => setReporting(true)}>
+              report
+            </button>
           </div>
         </div>
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
