@@ -148,12 +148,19 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
   const insert = async () => {
     const editedUri = `${uploadDirectory}${nameForFile(file)}`
     const originalUri = uriForOriginal(editedUri)
+    console.log("uploading from file")
     uploadFromFile(file, originalUri)
+    console.log("uploading from canvas")
     const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
+    console.log("on upload")
     onUpload && onUpload(response, file.type)
+    console.log("inserting ")
     const insertAt = insertionPoint(editor, element)
+    console.log("inserting at")
     insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
+    console.log("transforms select")
     Transforms.select(editor, insertAt)
+    console.log("on close", onClose)
     onClose && onClose()
   }
 
