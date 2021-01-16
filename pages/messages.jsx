@@ -55,7 +55,11 @@ function Message({resource, onDelete}){
         {body}
       </p>
       <div className="flex flex-row mt-6">
-        <button className="btn mr-3">reply</button>
+        <Link href={`${profilePath(authorWebId)}/message`}>
+          <a className="btn mr-3">
+            reply
+          </a>
+        </Link>
         {onDelete && <button className="btn m3" onClick={archive}>archive</button>}
       </div>
     </div>
