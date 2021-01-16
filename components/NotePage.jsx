@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
 import { Slate, withReact } from 'slate-react'
-import { useWebId, useEnsured, useResource, useThing, useAuthentication } from 'swrlit'
+import { useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile } from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
@@ -26,7 +26,7 @@ import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
 
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
-import { publicNotePath, privateNotePath } from '../utils/uris'
+import { publicNotePath, privateNotePath, profilePath } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
 import { noteBody,  refs } from '../vocab'
 
@@ -179,6 +179,9 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   }, [bodyJSON, errorStatus])
 
 
+  const { profile: authorProfile } = useProfile(webId)
+  const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
+
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
@@ -231,31 +234,41 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
         <Nav />
         <div className={`relative overflow-y-hidden flex-none ${coverImage ? "h-36 sm:h-48" : "h-36"}`}>
           {coverImage && <img className="w-full" src={coverImage}/>}
-          <div className="flex flex-row justify-between absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black">
-            <h1 className="text-5xl">{name}</h1>
-            {readOnly ? (
-              (myWebId === webId) && (
-                <Link href={privateNotePath(name)}>
+          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black flex flex-col">
+            <div className="flex flex-row justify-between">
+              <h1 className="text-5xl">{name}</h1>
+              {readOnly ? (
+                (myWebId === webId) && (
+                  <Link href={privateNotePath(name)}>
+                    <a>
+                      edit link
+                    </a>
+                  </Link>
+                )
+              ) : (
+                <Link href={publicNotePath(webId, name)}>
                   <a>
-                    edit link
+                    public link
                   </a>
                 </Link>
-              )
-            ) : (
-              <Link href={publicNotePath(webId, name)}>
+              )}
+              <a href={conceptDocUri} target="_blank" rel="noopener">
+                source
+              </a>
+              <ReportIcon className="cursor-pointer flex-none"
+                          onClick={() => setReporting(true)}/>
+              <ReactModal isOpen={reporting} >
+                <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
+              </ReactModal>
+            </div>
+            <div className="text-lg">
+              by&nbsp;
+              <Link href={profilePath(webId)}>
                 <a>
-                  public link
+                  {authorName}
                 </a>
               </Link>
-            )}
-            <a href={conceptDocUri} target="_blank" rel="noopener">
-              source
-            </a>
-            <ReportIcon className="cursor-pointer flex-none"
-                        onClick={() => setReporting(true)}/>
-            <ReactModal isOpen={reporting} >
-              <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
-            </ReactModal>
+            </div>
           </div>
         </div>
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
