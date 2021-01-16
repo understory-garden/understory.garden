@@ -232,7 +232,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
         <Nav />
-        <div className={`relative overflow-y-hidden flex-none ${coverImage ? "h-56" : "h-36"}`}>
+        <div className={`relative overflow-y-hidden flex-none h-56`}>
           {coverImage && <img className="w-full" src={coverImage}/>}
           <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black flex flex-col justify-between">
             <div className="flex flex-row justify-between h-24 overflow-y-hidden">
