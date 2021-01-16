@@ -19,6 +19,7 @@ import Notes from '../components/Notes'
 import Follows from '../components/Follows'
 import Feed from '../components/Feed'
 import TabButton from '../components/TabButton'
+import { EditIcon } from '../components/icons'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -94,6 +95,11 @@ export default function IndexPage() {
   const webId = useWebId()
   const appContainerUri = useFacebabyContainerUri(webId)
   const [tab, setTab] = useState("feed")
+  const [editingName, setEditingName] = useState(false)
+  function saveName(){
+    onSave()
+    setEditingName(false)
+  }
   return (
     <div className="page" id="page">
       { (loggedIn === true) ? (
@@ -104,15 +110,22 @@ export default function IndexPage() {
             <div className="flex flex-row">
               {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
               <div className="flex flex-col mr-12">
-                {name && (
-                  <h3 className="text-4xl text-center font-logo mb-3">{name}</h3>
+                {editingName ? (
+                  <div className="flex flex-row justify-center">
+                    <input className="text-xl"
+                      value={newName}
+                           onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+                    <button className="btn" onClick={saveName}>
+                      Set Name
+                    </button>
+                  </div>
+                ): (
+                  <div className="relative flex flex-row">
+                    <h3 className="text-4xl text-center font-logo mb-3">{name}</h3>
+                    <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
+                              onClick={() => setEditingName(true)} />
+                  </div>
                 )}
-                <div className="flex flex-row justify-center">
-                  <input value={newName} onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
-                <button className="btn" onClick={onSave}>
-                  Set Name
-                </button>
-                </div>
               </div>
             </div>
             <div className="flex flex-col">
