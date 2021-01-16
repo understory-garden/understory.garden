@@ -75,7 +75,7 @@ const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => ne
   const myFetch = passedFetch || fetch
   canvas.toBlob(async (blob) => {
     console.log("scaling blob")
-    const scaledBlob = await newBlobReducer().toBlob(blob, {max: 1000})
+    const scaledBlob = await newBlobReducer().toBlob(blob, {max: 600})
     console.log("scaled blob")
     const response = await myFetch(uri, {
       method: 'PUT',
