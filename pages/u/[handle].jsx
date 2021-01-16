@@ -32,18 +32,20 @@ export default function ProfilePage(){
   return (
     <div className="page">
       <Nav />
-      <div className="flex flex-row mb-6">
-        {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
-        {name && (
-          <h3 className="text-4xl text-center font-logo">{name}</h3>
-        )}
+      <div className="flex flex-row mt-6 mb-6 justify-between items-start">
+        <div className="flex flex-row">
+          {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
+          {name && (
+            <h3 className="text-4xl text-center font-logo">{name}</h3>
+          )}
+        </div>
         {(follows && !isMyProfile) && (
           alreadyFollowing ? (
-            <button className="btn" onClick={unfollow}>
+            <button className="btn py-1" onClick={unfollow}>
               unfollow
             </button>
           ) : (
-            <button className="btn" onClick={follow}>
+            <button className="btn py-1" onClick={follow}>
               follow
             </button>
           )
