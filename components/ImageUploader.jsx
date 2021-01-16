@@ -148,17 +148,13 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
   const insert = async () => {
     const editedUri = `${uploadDirectory}${nameForFile(file)}`
     const originalUri = uriForOriginal(editedUri)
-    try {
-      uploadFromFile(file, originalUri)
-      const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
-      onUpload && onUpload(response, file.type)
-      const insertAt = insertionPoint(editor, element)
-      insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
-      Transforms.select(editor, insertAt)
-      onClose && onClose()
-    } catch (e){
-      alert("problem uploading your image - it's probably too big. please scale it down and try again.")
-    }
+    uploadFromFile(file, originalUri)
+    const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
+    onUpload && onUpload(response, file.type)
+    const insertAt = insertionPoint(editor, element)
+    insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
+    Transforms.select(editor, insertAt)
+    onClose && onClose()
   }
 
   useEffect(() => {
