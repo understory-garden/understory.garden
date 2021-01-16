@@ -13,10 +13,11 @@ import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
+import ReactModal from 'react-modal'
 
 import EditorToolbar from "./EditorToolbar"
 import Editable, { useNewEditor } from "./Editable";
-import { ExternalLinkIcon } from './icons'
+import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
@@ -96,6 +97,60 @@ function createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, c
   return setThing(conceptIndex || createSolidDataset(), newConceptReferences)
 }
 
+function ReportDialog({conceptUri, close}){
+  const [message, setMessage] = useState("")
+  const [reported, setReported] = useState(false)
+  function report(){
+    console.log("reporting", message)
+    setReported(true)
+  }
+  function onClose(){
+    close()
+  }
+  return (
+    <div className="w-full text-black flex flex-col">
+      {reported ? (
+        <>
+          {(conceptUri === "https://cassette.loves.face.baby/public/itme/facebaby/concepts/SHOCKING%20REVEAL!!!%20100%25%20GENUINE!.ttl#concept") ? (
+            <>
+              <h3 className="text-2xl text-center">
+                Thank you for your report!
+              </h3>
+              <p className="text-xl mt-6 text-center">
+                We would like you to know that while we have
+                received 72888 reports on this post from valued community
+                members like you, we will almost certainly take no action.
+              </p>
+            </>
+          ) : (
+            <p className="text-xl mt-6 text-center">
+              Thank you for your report! The offending parties will be harshly dealt with.
+            </p>
+          )}
+          <button onClick={close} className="bg-purple-100 p-6 rounded-lg mt-6">
+            Close
+          </button>
+        </>
+      ) : (
+        <>
+          <h3 className="text-center text-3xl">
+            🚨 REPORT THIS CONTENT 🚨
+          </h3>
+          <p className="text-xl mt-6 text-center">
+            Thank you for your concern, fair citizen of face.baby. Please
+            let us know why this content deserves our attention and scorn.
+          </p>
+          <textarea value={message} onChange={e => setMessage(e.target.value)}
+                    className="mt-6 w-full h-36" />
+          <button onClick={report} className="bg-purple-100 m-auto p-6 rounded-lg mt-6">
+            Submit Report
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const myWebId = useWebId()
   const conceptContainerUri = useConceptContainerUri(webId)
@@ -168,6 +223,8 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     }
   }
   const coverImage = note && getUrl(note, FOAF.img)
+
+  const [reporting, setReporting] = useState(false)
   return (
     <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
@@ -194,6 +251,11 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
             <a href={conceptDocUri} target="_blank" rel="noopener">
               source
             </a>
+            <ReportIcon className="cursor-pointer flex-none"
+                        onClick={() => setReporting(true)}/>
+            <ReactModal isOpen={reporting} >
+              <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
+            </ReactModal>
           </div>
         </div>
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
@@ -204,7 +266,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 value={value}
                 onChange={newValue => setValue(newValue)}
               >
-                {!readOnly && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3 pt-2 sticky top-0 bg-black z-40"/>}
+                {!readOnly && !reporting && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3 pt-2 sticky top-0 bg-black z-20"/>}
                 <div className="flex-grow flex flex-row">
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
