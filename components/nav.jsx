@@ -38,6 +38,7 @@ export default function Nav() {
               </a>
             </Link>
           )}
+          {loggedIn && (
           <div>
             {profileImage ? (
               <img src={profileImage}
@@ -78,6 +79,7 @@ export default function Nav() {
               }
             </Transition>
           </div>
+          )}
         </ul>
       </ul>
     </nav>
