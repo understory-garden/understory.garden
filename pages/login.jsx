@@ -68,7 +68,7 @@ export default function RegistrationPage(){
             <label className="text-2xl mb-6" htmlFor="username">username</label>
             <Field id="username" name="username"
                    className="bg-gray-800 py-2 px-2"
-                   placeholder="pick a username" />
+                   placeholder="what's your username" />
             {errors.username && touched.username ? <div className="text-red-500">{errors.username}</div> : null}
 
             <label className="text-2xl mb-6 mt-12" htmlFor="email">email</label>
