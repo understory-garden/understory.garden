@@ -293,7 +293,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 by&nbsp;
                 <Link href={profilePath(webId)}>
                   <a>
-                    {authorName}
+                    {authorName || "someone cool"}
                   </a>
                 </Link>
               </div>
