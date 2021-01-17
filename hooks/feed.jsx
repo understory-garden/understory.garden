@@ -1,6 +1,6 @@
 import { useWebId, useThing, useResource } from 'swrlit'
-import { getUrlAll } from '@inrupt/solid-client'
-import { hasFeedItem } from '../vocab'
+import { getUrlAll, getThing, getDecimal, getThingAll, getUrl } from '@inrupt/solid-client'
+import { hasFeedItem, accountOf, amount } from '../vocab'
 
 const feedItems = [
   "https://cassette.loves.face.baby/public/itme/facebaby/concepts/SHOCKING%20REVEAL!!!%20100%25%20GENUINE!.ttl#concept",
@@ -17,6 +17,21 @@ export function useFeed(){
 export function useLedger(){
   const {resource: ledger, ...rest} = useResource("https://toby.loves.face.baby/public/itme/facebaby/ledger.ttl")
   return {ledger, ...rest}
+}
+
+
+export function useLedgerTotalFor(webId){
+  const { ledger } = useLedger()
+  const ledgerEntries = ledger && getThingAll(ledger)
+  const myLedgerEntries = ledgerEntries && ledgerEntries
+        .filter(e => (getUrl(e, accountOf) === webId))
+  const total = myLedgerEntries && myLedgerEntries.reduce((total, e) => total + getDecimal(e, amount), 0)
+  return total
+}
+
+export function useMyLedgerTotal(){
+  const webId = useWebId()
+  return useLedgerTotalFor(webId)
 }
 
 export function useFeedItems(){

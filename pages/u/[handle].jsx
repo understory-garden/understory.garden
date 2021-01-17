@@ -9,6 +9,7 @@ import { handleToWebId, profilePath } from "../../utils/uris"
 import Notes from '../../components/Notes'
 import Nav from '../../components/nav'
 import { useFollows } from '../../hooks/people'
+import { useLedgerTotalFor } from '../../hooks/feed'
 
 export default function ProfilePage(){
   const router = useRouter()
@@ -30,15 +31,21 @@ export default function ProfilePage(){
   const isMyProfile = (myWebId === webId)
   const follows = useFollows()
   const alreadyFollowing = follows && follows.includes(webId)
+  const ledgerTotal = useLedgerTotalFor(webId)
   return (
     <div className="page">
       <Nav />
       <div className="flex flex-row mt-6 mb-6 justify-between items-start">
         <div className="flex flex-row">
           {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
-          {name && (
-            <h3 className="text-4xl text-center font-logo">{name}</h3>
-          )}
+          <div className="flex flex-col">
+            {name && (
+              <h3 className="text-4xl text-center font-logo">{name}</h3>
+            )}
+            <span className="text-3xl text-bold text-green-200">
+              { ledgerTotal } 😀💰
+            </span>
+          </div>
         </div>
         <h5 className="text-xl text-center font-logo">
           <Link href={`${profilePath(webId)}/message`}>

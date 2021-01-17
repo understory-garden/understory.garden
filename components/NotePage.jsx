@@ -9,10 +9,10 @@ import {
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, addDecimal
+  removeThing, getUrl, setDecimal, setUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
+import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
 import ReactModal from 'react-modal'
@@ -29,9 +29,10 @@ import { useConceptIndex } from '../hooks/concepts'
 import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
-import { publicNotePath, privateNotePath, profilePath } from '../utils/uris'
+import { publicNotePath, privateNotePath, profilePath, noteUriToName } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs, hasFeedItem, credit, debit } from '../vocab'
+import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf } from '../vocab'
+import { sendMessage } from '../utils/message'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -155,13 +156,24 @@ function ReportDialog({conceptUri, close}){
 }
 
 function BuyButton({authorWebId, conceptUri, className='', ...rest}){
+  const myWebId = useWebId()
+  const { profile } = useProfile(authorWebId)
+  const inboxUri = profile && getUrl(profile, LDP.inbox)
+
   const { feed, save: saveFeed } = useFeed()
   const { ledger, save: saveLedger } = useLedger()
   async function buy(){
-    //saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
-    //const ledgerUser = ledger ? getThing(ledger, authorWebId) : createThing({url: authorWebId})
-    //console.log(ledgerUser)
-    //console.log(setThing(ledger || createSolidDataset(), addDecimal(ledgerUser, 69.0)))
+    await saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
+    let ledgerEntry = createThing()
+    ledgerEntry = setUrl(ledgerEntry, RDF.type, Credit)
+    const award = 69.0
+    ledgerEntry = setDecimal(ledgerEntry, amount, award)
+    ledgerEntry = setUrl(ledgerEntry, accountOf, authorWebId)
+    ledgerEntry = setDatetime(ledgerEntry, DCTERMS.date, new Date())
+    await saveLedger(setThing(ledger || createSolidDataset(), ledgerEntry))
+    sendMessage(inboxUri, myWebId,
+                "congratulations!",
+                `you've been awarded ${award} facebux for note '${noteUriToName(conceptUri)}'`)
   }
   return (
     <div className={`${className} flex flex-row`}>

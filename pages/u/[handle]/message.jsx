@@ -13,6 +13,7 @@ import Nav from '../../../components/nav'
 import { handleToWebId } from "../../../utils/uris"
 
 
+
 export default function MessagePage () {
   const router = useRouter()
   const { query: { handle } } = router
