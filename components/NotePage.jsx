@@ -324,7 +324,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
                     <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="h-2 text-3xl text-pink-500 font-bold absolute -left-2">
+                            className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
                       {sidebarOpen ? ">>" : "<<"}
                     </button>
                     <Transition
