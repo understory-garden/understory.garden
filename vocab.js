@@ -1,2 +1,5 @@
 export const noteBody = "https://face.baby/vocab#noteBody"
 export const refs = "https://face.baby/vocab#refs"
+export const hasFeedItem = "https://face.baby/vocab#hasFeedItem"
+export const credit = "https://face.baby/vocab#credit"
+export const debit = "https://face.baby/vocab#debit"
