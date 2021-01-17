@@ -1,4 +1,4 @@
-export default LedgerPage(){
+export default function LedgerPage(){
   return (
     <div className="page">
     </div>
