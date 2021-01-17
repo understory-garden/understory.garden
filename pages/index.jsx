@@ -182,15 +182,6 @@ export default function IndexPage() {
           <>
             <div className="py-20 relative">
               <div className="m-auto">
-                <div className="p-6 text-xl text-red-800 font-bold opacity-95 bg-gray-500 absolute transform -rotate-6">
-                  THE WEIRD WIZE WIZARDS WERE HERE - COME THROUGH THE&nbsp;
-                  <Link href="/u/www.loves.face.baby/face.baby%20back%20door">
-                    <a>
-                      BACK DOOR!
-                    </a>
-                  </Link>
-
-                </div>
                 <h1 className="text-6xl text-center bold font-logo text-white">
                   FACE
                 </h1>
