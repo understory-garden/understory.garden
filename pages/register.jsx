@@ -37,8 +37,10 @@ const SolidServerURI = "https://loves.face.baby"
 async function sendMagicLink(username, email) {
   const magicLinkURI = SolidServerURI + "/magic-link/generate"
   console.log("Sending magic link to " + email)
-  const values = username ? {username, email} : {email}
-  return postFormData(magicLinkURI, values)
+  return postFormData(magicLinkURI, {
+    username, email,
+    returnToUrl: `https://face.baby/login/${username}.loves.face.baby`
+  })
 }
 
 export default function RegistrationPage(){
