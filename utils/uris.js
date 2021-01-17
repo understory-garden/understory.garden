@@ -31,7 +31,7 @@ export function privateNotePath(name){
 }
 
 export function noteUriToName(noteUri){
-  return decodeURIComponent(noteUri.split("/").slice(-1)[0].split(".")[0])
+  return decodeURIComponent(noteUri.split("/").slice(-1)[0].replace(".ttl#concept", ""))
 }
 
 export function noteUriToWebId(noteUri){
