@@ -3,11 +3,13 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
 import { Slate, withReact } from 'slate-react'
-import { useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile } from 'swrlit'
+import {
+  useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile
+} from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl
+  removeThing, getUrl, addDecimal
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
@@ -24,12 +26,12 @@ import NoteContext from '../contexts/NoteContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
-import { useIsFeedAdmin, useFeed } from '../hooks/feed'
+import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 import { publicNotePath, privateNotePath, profilePath } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs, hasFeedItem } from '../vocab'
+import { noteBody,  refs, hasFeedItem, credit, debit } from '../vocab'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -157,9 +159,9 @@ function BuyButton({authorWebId, conceptUri, className='', ...rest}){
   const { ledger, save: saveLedger } = useLedger()
   async function buy(){
     //saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
-    const ledgerUser = getThing(ledger, authorWebId) || createThing({url: authorWebId})
-    console.log(ledgerUser)
-    //save(addUrl(feed || createSolidDataset(), credit, conceptUri))
+    //const ledgerUser = ledger ? getThing(ledger, authorWebId) : createThing({url: authorWebId})
+    //console.log(ledgerUser)
+    //console.log(setThing(ledger || createSolidDataset(), addDecimal(ledgerUser, 69.0)))
   }
   return (
     <div className={`${className} flex flex-row`}>
@@ -227,7 +229,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     }
   }, [debouncedValue])
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const { fetch } = useAuthentication()
   const router = useRouter()
@@ -310,7 +312,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
                     <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="h-2 text-2xl text-pink-900 font-bold absolute">
+                            className="h-2 text-3xl text-pink-500 font-bold absolute -left-2">
                       {sidebarOpen ? ">>" : "<<"}
                     </button>
                     <Transition

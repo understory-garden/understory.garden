@@ -1,4 +1,4 @@
-import { useWebId, useThing } from 'swrlit'
+import { useWebId, useThing, useResource } from 'swrlit'
 import { getUrlAll } from '@inrupt/solid-client'
 import { hasFeedItem } from '../vocab'
 
