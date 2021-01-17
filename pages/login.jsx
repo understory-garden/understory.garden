@@ -30,10 +30,12 @@ export default function RegistrationPage(){
   return (
     <div className="page text-center p-6">
       <Nav/>
-      <h3 className="text-5xl mt-12 mb-12">
-        create your account
+      <h3 className="text-5xl mt-12 mb-6">
+        get a magic login link
       </h3>
-
+      <p className="text-xl mb-12">
+        please enter your the username and email with which you registered
+      </p>
       {(success !== undefined) && (
         <div className="text-4xl text-purple-300 mb-12">
           {
@@ -45,7 +47,7 @@ export default function RegistrationPage(){
                 <h3>please click the link to log in.</h3>
               </>
             ) : (
-              <h3>hm, something has gone wrong. most likely, a user with that username already exists.</h3>
+              <h3>hm, something has gone wrong. did you use the right username and email?</h3>
             )
           }
         </div>
