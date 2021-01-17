@@ -6,13 +6,8 @@ import { getUrl, getStringNoLocale } from '@inrupt/solid-client'
 import { FOAF } from '@inrupt/vocab-common-rdf'
 
 import { profilePath, publicNotePath, noteUriToName, noteUriToWebId } from '../utils/uris'
-
-const feedItems = [
-  "https://cassette.loves.face.baby/public/itme/facebaby/concepts/SHOCKING%20REVEAL!!!%20100%25%20GENUINE!.ttl#concept",
-  "https://www.loves.face.baby/public/itme/facebaby/concepts/soul%20monetization.ttl#concept",
-  "https://www.loves.face.baby/public/itme/facebaby/concepts/%E2%98%A0%EF%B8%8F.ttl#concept",
-  "https://www.loves.face.baby/public/itme/facebaby/concepts/The%20Face%20Baby.ttl#concept"
-]
+import { useFeedItems } from '../hooks/feed'
+import { Loader } from './elements'
 
 function FeedItem({uri}){
   const name = noteUriToName(uri)
@@ -48,38 +43,43 @@ function FeedItem({uri}){
 
 export default function Feed(){
   const [n, setN] = useState(3)
-  const items = feedItems.slice(0, n)
+  const { feedItems } = useFeedItems()
+  const items = feedItems && feedItems.slice(0, n)
   function fetchData(x){
     setN(m => m + 3)
   }
   return (
     <div className="flex flex-col">
-      <InfiniteScroll
-        dataLength={items.length}
-        next={fetchData}
-        hasMore={n < feedItems.length}
-        loader={<h4>Loading...</h4>}
-        endMessage={
-          <p className="text-center font-logo">
-            <b>that's it, check back soon...</b>
-          </p>
-        }
-        scrollableTarget="page"
-        // below props only if you need pull down functionality
-        //refreshFunction={this.refresh}
-        //pullDownToRefresh
-        //pullDownToRefreshThreshold={50}
-        //pullDownToRefreshContent={
-        //  <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-        //}
-        //releaseToRefreshContent={
-        //  <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-        //}
-      >
-        {items.map(uri => (
-          <FeedItem uri={uri} key={uri} />
-        ))}
-      </InfiniteScroll>
+      {items ? (
+        <InfiniteScroll
+          dataLength={items.length}
+          next={fetchData}
+          hasMore={(n < feedItems.length)}
+          loader={<h4>Loading...</h4>}
+          endMessage={
+            <p className="text-center font-logo">
+              <b>that's it, check back soon...</b>
+            </p>
+          }
+          scrollableTarget="page"
+          // below props only if you need pull down functionality
+          //refreshFunction={this.refresh}
+          //pullDownToRefresh
+          //pullDownToRefreshThreshold={50}
+          //pullDownToRefreshContent={
+            //  <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+            //}
+            //releaseToRefreshContent={
+            //  <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+            //}
+              >
+              {items.map(uri => (
+                <FeedItem uri={uri} key={uri} />
+              ))}
+            </InfiniteScroll>
+      ) : (
+        <Loader/>
+      )}
     </div>
   )
 }

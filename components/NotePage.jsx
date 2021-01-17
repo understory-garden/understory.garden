@@ -3,11 +3,13 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
 import { Slate, withReact } from 'slate-react'
-import { useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile } from 'swrlit'
+import {
+  useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile
+} from 'swrlit'
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl
+  removeThing, getUrl, addDecimal
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
@@ -24,11 +26,12 @@ import NoteContext from '../contexts/NoteContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
+import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 import { publicNotePath, privateNotePath, profilePath } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs } from '../vocab'
+import { noteBody,  refs, hasFeedItem, credit, debit } from '../vocab'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -151,6 +154,22 @@ function ReportDialog({conceptUri, close}){
   )
 }
 
+function BuyButton({authorWebId, conceptUri, className='', ...rest}){
+  const { feed, save: saveFeed } = useFeed()
+  const { ledger, save: saveLedger } = useLedger()
+  async function buy(){
+    //saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
+    //const ledgerUser = ledger ? getThing(ledger, authorWebId) : createThing({url: authorWebId})
+    //console.log(ledgerUser)
+    //console.log(setThing(ledger || createSolidDataset(), addDecimal(ledgerUser, 69.0)))
+  }
+  return (
+    <div className={`${className} flex flex-row`}>
+      <button className="btn" onClick={buy}>buy</button>
+    </div>
+  )
+}
+
 export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const myWebId = useWebId()
   const conceptContainerUri = useConceptContainerUri(webId)
@@ -210,7 +229,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     }
   }, [debouncedValue])
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const { fetch } = useAuthentication()
   const router = useRouter()
@@ -228,6 +247,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const coverImage = note && getUrl(note, FOAF.img)
 
   const [reporting, setReporting] = useState(false)
+  const feedAdmin = useIsFeedAdmin()
   return (
     <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
@@ -269,9 +289,14 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
               </ReactModal>
             </div>
-            <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
-              report
-            </button>
+            <div class="flex flex-row">
+              <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
+                report
+              </button>
+              {feedAdmin && (
+                <BuyButton conceptUri={conceptUri} authorWebId={webId} className="ml-6"/>
+              )}
+            </div>
           </div>
         </div>
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
@@ -287,7 +312,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
                     <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="h-2 text-2xl text-pink-900 font-bold absolute">
+                            className="h-2 text-3xl text-pink-500 font-bold absolute -left-2">
                       {sidebarOpen ? ">>" : "<<"}
                     </button>
                     <Transition
