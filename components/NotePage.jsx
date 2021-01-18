@@ -166,7 +166,7 @@ function BuyButton({authorWebId, conceptUri, className='', ...rest}){
     await saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
     let ledgerEntry = createThing()
     ledgerEntry = setUrl(ledgerEntry, RDF.type, Credit)
-    const award = 69.0
+    const award = 42.0
     ledgerEntry = setDecimal(ledgerEntry, amount, award)
     ledgerEntry = setUrl(ledgerEntry, accountOf, authorWebId)
     ledgerEntry = setDatetime(ledgerEntry, DCTERMS.date, new Date())
