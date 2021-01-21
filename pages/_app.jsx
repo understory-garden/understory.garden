@@ -9,7 +9,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <link rel="stylesheet" href="https://use.typekit.net/nmi0hpt.css"/>
+        <link rel="stylesheet" href="https://use.typekit.net/fgi5twt.css"/>
       </Head>
       <DndProvider backend={HTML5Backend}>
         <AuthenticationProvider>

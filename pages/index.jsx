@@ -52,14 +52,14 @@ function LoginUI(){
       <Link href="/register">
         <a className="text-4xl">create your account</a>
       </Link>
-      <h3 className="text-3xl my-12">OR</h3>
+      <h3 className="text-3xl my-6">OR</h3>
       <Link href="/login">
         <a className="text-4xl">get a magic login link</a>
       </Link>
-      <h3 className="text-3xl my-12">OR</h3>
-      <h3 className="text-2xl my-6">login with your handle</h3>
+      <h3 className="text-3xl my-6">OR</h3>
+      <h3 className="text-3xl mb-3">login with your handle</h3>
       <input type="text" className="pl-2 w-2/3 m-auto font-logo text-2xl rounded text-center text-black"
-             placeholder="username.loves.face.baby"
+             placeholder="what's your handle?"
              value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
         <p className="text-xs text-red-500 m-auto mt-1">
@@ -69,7 +69,7 @@ function LoginUI(){
       {loggingIn ? (
         <Loader/>
       ) : (
-        <button className="mt-6 text-3xl font-logo" onClick={logIn}>log in</button>
+        <button className="mt-6 btn p-3 text-3xl font-logo" onClick={logIn}>log in</button>
       )}
     </div>
   )
@@ -180,14 +180,12 @@ export default function IndexPage() {
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
           <>
-            <div className="py-20 relative">
-              <div className="m-auto">
-                <h1 className="text-6xl text-center bold font-logo text-white">
-                  FACE
-                </h1>
-              </div>
-              <h1 className="text-6xl text-center bold font-logo text-white">
-                BABY
+            <div className="py-20 relative bg-gradient-to-r from-green-400 via-purple-500 to-pink-500 bg-clip-text">
+              <h1 className="text-9xl text-center font-bold font-logo text-transparent">
+                itme
+              </h1>
+              <h1 className="text-6xl text-center font-bold font-logo text-transparent">
+                online
               </h1>
             </div>
             <LoginUI/>

@@ -3,7 +3,7 @@
 /* Write your own custom base styles here */
 
 a {
-    @apply text-purple-300;
+    @apply text-purple-700;
 }
 
 blockquote {
@@ -37,7 +37,7 @@ p {
 }
 
 .page {
-    @apply bg-black text-gray-100 h-screen overflow-y-scroll px-6 pb-12;
+    @apply text-gray-900 h-screen overflow-y-scroll px-6 pb-12;
 }
 
 .btn {

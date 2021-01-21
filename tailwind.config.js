@@ -7,8 +7,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ['alegreya', 'sans-serif'],
-      logo: ['westsac', 'sans-serif'],
+      sans: ['basic-sans', 'sans-serif'],
+      logo: ['chaloops', 'sans-serif'],
       mono: ['fira-mono', 'monospace']
     },
   },
