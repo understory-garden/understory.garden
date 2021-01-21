@@ -189,7 +189,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
   const { error, resource, thing: note, save, isValidating } = useThing(conceptUri)
   const bodyJSON = note && getStringNoLocale(note, noteBody)
-  const errorStatus = error && error.status
+  const errorStatus = error && error.statusCode
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);
   const [saving, setSaving] = useState(false)
