@@ -6,6 +6,7 @@ import {
 } from '@inrupt/solid-client'
 import { FOAF, AS, RDF, RDFS, DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
+import { ITME } from "../vocab"
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
@@ -94,7 +95,7 @@ function NewNoteForm(){
   )
 }
 
-function Name({name, save}){
+function Name({name, save, ...props}){
   const [newName, setNewName] = useState()
   const [editingName, setEditingName] = useState(false)
   function saveName(){
@@ -106,7 +107,7 @@ function Name({name, save}){
     setEditingName(true)
   }
   return (
-    <>
+    <div {...props}>
       {editingName ? (
         <div className="flex flex-row justify-center">
           <input className="text-xl input-text mr-3"
@@ -125,7 +126,51 @@ function Name({name, save}){
                     onClick={onEdit} />
         </div>
       )}
-    </>
+    </div>
+  )
+}
+
+function WebMonetizationPointer({profile, save, ...props}){
+  const paymentPointer = profile && getStringNoLocale(profile, ITME.paymentPointer)
+  const [newPaymentPointer, setNewPaymentPointer] = useState()
+  const [editingPaymentPointer, setEditingPaymentPointer] = useState(false)
+  function savePaymentPointer(){
+    save(newPaymentPointer)
+    setEditingPaymentPointer(false)
+  }
+  function onEdit(){
+    setNewPaymentPointer(paymentPointer)
+    setEditingPaymentPointer(true)
+  }
+  return (
+    <div {...props}>
+      {editingPaymentPointer ? (
+        <div className="flex flex-row justify-center">
+          <input className="text-xl input-text mr-3"
+                 value={newPaymentPointer}
+                 autoFocus
+                 onChange={e => setNewPaymentPointer(e.target.value)} type="text"
+                 placeholder="New Payment Pointer" />
+          <button className="btn" onClick={savePaymentPointer}>
+            Set PaymentPointer
+          </button>
+        </div>
+      ): (
+        <div className="relative flex flex-row">
+          <h3 className="text-xl text-center mb-3">
+            {paymentPointer || (
+              <span className="text-gray-500" onClick={onEdit}>
+                click to set payment pointer
+              </span>
+            )}
+          </h3>
+          {paymentPointer && (
+            <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
+                      onClick={onEdit} />
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -134,8 +179,11 @@ export default function IndexPage() {
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
   const profileImage = profile && getUrl(profile, FOAF.img)
-  async function onSave(newName){
+  async function onSaveName(newName){
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
+  }
+  async function onSavePaymentPointer(newPaymentPointer){
+    return await saveProfile(setStringNoLocale(profile, ITME.paymentPointer, newPaymentPointer))
   }
 
   const webId = useWebId()
@@ -151,7 +199,9 @@ export default function IndexPage() {
             <div className="flex flex-row">
               {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
               <div className="flex flex-col mr-12">
-                <Name name={name} save={onSave}/>
+                <Name name={name} save={onSaveName}/>
+                <WebMonetizationPointer profile={profile} save={onSavePaymentPointer}
+                                        className="mt-2"/>
               </div>
             </div>
             <div className="flex flex-col">

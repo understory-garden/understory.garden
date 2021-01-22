@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { handleToWebId, profilePath } from "../../utils/uris"
 import Notes from '../../components/Notes'
 import Nav from '../../components/nav'
-import { useFollows } from '../../hooks/people'
+import { useFollows, useProfilePaymentPointer } from '../../hooks/people'
 import { useLedgerTotalFor } from '../../hooks/feed'
 
 export default function ProfilePage(){
@@ -18,6 +18,7 @@ export default function ProfilePage(){
   const { profile } = useProfile(webId)
   const name = profile && getStringNoLocale(profile, FOAF.name)
 
+  useProfilePaymentPointer(webId)
   const { profile: myProfile, save: saveProfile } = useMyProfile()
   const profileImage = profile && getUrl(profile, FOAF.img)
 
@@ -40,14 +41,16 @@ export default function ProfilePage(){
           {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
           <div className="flex flex-col">
             {name && (
-              <h3 className="text-4xl text-center font-logo">{name}</h3>
+              <h3 className="text-4xl text-center">{name}</h3>
             )}
+            {/*
             <span className="text-3xl text-bold text-green-200">
               { ledgerTotal } 😀💰
             </span>
+             */}
           </div>
         </div>
-        <h5 className="text-xl text-center font-logo">
+        <h5 className="text-xl text-center">
           <Link href={`${profilePath(webId)}/message`}>
             <a>
               send message
