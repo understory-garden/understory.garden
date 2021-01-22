@@ -251,7 +251,17 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
           {coverImage && <img className="w-full" src={coverImage}/>}
           <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-24 overflow-y-hidden">
-              <h1 className="text-5xl text-bold">{name}</h1>
+              <div className="flex flex-col">
+                <h1 className="text-5xl font-bold">{name}</h1>
+                <div className="text-lg">
+                  by&nbsp;
+                  <Link href={profilePath(webId)}>
+                    <a>
+                      {authorName || "someone cool"}
+                    </a>
+                  </Link>
+                </div>
+              </div>
               {readOnly ? (
                 (myWebId === webId) && (
                   <Link href={privateNotePath(name)}>
@@ -272,14 +282,6 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 source
               </a>
                */}
-              <div className="text-lg">
-                by&nbsp;
-                <Link href={profilePath(webId)}>
-                  <a>
-                    {authorName || "someone cool"}
-                  </a>
-                </Link>
-              </div>
               <ReactModal isOpen={reporting} >
                 <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
               </ReactModal>
