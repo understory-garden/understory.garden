@@ -252,8 +252,10 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
           <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-44 overflow-y-hidden">
               <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-gray-900">{name}</h1>
-                <div className="text-lg">
+                <h1 className="text-5xl font-bold text-gray-800">
+                  {name}
+                </h1>
+                <div className="text-lg text-gray-800">
                   by&nbsp;
                   <Link href={profilePath(webId)}>
                     <a>
@@ -311,7 +313,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                                  className="sticky top-0 z-20"/>
                 )}
                 <div className="flex-grow flex flex-row mt-3">
-                  <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
+                  <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
                   <div className="relative">
                     <button onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
