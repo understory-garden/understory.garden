@@ -140,7 +140,7 @@ export default function IndexPage() {
 
   const webId = useWebId()
   const appContainerUri = useFacebabyContainerUri(webId)
-  const [tab, setTab] = useState("feed")
+  const [tab, setTab] = useState("notes")
   return (
     <div className="page" id="page">
       { (loggedIn === true) ? (
@@ -168,9 +168,11 @@ export default function IndexPage() {
             <div className="mr-6 flex-grow">
               <NewNoteForm />
               <div className="flex mb-6">
+                {/*
                 <TabButton name="feed" activeName={tab} setTab={setTab}>
                   feed
                 </TabButton>
+                 */}
                 <TabButton name="notes" activeName={tab} setTab={setTab}>
                   notes
                 </TabButton>
