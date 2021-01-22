@@ -250,9 +250,9 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
         <div className="relative overflow-y-hidden flex-none h-56">
           {coverImage && <img className="w-full" src={coverImage}/>}
           <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
-            <div className="flex flex-row justify-between h-24 overflow-y-hidden">
+            <div className="flex flex-row justify-between h-44 overflow-y-hidden">
               <div className="flex flex-col">
-                <h1 className="text-5xl font-bold">{name}</h1>
+                <h1 className="text-5xl font-bold text-gray-900">{name}</h1>
                 <div className="text-lg">
                   by&nbsp;
                   <Link href={profilePath(webId)}>

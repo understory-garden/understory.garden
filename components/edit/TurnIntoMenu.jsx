@@ -13,12 +13,12 @@ const TurnIntoItem = forwardRef(({ element, icon, iconBg="bg-blue-600", children
     onClose()
   }, [editor, format, element, onClose])
   return (
-    <MenuItem className="col-span-1 flex shadow-sm rounded-md cursor-pointer"
+    <MenuItem className="col-span-1 flex shadow-sm hover:shadow-lg rounded-md cursor-pointer"
               onClick={onClick} ref={ref} {...props} >
       <div className={`${iconBg} text-2xl flex-shrink-0 flex items-center justify-center w-16  text-white text-sm font-medium rounded-l-md`}>
         {icon}
       </div>
-      <div className="px-3 py-3 text-lg flex-1 flex items-center justify-center border-t border-r border-b border-gray-600 bg-gray-600 rounded-r-md truncate">
+      <div className="px-3 py-3 text-lg flex-1 flex items-center justify-center border-t border-r border-b border-gray-600 bg-gray-200 rounded-r-md truncate">
         {children}
       </div>
     </MenuItem>
@@ -27,7 +27,7 @@ const TurnIntoItem = forwardRef(({ element, icon, iconBg="bg-blue-600", children
 
 const TurnIntoMenu = ({ element, onClose, className, ...props }) => {
   return (
-    <Menu className={`mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-4 lg:grid-cols-5 ${className}`}
+    <Menu className={`mt-1 mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-4 lg:grid-cols-5 ${className}`}
           onClose={onClose} {...props}>
       <TurnIntoItem element={element} format="paragraph" onClose={onClose} icon="abc">
         text

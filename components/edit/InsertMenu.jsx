@@ -21,13 +21,13 @@ const InsertItem = forwardRef(({ element, icon, iconBg="bg-pink-600", children, 
     onClose()
   }, [editor, format, element, onClose])
   return (
-    <MenuItem className="col-span-1 flex shadow-sm rounded-md cursor-pointer"
+    <MenuItem className="col-span-1 flex shadow-sm hover:shadow-lg rounded-md cursor-pointer"
               onClick={onClickCallback}
               ref={ref} {...props}>
       <div className={`${iconBg} text-2xl flex-shrink-0 flex items-center justify-center w-16  text-white text-sm font-medium rounded-l-md`}>
         {icon}
       </div>
-      <div className="px-3 py-3 text-lg flex-1 flex items-center justify-center border-t border-r border-b border-gray-600 bg-gray-600 rounded-r-md truncate">
+      <div className="px-3 py-3 text-lg flex-1 flex items-center justify-center border-t border-r border-b border-gray-600 bg-gray-200 rounded-r-md truncate">
         {children}
       </div>
     </MenuItem>

@@ -68,7 +68,7 @@ function LoginUI(){
         </p>
       )}
       {loggingIn ? (
-        <Loader className="text-center flex flex-row justify-center"/>
+        <Loader className="flex flex-row justify-center"/>
       ) : (
         <button className="btn mt-6 p-3 text-3xl flex-auto block m-auto hover:shadow-md" onClick={logIn}>
           log in
@@ -112,6 +112,10 @@ export default function IndexPage() {
     onSave()
     setEditingName(false)
   }
+  function onEdit(){
+    setNewName(name)
+    setEditingName(true)
+  }
   return (
     <div className="page" id="page">
       { (loggedIn === true) ? (
@@ -137,7 +141,7 @@ export default function IndexPage() {
                   <div className="relative flex flex-row">
                     <h3 className="text-4xl text-center mb-3">{name}</h3>
                     <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
-                              onClick={() => setEditingName(true)} />
+                              onClick={onEdit} />
                   </div>
                 )}
               </div>
@@ -185,7 +189,7 @@ export default function IndexPage() {
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
             <div className="text-center">
-              <div className="my-12 logo-bg inline-block">
+              <div className="my-12 logo-bg">
                 <h1 className="text-9xl font-bold font-logo text-transparent">
                   itme
                 </h1>
@@ -196,9 +200,7 @@ export default function IndexPage() {
               <LoginUI/>
             </div>
         ) : (
-          <div>
-            loading....
-          </div>
+          <Loader className="flex flex-row justify-center mt-36"/>
         )
       ) }
     </div>
