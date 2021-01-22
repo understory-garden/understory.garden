@@ -41,8 +41,8 @@ p {
 }
 
 .btn {
-    @apply bg-purple-300 text-gray-700 text-xl rounded-lg px-3 font-bold;
-    text-shadow: 1px 1px 4px white;
+    @apply bg-purple-500 text-gray-100 text-xl rounded-lg px-3 font-bold border-2 border-gray-100;
+
 }
 
 .block {

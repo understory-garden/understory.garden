@@ -34,7 +34,6 @@ function LoginUI(){
     } catch (e) {
       console.log("error:", e)
       setBadHandle(true)
-    } finally {
       setLoggingIn(false)
     }
   }
@@ -64,14 +63,14 @@ function LoginUI(){
              placeholder="what's your handle?"
              value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
-        <p className="text-xs text-red-500 m-auto mt-1">
+        <p className="text-red-500 m-auto mt-2">
           hm, I don't recognize that handle
         </p>
       )}
       {loggingIn ? (
-        <Loader/>
+        <Loader className="text-center flex flex-row justify-center"/>
       ) : (
-        <button className="mt-6 btn p-3 text-3xl flex-auto block m-auto" onClick={logIn}>
+        <button className="btn mt-6 p-3 text-3xl flex-auto block m-auto hover:shadow-md" onClick={logIn}>
           log in
         </button>
       )}
