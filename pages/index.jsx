@@ -94,28 +94,53 @@ function NewNoteForm(){
   )
 }
 
-export default function IndexPage() {
-  const loggedIn = useLoggedIn()
-  const { profile, save: saveProfile } = useMyProfile()
-  const name = profile && getStringNoLocale(profile, FOAF.name)
-  const profileImage = profile && getUrl(profile, FOAF.img)
+function Name({name, save}){
   const [newName, setNewName] = useState()
-  async function onSave(){
-    return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
-  }
-
-  const webId = useWebId()
-  const appContainerUri = useFacebabyContainerUri(webId)
-  const [tab, setTab] = useState("feed")
   const [editingName, setEditingName] = useState(false)
   function saveName(){
-    onSave()
+    save(newName)
     setEditingName(false)
   }
   function onEdit(){
     setNewName(name)
     setEditingName(true)
   }
+  return (
+    <>
+      {editingName ? (
+        <div className="flex flex-row justify-center">
+          <input className="text-xl input-text mr-3"
+                 value={newName}
+                 autoFocus
+                 onChange={e => setNewName(e.target.value)} type="text"
+                 placeholder="New Name" />
+          <button className="btn" onClick={saveName}>
+            Set Name
+          </button>
+        </div>
+      ): (
+        <div className="relative flex flex-row">
+          <h3 className="text-4xl text-center mb-3">{name}</h3>
+          <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
+                    onClick={onEdit} />
+        </div>
+      )}
+    </>
+  )
+}
+
+export default function IndexPage() {
+  const loggedIn = useLoggedIn()
+  const { profile, save: saveProfile } = useMyProfile()
+  const name = profile && getStringNoLocale(profile, FOAF.name)
+  const profileImage = profile && getUrl(profile, FOAF.img)
+  async function onSave(newName){
+    return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
+  }
+
+  const webId = useWebId()
+  const appContainerUri = useFacebabyContainerUri(webId)
+  const [tab, setTab] = useState("feed")
   return (
     <div className="page" id="page">
       { (loggedIn === true) ? (
@@ -126,24 +151,7 @@ export default function IndexPage() {
             <div className="flex flex-row">
               {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
               <div className="flex flex-col mr-12">
-                {editingName ? (
-                  <div className="flex flex-row justify-center">
-                    <input className="text-xl input-text mr-3"
-                           value={newName}
-                           autoFocus
-                           onChange={e => setNewName(e.target.value)} type="text"
-                           placeholder="New Name" />
-                    <button className="btn" onClick={saveName}>
-                      Set Name
-                    </button>
-                  </div>
-                ): (
-                  <div className="relative flex flex-row">
-                    <h3 className="text-4xl text-center mb-3">{name}</h3>
-                    <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
-                              onClick={onEdit} />
-                  </div>
-                )}
+                <Name name={name} save={onSave}/>
               </div>
             </div>
             <div className="flex flex-col">
