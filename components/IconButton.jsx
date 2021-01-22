@@ -1,7 +1,7 @@
 const IconButton = ({active=true, className, ...props}) => {
-  const activeClasses = active ? "text-white bg-gray-700 hover:bg-gray-600" : "text-white bg-gray-900 hover:bg-gray-800"
+  const activeClasses = active ? "bg-pink-200 hover:bg-pink-100" : "bg-gray-200 hover:bg-gray-100"
   return (
-    <button className={`${activeClasses} px-1 ${className || ''}`} {...props}/>
+    <button className={`${activeClasses} text-gray-900 px-1 ${className || ''}`} {...props}/>
   )
 }
 

@@ -17,11 +17,11 @@ function FeedItem({uri}){
   const { thing: note } = useThing(uri)
   const coverImage = note && getUrl(note, FOAF.img)
   return (
-    <div className="relative overflow-y-hidden flex-none h-36 bg-gray-600 mb-12 rounded-lg">
+    <div className="relative overflow-y-hidden flex-none h-52 bg-gray-600 mb-12 rounded-lg">
       {coverImage && <img className="w-full" src={coverImage}/>}
 
-      <div className="pb-24 pt-3 text-center absolute top-0 left-0 w-full bg-gradient-to-b from-black">
-        <h2 className="text-5xl mb-1">
+      <div className="pb-24 pt-3 text-center absolute top-0 left-0 w-full bg-gradient-to-b from-white via-gray-100">
+        <h2 className="text-5xl mb-1 font-bold">
           <Link href={publicNotePath(webId, name)}>
             <a>
               {name}

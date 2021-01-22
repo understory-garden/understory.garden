@@ -86,7 +86,7 @@ function NewNoteForm(){
   })
   return (
     <div className="flex flex-row m-auto my-6">
-      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3 bg-gray-900" type="text" placeholder="New Note Name" />
+      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Note Name" />
       <button className="btn" onClick={onCreate} disabled={noteName === ""}>
         Create Note
       </button>
@@ -99,7 +99,7 @@ export default function IndexPage() {
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
   const profileImage = profile && getUrl(profile, FOAF.img)
-  const [newName, setNewName] = useState("")
+  const [newName, setNewName] = useState()
   async function onSave(){
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
   }
@@ -124,9 +124,11 @@ export default function IndexPage() {
               <div className="flex flex-col mr-12">
                 {editingName ? (
                   <div className="flex flex-row justify-center">
-                    <input className="text-xl"
-                      value={newName}
-                           onChange={e => setNewName(e.target.value)} className="input-text bg-gray-900 mr-3" type="text" placeholder="New Name" />
+                    <input className="text-xl input-text mr-3"
+                           value={newName}
+                           autoFocus
+                           onChange={e => setNewName(e.target.value)} type="text"
+                           placeholder="New Name" />
                     <button className="btn" onClick={saveName}>
                       Set Name
                     </button>

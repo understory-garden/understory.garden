@@ -112,25 +112,12 @@ function ReportDialog({conceptUri, close}){
     close()
   }
   return (
-    <div className="w-full text-black flex flex-col">
+    <div className="w-full flex flex-col">
       {reported ? (
         <>
-          {(conceptUri === "https://cassette.loves.face.baby/public/itme/facebaby/concepts/SHOCKING%20REVEAL!!!%20100%25%20GENUINE!.ttl#concept") ? (
-            <>
-              <h3 className="text-2xl text-center">
-                Thank you for your report!
-              </h3>
-              <p className="text-xl mt-6 text-center">
-                We would like you to know that while we have
-                received 72888 reports on this post from valued community
-                members like you, we will almost certainly take no action.
-              </p>
-            </>
-          ) : (
-            <p className="text-xl mt-6 text-center">
-              Thank you for your report! The offending parties will be harshly dealt with.
-            </p>
-          )}
+          <p className="text-xl mt-6 text-center">
+            Thank you for your report! The offending parties will be harshly dealt with.
+          </p>
           <button onClick={close} className="bg-purple-100 p-6 rounded-lg mt-6">
             Close
           </button>
@@ -138,12 +125,8 @@ function ReportDialog({conceptUri, close}){
       ) : (
         <>
           <h3 className="text-center text-3xl">
-            🚨 REPORT THIS CONTENT 🚨
+            REPORT THIS CONTENT
           </h3>
-          <p className="text-xl mt-6 text-center">
-            Thank you for your concern, fair citizen of face.baby. Please
-            let us know why this content deserves our attention and scorn.
-          </p>
           <textarea value={message} onChange={e => setMessage(e.target.value)}
                     className="mt-6 w-full h-36" />
           <button onClick={report} className="bg-purple-100 m-auto p-6 rounded-lg mt-6">
@@ -264,11 +247,11 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
     <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
         <Nav />
-        <div className={`relative overflow-y-hidden flex-none h-56`}>
+        <div className="relative overflow-y-hidden flex-none h-56">
           {coverImage && <img className="w-full" src={coverImage}/>}
-          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-black flex flex-col justify-between">
+          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-24 overflow-y-hidden">
-              <h1 className="text-5xl">{name}</h1>
+              <h1 className="text-5xl text-bold">{name}</h1>
               {readOnly ? (
                 (myWebId === webId) && (
                   <Link href={privateNotePath(name)}>
@@ -302,9 +285,11 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
               </ReactModal>
             </div>
             <div class="flex flex-row">
-              <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
-                report
-              </button>
+              {/*
+                 <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
+                 report
+                 </button>
+               */}
               {feedAdmin && (
                 <BuyButton conceptUri={conceptUri} authorWebId={webId} className="ml-6"/>
               )}
@@ -319,7 +304,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 value={value}
                 onChange={newValue => setValue(newValue)}
               >
-                {!readOnly && !reporting && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3 pt-2 sticky top-0 bg-black z-20"/>}
+                {!readOnly && !reporting && <EditorToolbar saving={saving} saved={saved} save={saveCallback} className="mb-3 pt-2 sticky top-0 z-20"/>}
                 <div className="flex-grow flex flex-row">
                   <Editable readOnly={readOnly} editor={editor} className="flex-grow" />
                   <div className="relative">
