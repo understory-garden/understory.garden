@@ -28,11 +28,13 @@ import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
 import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 
-import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 import { publicNotePath, privateNotePath, profilePath, noteUriToName } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
 import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf } from '../vocab'
 import { sendMessage } from '../utils/message'
+import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
+
+import WebMonetization from '../components/WebMonetization'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -246,6 +248,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   return (
     <NoteContext.Provider value={{path, note, save}}>
       <div className="flex flex-col page">
+        <WebMonetization webId={webId} />
         <Nav />
         <div className="relative overflow-y-hidden flex-none h-56">
           {coverImage && <img className="w-full" src={coverImage}/>}

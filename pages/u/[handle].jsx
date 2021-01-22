@@ -8,7 +8,8 @@ import Link from 'next/link'
 import { handleToWebId, profilePath } from "../../utils/uris"
 import Notes from '../../components/Notes'
 import Nav from '../../components/nav'
-import { useFollows, useProfilePaymentPointer } from '../../hooks/people'
+import WebMonetization from '../../components/WebMonetization'
+import { useFollows } from '../../hooks/people'
 import { useLedgerTotalFor } from '../../hooks/feed'
 
 export default function ProfilePage(){
@@ -18,7 +19,6 @@ export default function ProfilePage(){
   const { profile } = useProfile(webId)
   const name = profile && getStringNoLocale(profile, FOAF.name)
 
-  useProfilePaymentPointer(webId)
   const { profile: myProfile, save: saveProfile } = useMyProfile()
   const profileImage = profile && getUrl(profile, FOAF.img)
 
@@ -35,6 +35,7 @@ export default function ProfilePage(){
   const ledgerTotal = useLedgerTotalFor(webId)
   return (
     <div className="page">
+      <WebMonetization webId={webId}/>
       <Nav />
       <div className="flex flex-row mt-6 mb-6 justify-between items-start">
         <div className="flex flex-row">
