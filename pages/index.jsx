@@ -48,17 +48,19 @@ function LoginUI(){
     }
   }
   return (
-    <div className="flex flex-col text-center">
+    <>
+      {/*
       <Link href="/register">
-        <a className="text-4xl">create your account</a>
+        <a className="text-4xl block">create your account</a>
       </Link>
       <h3 className="text-3xl my-6">OR</h3>
       <Link href="/login">
         <a className="text-4xl">get a magic login link</a>
       </Link>
       <h3 className="text-3xl my-6">OR</h3>
-      <h3 className="text-3xl mb-3">login with your handle</h3>
-      <input type="text" className="pl-2 w-2/3 m-auto font-logo text-2xl rounded text-center text-black"
+      <h3 className="text-3xl mb-3 text-gray-800">login with your handle</h3>
+       */}
+      <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
              placeholder="what's your handle?"
              value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
@@ -69,9 +71,11 @@ function LoginUI(){
       {loggingIn ? (
         <Loader/>
       ) : (
-        <button className="mt-6 btn p-3 text-3xl font-logo" onClick={logIn}>log in</button>
+        <button className="mt-6 btn p-3 text-3xl flex-auto block m-auto" onClick={logIn}>
+          log in
+        </button>
       )}
-    </div>
+    </>
   )
 }
 
@@ -130,7 +134,7 @@ export default function IndexPage() {
                   </div>
                 ): (
                   <div className="relative flex flex-row">
-                    <h3 className="text-4xl text-center font-logo mb-3">{name}</h3>
+                    <h3 className="text-4xl text-center mb-3">{name}</h3>
                     <EditIcon className="relative -top-6 text-purple-300 cursor-pointer"
                               onClick={() => setEditingName(true)} />
                   </div>
@@ -138,7 +142,7 @@ export default function IndexPage() {
               </div>
             </div>
             <div className="flex flex-col">
-              <h5 className="text-xl text-center font-logo mb-6">
+              <h5 className="text-xl text-center mb-6">
                 <Link href={`${profilePath(webId)}`}>
                   <a>
                     public profile
@@ -179,17 +183,17 @@ export default function IndexPage() {
           </>
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
-          <>
-            <div className="py-20 relative bg-gradient-to-r from-green-400 via-purple-500 to-pink-500 bg-clip-text">
-              <h1 className="text-9xl text-center font-bold font-logo text-transparent">
-                itme
-              </h1>
-              <h1 className="text-6xl text-center font-bold font-logo text-transparent">
-                online
-              </h1>
+            <div className="text-center">
+              <div className="my-12 logo-bg inline-block">
+                <h1 className="text-9xl font-bold font-logo text-transparent">
+                  itme
+                </h1>
+                <h1 className="text-6xl font-bold font-logo text-transparent">
+                  online
+                </h1>
+              </div>
+              <LoginUI/>
             </div>
-            <LoginUI/>
-          </>
         ) : (
           <div>
             loading....

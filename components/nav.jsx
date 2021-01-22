@@ -23,13 +23,13 @@ export default function Nav() {
     <nav className="pt-3">
       <ul className="flex justify-between items-center">
         <Link href="/">
-          <a className="font-bold text-4xl">👶</a>
+          <a className="font-bold font-logo text-4xl logo-bg">itme</a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
-          {loggedIn && (
+          { false && loggedIn && (
             <Link href="/ledger">
               <a>
-                <span className="text-3xl text-bold text-green-200">
+                <span className="text-3xl text-bold text-green-400">
                   { ledgerTotal } 😀💰
                 </span>
               </a>

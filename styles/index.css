@@ -3,7 +3,7 @@
 /* Write your own custom base styles here */
 
 a {
-    @apply text-purple-700;
+    @apply text-purple-500;
 }
 
 blockquote {
@@ -37,11 +37,12 @@ p {
 }
 
 .page {
-    @apply text-gray-900 h-screen overflow-y-scroll px-6 pb-12;
+    @apply text-gray-700 h-screen overflow-y-scroll px-6 pb-12;
 }
 
 .btn {
-    @apply bg-purple-100 text-gray-800 text-xl rounded-lg px-3;
+    @apply bg-purple-300 text-gray-700 text-xl rounded-lg px-3 font-bold;
+    text-shadow: 1px 1px 4px white;
 }
 
 .block {
@@ -72,3 +73,7 @@ p {
 /* Stop purging. */
 
 /* Your own custom utilities */
+
+.logo-bg {
+    @apply bg-gradient-to-br from-green-400 via-purple-500 to-pink-500 bg-clip-text;
+}
