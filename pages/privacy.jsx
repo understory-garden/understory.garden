@@ -11,12 +11,12 @@ export default function PrivacyPage(){
         <h3 className="text-5xl my-12">privacy at face.baby</h3>
         <p className="text-2xl my-6">
           We are dedicated to providing you our commitment to the highest
-          standards for privacy and the protection of your digital soul. We
+          standards for privacy and the protection of your data. We
           certainly wouldn't want anything bad to happen to it!
         </p>
         <p className="text-2xl my-6">
-          face.baby is built on decentralized web technology that gives you
-          the ultimate in control over your succulent digital body.
+          itme.online is built on decentralized web technology that gives you
+          the ultimate in control over your digital body.
         </p>
         {loggedIn ? (
           <p className="text-2xl my-6">
@@ -30,8 +30,6 @@ export default function PrivacyPage(){
           </p>
         ) : (
           <p className="text-2xl my-6">
-            Take control of your digital destiny today! Join face.baby and
-            monetize your digital soul!
           </p>
         )}
       </div>
