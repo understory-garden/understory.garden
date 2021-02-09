@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <link rel="stylesheet" href="https://use.typekit.net/fgi5twt.css"/>
+        <meta name="monetization" content="$ilp.uphold.com/DYPhbXPmDa2P" />
       </Head>
       <DndProvider backend={HTML5Backend}>
         <AuthenticationProvider>

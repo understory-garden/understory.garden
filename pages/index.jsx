@@ -21,6 +21,7 @@ import Follows from '../components/Follows'
 import Feed from '../components/Feed'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
+import WebMonetization from '../components/WebMonetization'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -193,6 +194,7 @@ export default function IndexPage() {
     <div className="page" id="page">
       { (loggedIn === true) ? (
         <>
+          <WebMonetization webId={webId}/>
           <Nav />
         <div className="px-6">
           <div className="flex flex-row py-6 justify-between">
