@@ -80,6 +80,7 @@ function LoginUI(){
           log in
         </button>
       )}
+      <p className="mt-3 text-gray-500">By logging in you agree to be bound by our <a href="/tos">Terms of Service</a></p>
     </>
   )
 }

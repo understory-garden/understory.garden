@@ -13,7 +13,7 @@ export default function TosPage(){
                   <div className="title text-3xl mb-6"><strong>TERMS OF USE</strong></div>
                   <div className="subtitle"><strong>Last updated February 09, 2021</strong></div>
                   <div className="mt-3 text-lg">Hi!</div>
-                  <div className="mb-6">These are our terms of use. We generated them using <a href="https://termly.io/products/terms-and-conditions-generator/">Termly</a>. They're legally binding but open for discussion - we'd like to know if any of them stop you from using our site. The good news is many of them probably don't apply if you're using a third party Solid Pod, and we'll be working with our lawyers to make sure they better reflect our values and liabilities soon. In the mean time, the important takeaway is: please don't be a jerk on our platform.</div>
+                  <div className="mb-6">These are our Terms of Use. We generated them using <a href="https://termly.io/products/terms-and-conditions-generator/">Termly</a>. They're legally binding but <a href="https://github.com/itme/itme.online/issues">open for discussion</a> - we'd like to know if any of them stop you from using our site. The good news is many of them probably don't apply if you're using a third party Solid Pod, and we'll be working with our lawyers to make sure they better reflect our values and liabilities soon. In the mean time, the important takeaway is: please don't be a jerk on our platform.</div>
                 </div>
               </div>
             </div>
