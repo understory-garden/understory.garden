@@ -1,9 +1,6 @@
 import Nav from '../components/nav'
-import { useWebId, useLoggedIn } from 'swrlit'
 
 export default function PrivacyPage(){
-  const webId = useWebId()
-  const loggedIn = useLoggedIn()
   return (
     <div className="page">
       <Nav/>
