@@ -4,13 +4,13 @@ export default function TosPage(){
   return (
     <div className="page">
       <Nav/>
-      <div className="body text-center">
+      <div className="body">
         <div>
           <div>
             <div><a name="_2cipo4yr3w5d"></a>
               <div>
-                <div><a name="_gm5sejt4p02f"></a>
-                  <div className="title text-3xl mb-6"><strong>TERMS OF USE</strong></div>
+                <div className="text-center">
+                  <div className="title text-3xl my-6"><strong>TERMS OF USE</strong></div>
                   <div className="subtitle"><strong>Last updated February 09, 2021</strong></div>
                   <div className="mt-3 text-lg">Hi!</div>
                   <div className="mb-6">These are our Terms of Use. We generated them using <a href="https://termly.io/products/terms-and-conditions-generator/">Termly</a>. They're legally binding but <a href="https://github.com/itme/itme.online/issues">open for discussion</a> - we'd like to know if any of them stop you from using our site. The good news is many of them probably don't apply if you're using a third party Solid Pod, and we'll be working with our lawyers to make sure they better reflect our values and liabilities soon. In the mean time, the important takeaway is: please don't be a jerk on our platform.</div>

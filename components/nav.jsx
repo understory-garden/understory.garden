@@ -78,6 +78,9 @@ export default function Nav() {
                         <a href="/privacy" className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                           privacy
                         </a>
+                        <a href="/tos" className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                          terms of service
+                        </a>
                         {loggedIn && (
                           <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
                                   onClick={logout}>
