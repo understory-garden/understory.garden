@@ -51,6 +51,7 @@ export default function ProfilePage(){
              */}
           </div>
         </div>
+        {/*
         <h5 className="text-xl text-center">
           <Link href={`${profilePath(webId)}/message`}>
             <a>
@@ -58,6 +59,7 @@ export default function ProfilePage(){
             </a>
           </Link>
         </h5>
+         */}
         {(follows && !isMyProfile) && (
           alreadyFollowing ? (
             <button className="btn py-1" onClick={unfollow}>
