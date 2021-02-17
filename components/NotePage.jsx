@@ -171,7 +171,9 @@ function BuyButton({authorWebId, conceptUri, className='', ...rest}){
 
 export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const myWebId = useWebId()
-  const conceptContainerUri = useConceptContainerUri(webId)
+  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
+
+  const defaultConceptContainerUri = useConceptContainerUri(webId, 'private')
   const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
   const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
   const { error, resource, thing: note, save, isValidating } = useThing(conceptUri)
@@ -200,7 +202,6 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const { profile: authorProfile } = useProfile(webId)
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){

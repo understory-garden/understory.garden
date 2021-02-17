@@ -7,23 +7,23 @@ export function useStorageContainer(webId) {
   return profile && getUrl(profile, WS.storage)
 }
 
-export function useFacebabyContainerUri(webId, path = 'public') {
+export function useItmeContainerUri(webId, path = 'public') {
   const storageContainer = useStorageContainer(webId)
   return useEnsured(storageContainer && `${storageContainer}${path}/itme/online/`)
 }
 
-export function useImageUploadUri(webId) {
-  const facebabyContainerUri = useFacebabyContainerUri(webId)
-  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}images/`)
+export function useImageUploadUri(webId, path='public') {
+  const itmeContainerUri = useItmeContainerUri(webId, path)
+  return useEnsured(itmeContainerUri && `${itmeContainerUri}images/`)
 }
 
-export function useConceptContainerUri(webId) {
-  const facebabyContainerUri = useFacebabyContainerUri(webId)
-  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}concepts/`)
+export function useConceptContainerUri(webId, path='public') {
+  const itmeContainerUri = useItmeContainerUri(webId, path)
+  return useEnsured(itmeContainerUri && `${itmeContainerUri}concepts/`)
 }
 
 export function useArchiveContainerUri() {
   const webId = useWebId()
-  const facebabyContainerUri = useFacebabyContainerUri(webId, "private")
-  return useEnsured(facebabyContainerUri && `${facebabyContainerUri}archive/`)
+  const itmeContainerUri = useItmeContainerUri(webId, "private")
+  return useEnsured(itmeContainerUri && `${itmeContainerUri}archive/`)
 }

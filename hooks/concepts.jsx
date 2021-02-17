@@ -1,10 +1,10 @@
-import { useFacebabyContainerUri } from './uris'
+import { useItmeContainerUri } from './uris'
 import { useResource, useWebId } from 'swrlit'
 import { getThingAll, getDatetime } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 
 export function useConceptIndex(webId){
-  const appContainerUri = useFacebabyContainerUri(webId)
+  const appContainerUri = useItmeContainerUri(webId)
 
   const conceptIndexUri = appContainerUri && `${appContainerUri}concepts.ttl`
   const {resource: index, ...rest} = useResource(conceptIndexUri)

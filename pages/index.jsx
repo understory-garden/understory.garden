@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import { useConceptIndex } from '../hooks/concepts'
-import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
+import { useStorageContainer } from '../hooks/uris'
 import { conceptNameFromUri } from '../model/concept'
 import { profilePath } from '../utils/uris'
 import Nav from '../components/nav'
@@ -193,7 +193,6 @@ export default function IndexPage() {
   }
 
   const webId = useWebId()
-  const appContainerUri = useFacebabyContainerUri(webId)
   const [tab, setTab] = useState("notes")
   return (
     <div className="page" id="page">
