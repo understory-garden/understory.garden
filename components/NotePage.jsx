@@ -9,7 +9,7 @@ import {
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl
+  removeThing, getUrl, setDecimal, setUrl, getSourceUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
@@ -30,7 +30,7 @@ import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 
 import { publicNotePath, privateNotePath, profilePath, noteUriToName } from '../utils/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf } from '../vocab'
+import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf, ITME } from '../vocab'
 import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 
@@ -39,14 +39,6 @@ import WebMonetization from '../components/WebMonetization'
 const emptyBody = [{ children: [{text: ""}]}]
 
 const thingName = "concept"
-
-function createConceptReferencesFor(noteUri, conceptUris){
-  var conceptReferences = createThing({url: noteUri})
-  for (const uri of conceptUris){
-    conceptReferences = addUrl(conceptReferences, refs, uri)
-  }
-  return conceptReferences
-}
 
 function LinkToConcept({uri, ...props}){
   const nameInUri = conceptNameFromUri(uri)
@@ -95,12 +87,22 @@ function createOrUpdateNote(note, value){
   return newNote
 }
 
-function createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri){
-  const concepts = getConceptNodes(editor).map(
-    ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
-  let newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
-  newConceptReferences = setDatetime(newConceptReferences, DCTERMS.modified, new Date())
-  return setThing(conceptIndex || createSolidDataset(), newConceptReferences)
+function createConceptFor(name, conceptNames){
+  let concept = createThing({name})
+  for (const conceptName of conceptNames){
+    concept = addUrl(concept, refs, createThing({name: conceptName}))
+  }
+  return concept
+}
+
+function createOrUpdateConceptIndex(conceptIndex, editor, name, storageUri){
+  const conceptNames = getConceptNodes(editor).map(
+    ([concept]) => getConceptNameFromNode(concept)
+  )
+  let newConcept = createConceptFor(name, conceptNames)
+  newConcept = addUrl(newConcept, ITME.storedAt, storageUri)
+  newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
+  return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
 
 function ReportDialog({conceptUri, close}){
@@ -203,11 +205,12 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
 
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
-    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri)
+    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, name, conceptUri)
+    console.log(newConceptIndex)
     setSaving(true)
     try {
-      await save(newNote)
-      await saveConceptIndex(newConceptIndex)
+//      await save(newNote)
+//      await saveConceptIndex(newConceptIndex)
     } catch (e) {
       console.log("error saving note", e)
     } finally {
@@ -291,7 +294,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                 <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
               </ReactModal>
             </div>
-            <div class="flex flex-row">
+            <div className="flex flex-row">
               {/*
                  <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
                  report

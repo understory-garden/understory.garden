@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 
 import { conceptNameFromUri } from '../model/concept'
-import { useConceptIndex } from '../hooks/concepts'
+import { useConcepts } from '../hooks/concepts'
 import NoteContext from '../contexts/NoteContext'
 
 function Note({concept}){
@@ -32,10 +32,7 @@ function Note({concept}){
 }
 
 export default function Notes({path = "/notes", webId}){
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
-  const concepts = conceptIndex && getThingAll(conceptIndex).sort(
-    (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
-  )
+  const { concepts } = useConcepts(webId)
   return (
     <NoteContext.Provider value={{path}}>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

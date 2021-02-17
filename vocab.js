@@ -6,6 +6,9 @@ export const Debit = "https://face.baby/vocab#Debit"
 export const amount = "https://face.baby/vocab#amount"
 export const accountOf = "https://face.baby/vocab#accountOf"
 
+
+const itmeRoot = "https://itme.online/vocab#"
 export const ITME = {
-  paymentPointer: "https://itme.online/vocab#paymentPointer",
+  paymentPointer: `${itmeRoot}paymentPointer`,
+  storedAt: `${itmeRoot}storedAt`
 }
