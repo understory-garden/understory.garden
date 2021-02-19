@@ -1,13 +1,36 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { getUrl } from '@inrupt/solid-client'
+import { getUrl, getSourceUrl } from '@inrupt/solid-client'
 import { FOAF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
-import { useAuthentication, useLoggedIn, useMyProfile, useContainer } from 'swrlit'
+import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } from 'swrlit'
 
 import { MailIcon } from '../components/icons'
 import { useMyLedgerTotal } from '../hooks/feed'
+import { useApp, useWorkspacePreferencesFileUri } from '../hooks/app'
+import { deleteResource } from '../utils/fetch'
+
+function DevTools(){
+  const webId = useWebId()
+
+  const { resource: appResource } = useApp(webId)
+  const workspacePreferencesFileUri = useWorkspacePreferencesFileUri(webId)
+  return (
+    <ul>
+      <li>
+        <button onClick={() => deleteResource(getSourceUrl(appResource))}>
+          delete app file
+        </button>
+      </li>
+      <li>
+        <button onClick={() => deleteResource(workspacePreferencesFileUri)}>
+          delete default workspace prefs
+        </button>
+      </li>
+    </ul>
+  )
+}
 
 export default function Nav() {
   const loggedIn = useLoggedIn()
@@ -20,7 +43,7 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const ledgerTotal = useMyLedgerTotal()
   return (
-    <nav className="pt-3">
+    <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
         <Link href="/">
           <a className="font-bold font-logo text-4xl logo-bg text-transparent">itme</a>
@@ -96,6 +119,7 @@ export default function Nav() {
           )}
         </ul>
       </ul>
+      <DevTools/>
     </nav>
   )
 }

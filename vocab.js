@@ -10,5 +10,10 @@ export const accountOf = "https://face.baby/vocab#accountOf"
 const itmeRoot = "https://itme.online/vocab#"
 export const ITME = {
   paymentPointer: `${itmeRoot}paymentPointer`,
-  storedAt: `${itmeRoot}storedAt`
+  storedAt: `${itmeRoot}storedAt`,
+  defaultNoteStorage: `${itmeRoot}defaultNoteStorage`,
+  hasWorkspace: `${itmeRoot}hasWorkspace`,
+  conceptIndex: `${itmeRoot}conceptIndex`,
+  tagIndex: `${itmeRoot}tagIndex`,
+  noteStorage: `${itmeRoot}noteStorage`
 }
