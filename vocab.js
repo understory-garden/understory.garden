@@ -9,11 +9,12 @@ export const accountOf = "https://face.baby/vocab#accountOf"
 
 const itmeRoot = "https://itme.online/vocab#"
 export const ITME = {
+  noteBody: `${itmeRoot}noteBody`,
+  refs: `${itmeRoot}refs`,
   paymentPointer: `${itmeRoot}paymentPointer`,
   storedAt: `${itmeRoot}storedAt`,
   defaultNoteStorage: `${itmeRoot}defaultNoteStorage`,
   hasWorkspace: `${itmeRoot}hasWorkspace`,
   conceptIndex: `${itmeRoot}conceptIndex`,
-  tagIndex: `${itmeRoot}tagIndex`,
-  noteStorage: `${itmeRoot}noteStorage`
+  tagIndex: `${itmeRoot}tagIndex`
 }

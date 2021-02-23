@@ -59,7 +59,7 @@ function ensureWorkspace(webId){
       let workspace = createThing({name: prefsWorkspaceName})
       workspace = setUrl(workspace, ITME.conceptIndex, new URL("concepts.ttl", workspacePreferencesFileUri).toString())
       workspace = setUrl(workspace, ITME.tagIndex, new URL("tags.ttl", workspacePreferencesFileUri).toString())
-      workspace = setUrl(workspace, ITME.noteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
+      workspace = setUrl(workspace, ITME.defaultNoteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
       prefsFile = setThing(prefsFile, workspace)
       save(prefsFile)
     }

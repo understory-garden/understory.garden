@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { useConceptIndex } from '../hooks/concepts'
 import { useStorageContainer } from '../hooks/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { profilePath } from '../utils/uris'
+import { profilePath, conceptNameToUrlSafeId } from '../utils/uris'
 import Nav from '../components/nav'
 import { Loader } from '../components/elements'
 import Notes from '../components/Notes'
@@ -22,6 +22,7 @@ import Feed from '../components/Feed'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
+import { useWorkspace } from '../hooks/app'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -89,7 +90,7 @@ function NewNoteForm(){
   const router = useRouter()
   const [noteName, setNoteName] = useState("")
   const onCreate = useCallback(function onCreate(){
-    router.push(`/notes/${encodeURIComponent(noteName)}`)
+    router.push(`/notes/${conceptNameToUrlSafeId(noteName)}`)
   })
   return (
     <div className="flex flex-row m-auto my-6">
@@ -193,6 +194,7 @@ export default function IndexPage() {
   }
 
   const webId = useWebId()
+  const { workspace } = useWorkspace(webId)
   const [tab, setTab] = useState("notes")
   return (
     <div className="page" id="page">

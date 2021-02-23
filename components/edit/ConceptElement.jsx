@@ -7,13 +7,14 @@ import { Popover } from 'react-tiny-popover'
 import { ExternalLinkIcon } from "../icons"
 import { getConceptNameFromNode } from '../../utils/slate'
 import NoteContext from '../../contexts/NoteContext'
+import { conceptNameToUrlSafeId } from '../../utils/uris'
 
 const ConceptElement = ({ attributes, children, element }) => {
   const selected = useSelected()
   const editor = useEditor()
   const readOnly = useReadOnly()
   const { path } = useContext(NoteContext)
-  const noteUrl = `${path}/${encodeURIComponent(getConceptNameFromNode(element))}`
+  const noteUrl = `${path}/${conceptNameToUrlSafeId(getConceptNameFromNode(element))}`
   return readOnly ? (
     <Link href={noteUrl}>
       <a className="text-blue-500">{children}</a>

@@ -9,5 +9,5 @@ export default function NotePage(){
   const { query: { name, handle } } = router
   const webId = handleToWebId(handle)
 
-  return <NotePageComponent webId={webId} name={name} path={`/u/${handle}`} readOnly={true}/>
+  return <NotePageComponent webId={webId} encodedName={name} path={`/u/${handle}`} readOnly={true}/>
 }

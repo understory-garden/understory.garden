@@ -9,7 +9,7 @@ import {
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl, getSourceUrl
+  removeThing, getUrl, setDecimal, setUrl, getSourceUrl, asUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
@@ -27,10 +27,14 @@ import NoteContext from '../contexts/NoteContext'
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
 import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
+import { useWorkspace } from '../hooks/app'
 
-import { publicNotePath, privateNotePath, profilePath, noteUriToName } from '../utils/uris'
-import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf, ITME } from '../vocab'
+import {
+  publicNotePath, privateNotePath, profilePath, noteUriToName,
+  conceptNameToUrlSafeId, urlSafeIdToConceptName
+} from '../utils/uris'
+import { conceptNameFromUri, conceptIdFromUri } from '../model/concept'
+import { ITME } from '../vocab'
 import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 
@@ -41,18 +45,18 @@ const emptyBody = [{ children: [{text: ""}]}]
 const thingName = "concept"
 
 function LinkToConcept({uri, ...props}){
-  const nameInUri = conceptNameFromUri(uri)
-  const name = decodeURIComponent(nameInUri)
+  const id = conceptIdFromUri(uri)
+  const name = urlSafeIdToConceptName(id)
   const { path } = useContext(NoteContext)
   return (
-    <Link href={`${path}/${nameInUri}`}>
+    <Link href={`${path}/${id}`}>
       <a className="text-blue-500 underline">[[{name}]]</a>
     </Link>
   )
 }
 
 function LinksTo({referencesThing}){
-  const conceptUris = getUrlAll(referencesThing, refs)
+  const conceptUris = getUrlAll(referencesThing, ITME.refs)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -83,14 +87,14 @@ function createNote(){
 
 function createOrUpdateNote(note, value){
   let newNote = note || createNote()
-  newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
+  newNote = setStringNoLocale(newNote, ITME.noteBody, JSON.stringify(value))
   return newNote
 }
 
 function createConceptFor(name, conceptNames){
-  let concept = createThing({name})
+  let concept = createThing({name: conceptNameToUrlSafeId(name)})
   for (const conceptName of conceptNames){
-    concept = addUrl(concept, refs, createThing({name: conceptName}))
+    concept = addUrl(concept, ITME.refs, createThing({name: conceptNameToUrlSafeId(conceptName)}))
   }
   return concept
 }
@@ -105,79 +109,29 @@ function createOrUpdateConceptIndex(conceptIndex, editor, name, storageUri){
   return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
 
-function ReportDialog({conceptUri, close}){
-  const [message, setMessage] = useState("")
-  const [reported, setReported] = useState(false)
-  function report(){
-    console.log("reporting", message)
-    setReported(true)
+function getConcept(index, name){
+  if (index && name) {
+    return getThing(index, `${getSourceUrl(index)}#${conceptNameToUrlSafeId(name)}`)
   }
-  function onClose(){
-    close()
-  }
-  return (
-    <div className="w-full flex flex-col">
-      {reported ? (
-        <>
-          <p className="text-xl mt-6 text-center">
-            Thank you for your report! The offending parties will be harshly dealt with.
-          </p>
-          <button onClick={close} className="bg-purple-100 p-6 rounded-lg mt-6">
-            Close
-          </button>
-        </>
-      ) : (
-        <>
-          <h3 className="text-center text-3xl">
-            REPORT THIS CONTENT
-          </h3>
-          <textarea value={message} onChange={e => setMessage(e.target.value)}
-                    className="mt-6 w-full h-36" />
-          <button onClick={report} className="bg-purple-100 m-auto p-6 rounded-lg mt-6">
-            Submit Report
-          </button>
-        </>
-      )}
-    </div>
-  )
 }
 
-function BuyButton({authorWebId, conceptUri, className='', ...rest}){
-  const myWebId = useWebId()
-  const { profile } = useProfile(authorWebId)
-  const inboxUri = profile && getUrl(profile, LDP.inbox)
-
-  const { feed, save: saveFeed } = useFeed()
-  const { ledger, save: saveLedger } = useLedger()
-  async function buy(){
-    await saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
-    let ledgerEntry = createThing()
-    ledgerEntry = setUrl(ledgerEntry, RDF.type, Credit)
-    const award = 42.0
-    ledgerEntry = setDecimal(ledgerEntry, amount, award)
-    ledgerEntry = setUrl(ledgerEntry, accountOf, authorWebId)
-    ledgerEntry = setDatetime(ledgerEntry, DCTERMS.date, new Date())
-    await saveLedger(setThing(ledger || createSolidDataset(), ledgerEntry))
-    sendMessage(inboxUri, myWebId,
-                "congratulations!",
-                `you've been awarded ${award} facebux for note '${noteUriToName(conceptUri)}'`)
-  }
-  return (
-    <div className={`${className} flex flex-row`}>
-      <button className="btn" onClick={buy}>buy</button>
-    </div>
-  )
+function defaultNoteStorageUri(workspace, name){
+  const containerUri = workspace && getUrl(workspace, ITME.defaultNoteStorage)
+  return containerUri && `${containerUri}${conceptNameToUrlSafeId(name)}.ttl#${thingName}`
 }
 
-export default function NotePage({name, webId, path="/notes", readOnly=false}){
+
+export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
+  const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
+  const concept = getConcept(conceptIndex, name)
+  const conceptUri = concept && asUrl(concept)
+  const { workspace } = useWorkspace(webId)
+  const noteStorageUri = conceptIndex && concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
+  const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
-  const defaultConceptContainerUri = useConceptContainerUri(webId, 'private')
-  const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
-  const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
-  const { error, resource, thing: note, save, isValidating } = useThing(conceptUri)
-  const bodyJSON = note && getStringNoLocale(note, noteBody)
+  const bodyJSON = note && getStringNoLocale(note, ITME.noteBody)
   const errorStatus = error && error.statusCode
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);
@@ -202,16 +156,14 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const { profile: authorProfile } = useProfile(webId)
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
-  const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
 
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
-    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, name, conceptUri)
-    console.log(newConceptIndex)
+    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, name, noteStorageUri)
     setSaving(true)
     try {
-//      await save(newNote)
-//      await saveConceptIndex(newConceptIndex)
+      await save(newNote)
+      await saveConceptIndex(newConceptIndex)
     } catch (e) {
       console.log("error saving note", e)
     } finally {
@@ -237,10 +189,10 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   async function deleteCallback(){
     if (confirm(`Are you sure you want to delete ${name} ?`)){
       // don't wait for this to return: we don't care
-      fetch(conceptUri, { method: 'DELETE' })
+      fetch(noteStorageUri, { method: 'DELETE' })
       // do wait for this to return so it doesn't show up on the homepage
-      if (conceptReferences){
-        await saveConceptIndex(removeThing(conceptIndex, conceptReferences))
+      if (concept){
+        await saveConceptIndex(removeThing(conceptIndex, concept))
       }
       router.push("/")
     }
@@ -271,7 +223,7 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                   </Link>
                 </div>
               </div>
-              {readOnly ? (
+              {name && (readOnly ? (
                 (myWebId === webId) && (
                   <Link href={privateNotePath(name)}>
                     <a>
@@ -285,25 +237,14 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                     public link
                   </a>
                 </Link>
-              )}
-              {/*
-              <a href={conceptDocUri} target="_blank" rel="noopener">
+              ))}
+              <a href={noteStorageUri} target="_blank" rel="noopener">
                 source
               </a>
-               */}
-              <ReactModal isOpen={reporting} >
-                <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
-              </ReactModal>
-            </div>
-            <div className="flex flex-row">
-              {/*
-                 <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
-                 report
-                 </button>
-               */}
-              {feedAdmin && (
-                <BuyButton conceptUri={conceptUri} authorWebId={webId} className="ml-6"/>
-              )}
+              <button onClick={deleteCallback}>
+                delete
+              </button>
+
             </div>
           </div>
         </div>
@@ -348,8 +289,8 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                               <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
                                 <div>
                                   <h3>Links to</h3>
-                                  {conceptReferences && (
-                                    <LinksTo referencesThing={conceptReferences}/>
+                                  {concept && (
+                                    <LinksTo referencesThing={concept}/>
                                   )}
                                 </div>
                                 <div>
@@ -363,9 +304,6 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
                                 <h2 className="text-xl">
                                   Actions
                                 </h2>
-                                <button className="btn" onClick={deleteCallback}>
-                                  delete
-                                </button>
                               </div>
                             </div>
                           </div>

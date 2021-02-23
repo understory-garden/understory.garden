@@ -8,5 +8,5 @@ export default function NotePage(){
   const { query: { name } } = router
   const webId = useWebId()
 
-  return <NotePageComponent webId={webId} name={name}/>
+  return <NotePageComponent webId={webId} encodedName={name}/>
 }

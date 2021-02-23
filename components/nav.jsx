@@ -119,7 +119,7 @@ export default function Nav() {
           )}
         </ul>
       </ul>
-      <DevTools/>
+      {false && <DevTools/>}
     </nav>
   )
 }

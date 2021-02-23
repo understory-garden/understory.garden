@@ -1,3 +1,5 @@
+import * as base58 from 'micro-base58'
+
 export function handleToWebId(handle) {
   if (handle) {
     try {
@@ -23,11 +25,11 @@ export function profilePath(webId){
 }
 
 export function publicNotePath(webId, name){
-  return `${profilePath(webId)}/${encodeURIComponent(name)}`
+  return webId && name && `${profilePath(webId)}/${conceptNameToUrlSafeId(name)}`
 }
 
 export function privateNotePath(name){
-  return `/notes/${encodeURIComponent(name)}`
+  return name && `/notes/${conceptNameToUrlSafeId(name)}`
 }
 
 export function noteUriToName(noteUri){
@@ -36,4 +38,11 @@ export function noteUriToName(noteUri){
 
 export function noteUriToWebId(noteUri){
   return `https://${new URL(noteUri).hostname}/profile/card#me`
+}
+
+export const conceptNameToUrlSafeId = (name) =>
+  base58.encode(name)
+
+export const urlSafeIdToConceptName = (id) => {
+  return new TextDecoder().decode(base58.decode(id))
 }

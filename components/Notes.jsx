@@ -6,19 +6,20 @@ import {
 import Link from 'next/link'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 
-import { conceptNameFromUri } from '../model/concept'
+import { conceptIdFromUri } from '../model/concept'
 import { useConcepts } from '../hooks/concepts'
 import NoteContext from '../contexts/NoteContext'
+import { urlSafeIdToConceptName } from '../utils/uris'
 
 function Note({concept}){
   const uri = asUrl(concept)
-  const nameInUri = conceptNameFromUri(uri)
-  const name = decodeURIComponent(nameInUri)
+  const id = conceptIdFromUri(uri)
+  const name = urlSafeIdToConceptName(id)
   const { path } = useContext(NoteContext)
 
   return (
     <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200 overflow-x-scroll">
-      <Link href={`${path}/${nameInUri}`}>
+      <Link href={`${path}/${id}`}>
         <a>
           <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
             <h3 className="text-gray-900 text-xl font-medium truncate text-center">

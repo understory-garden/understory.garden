@@ -1,14 +1,24 @@
-import { useItmeContainerUri } from './uris'
+import { useItmeContainerUri, useConceptContainerUri } from './uris'
+import { useWorkspace } from './app'
 import { useResource, useWebId } from 'swrlit'
-import { getThingAll, getDatetime } from '@inrupt/solid-client'
+import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import { ITME } from '../vocab'
 
 export function useConceptIndex(webId){
   const appContainerUri = useItmeContainerUri(webId)
+  const defaultNoteContainerUri = useConceptContainerUri(webId, 'private')
 
-  const conceptIndexUri = appContainerUri && `${appContainerUri}concepts.ttl`
-  const {resource: index, ...rest} = useResource(conceptIndexUri)
-  return {index, ...rest}
+
+  const { workspace } = useWorkspace(webId)
+  const conceptIndexUri = workspace && getUrl(workspace, ITME.conceptIndex)
+  const {resource, error, ...rest} = useResource(conceptIndexUri)
+  if (error && (error.statusCode === 404)) {
+    const index = createSolidDataset()
+    return {index, error, ...rest}
+  } else {
+    return {index: resource, error, ...rest}
+  }
 }
 
 export function useConcepts(webId){

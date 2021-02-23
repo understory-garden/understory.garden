@@ -20,6 +20,7 @@
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.2.0",
     "is-url": "^1.2.4",
+    "micro-base58": "^0.4.3",
     "next": "latest",
     "postcss": "^7.0.35",
     "rdf-namespaces": "^1.9.2",
