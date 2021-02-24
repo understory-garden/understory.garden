@@ -23,6 +23,7 @@ import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
 import { useWorkspace } from '../hooks/app'
+import WorkspaceContext from '../contexts/WorkspaceContext'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -222,36 +223,38 @@ export default function IndexPage() {
               </h5>
             </div>
           </div>
-          <div className="flex justify-between">
-            <div className="mr-6 flex-grow">
-              <NewNoteForm />
-              <div className="flex mb-6">
-                {/*
-                <TabButton name="feed" activeName={tab} setTab={setTab}>
-                  feed
-                </TabButton>
-                 */}
-                <TabButton name="notes" activeName={tab} setTab={setTab}>
-                  notes
-                </TabButton>
-                <TabButton name="following" activeName={tab} setTab={setTab}>
-                  following
-                </TabButton>
-              </div>
-              {tab === "notes" ? (
-                <Notes webId={webId}/>
-              ) : (tab === "feed" ? (
-                <Feed/>
-              ) : (tab === "following" ? (
-                <Follows />
-              ) : (
-                <div className="font-logo">
-                  you are in a maze of twisty passages, all alike
+          <WorkspaceContext.Provider value={{slug: 'default'}}>
+            <div className="flex justify-between">
+              <div className="mr-6 flex-grow">
+                <NewNoteForm />
+                <div className="flex mb-6">
+                  {/*
+                     <TabButton name="feed" activeName={tab} setTab={setTab}>
+                     feed
+                     </TabButton>
+                   */}
+                  <TabButton name="notes" activeName={tab} setTab={setTab}>
+                    notes
+                  </TabButton>
+                  <TabButton name="following" activeName={tab} setTab={setTab}>
+                    following
+                  </TabButton>
                 </div>
-              )
-              ))}
+                {tab === "notes" ? (
+                  <Notes webId={webId}/>
+                ) : (tab === "feed" ? (
+                  <Feed/>
+                ) : (tab === "following" ? (
+                  <Follows />
+                ) : (
+                  <div className="font-logo">
+                    you are in a maze of twisty passages, all alike
+                  </div>
+                )
+                    ))}
+              </div>
             </div>
-          </div>
+          </WorkspaceContext.Provider>
         </div>
           </>
       ) : (

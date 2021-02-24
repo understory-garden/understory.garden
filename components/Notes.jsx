@@ -5,6 +5,7 @@ import {
 } from '@inrupt/solid-client'
 import Link from 'next/link'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import WorkspaceContext from '../contexts/WorkspaceContext'
 
 import { conceptIdFromUri } from '../model/concept'
 import { useConcepts } from '../hooks/concepts'
@@ -34,8 +35,9 @@ function Note({concept}){
 
 export default function Notes({path = "/notes", webId}){
   const { concepts } = useConcepts(webId)
+  const { slug: workspaceSlug } = useContext(WorkspaceContext)
   return (
-    <NoteContext.Provider value={{path}}>
+    <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`}}>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept}/>)}
       </ul>

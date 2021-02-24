@@ -43,14 +43,15 @@ export function useApp(webId){
 
 const prefsWorkspaceName = "workspace"
 
-export function useWorkspacePreferencesFileUri(webId){
+export function useWorkspacePreferencesFileUri(webId, workspaceSlug){
   const { app } = useApp(webId)
+  // we're ignoring the workspaceSlug parameter for now, but eventually we'll want to use this to get the currect workspace
   const { thing: workspaceInfo } = useThing(app && getUrl(app, ITME.hasWorkspace))
   return workspaceInfo && getUrl(workspaceInfo, WS.preferencesFile)
 }
 
-function ensureWorkspace(webId){
-  const workspacePreferencesFileUri = useWorkspacePreferencesFileUri(webId)
+function ensureWorkspace(webId, workspaceSlug){
+  const workspacePreferencesFileUri = useWorkspacePreferencesFileUri(webId, workspaceSlug)
   const {resource, save, error, ...rest} = useResource(workspacePreferencesFileUri)
 
   useEffect(function(){
@@ -68,8 +69,8 @@ function ensureWorkspace(webId){
   return resource && getSourceUrl(resource)
 }
 
-export function useWorkspace(webId){
-  const workspacePreferencesFileUri = ensureWorkspace(webId)
+export function useWorkspace(webId, workspaceSlug){
+  const workspacePreferencesFileUri = ensureWorkspace(webId, workspaceSlug)
   const { thing: workspace, ...rest } = useThing(workspacePreferencesFileUri && `${workspacePreferencesFileUri}#workspace`)
 
   return { workspace, ...rest }

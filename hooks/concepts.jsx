@@ -5,12 +5,11 @@ import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl } from '@i
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { ITME } from '../vocab'
 
-export function useConceptIndex(webId){
+export function useConceptIndex(webId, workspaceSlug='default'){
   const appContainerUri = useItmeContainerUri(webId)
-  const defaultNoteContainerUri = useConceptContainerUri(webId, 'private')
+  const defaultNoteContainerUri = useConceptContainerUri(webId, 'public')
 
-
-  const { workspace } = useWorkspace(webId)
+  const { workspace } = useWorkspace(webId, workspaceSlug)
   const conceptIndexUri = workspace && getUrl(workspace, ITME.conceptIndex)
   const {resource, error, ...rest} = useResource(conceptIndexUri)
   if (error && (error.statusCode === 404)) {

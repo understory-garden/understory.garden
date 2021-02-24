@@ -23,6 +23,7 @@ import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
+import WorkspaceContext from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
@@ -121,7 +122,7 @@ function defaultNoteStorageUri(workspace, name){
 }
 
 
-export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
+export default function NotePage({encodedName, webId, path="/notes", readOnly=false, workspaceSlug}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
@@ -202,129 +203,130 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const [reporting, setReporting] = useState(false)
   const feedAdmin = useIsFeedAdmin()
   return (
-    <NoteContext.Provider value={{path, note, save}}>
-      <div className="flex flex-col page">
-        <WebMonetization webId={webId} />
-        <Nav />
-        <div className="relative overflow-y-hidden flex-none h-56">
-          {coverImage && <img className="w-full" src={coverImage}/>}
-          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
-            <div className="flex flex-row justify-between h-44 overflow-y-hidden">
-              <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-gray-800">
-                  {name}
-                </h1>
-                <div className="text-lg text-gray-800">
-                  by&nbsp;
-                  <Link href={profilePath(webId)}>
-                    <a>
-                      {authorName || "someone cool"}
-                    </a>
-                  </Link>
+    <WorkspaceContext.Provider value={{slug: workspaceSlug}}>
+      <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`, note, save}}>
+        <div className="flex flex-col page">
+          <WebMonetization webId={webId} />
+          <Nav />
+          <div className="relative overflow-y-hidden flex-none h-56">
+            {coverImage && <img className="w-full" src={coverImage}/>}
+            <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
+              <div className="flex flex-row justify-between h-44 overflow-y-hidden">
+                <div className="flex flex-col">
+                  <h1 className="text-5xl font-bold text-gray-800">
+                    {name}
+                  </h1>
+                  <div className="text-lg text-gray-800">
+                    by&nbsp;
+                    <Link href={profilePath(webId)}>
+                      <a>
+                        {authorName || "someone cool"}
+                      </a>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              {name && (readOnly ? (
-                (myWebId === webId) && (
-                  <Link href={privateNotePath(name)}>
+                {name && (readOnly ? (
+                  (myWebId === webId) && (
+                    <Link href={privateNotePath(workspaceSlug, name)}>
+                      <a>
+                        edit link
+                      </a>
+                    </Link>
+                  )
+                ) : (
+                  <Link href={publicNotePath(webId, workspaceSlug, name)}>
                     <a>
-                      edit link
+                      public link
                     </a>
                   </Link>
-                )
-              ) : (
-                <Link href={publicNotePath(webId, name)}>
-                  <a>
-                    public link
-                  </a>
-                </Link>
-              ))}
-              <a href={noteStorageUri} target="_blank" rel="noopener">
-                source
-              </a>
-              <button onClick={deleteCallback}>
-                delete
-              </button>
-
+                ))}
+                <a href={noteStorageUri} target="_blank" rel="noopener">
+                  source
+                </a>
+                <button onClick={deleteCallback}>
+                  delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
-          <div className="w-full flex flex-col flex-grow">
-            {(value !== undefined) && (
-              <Slate
-                editor={editor}
-                value={value}
-                onChange={newValue => setValue(newValue)}
-              >
-                {!readOnly && (
-                  <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                                 className="sticky top-0 z-20"/>
-                )}
-                <div className="flex-grow flex flex-row mt-3">
-                  <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
-                  <div className="relative">
-                    <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
-                      {sidebarOpen ? ">>" : "<<"}
-                    </button>
-                    <Transition
-                      show={sidebarOpen}
-                      enter="transform transition ease-in-out duration-500 sm:duration-700"
-                      enterFrom="translate-x-full"
-                      enterTo="translate-x-0"
-                      leave="transform transition ease-in-out duration-500 sm:duration-700"
-                      leaveFrom="translate-x-0"
-                      leaveTo="translate-x-full">
-                      {
-                        (ref) => (
-                          <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                            <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                              <div className="px-6 sm:px-6">
-                                <div className="flex items-start justify-between">
-                                  <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                                    Links
+          <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
+            <div className="w-full flex flex-col flex-grow">
+              {(value !== undefined) && (
+                <Slate
+                  editor={editor}
+                  value={value}
+                  onChange={newValue => setValue(newValue)}
+                >
+                  {!readOnly && (
+                    <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                                   className="sticky top-0 z-20"/>
+                  )}
+                  <div className="flex-grow flex flex-row mt-3">
+                    <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
+                    <div className="relative">
+                      <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                              className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
+                        {sidebarOpen ? ">>" : "<<"}
+                      </button>
+                      <Transition
+                        show={sidebarOpen}
+                        enter="transform transition ease-in-out duration-500 sm:duration-700"
+                        enterFrom="translate-x-full"
+                        enterTo="translate-x-0"
+                        leave="transform transition ease-in-out duration-500 sm:duration-700"
+                        leaveFrom="translate-x-0"
+                        leaveTo="translate-x-full">
+                        {
+                          (ref) => (
+                            <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                              <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                                <div className="px-6 sm:px-6">
+                                  <div className="flex items-start justify-between">
+                                    <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                      Links
+                                    </h2>
+                                  </div>
+                                </div>
+                                <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                                  <div>
+                                    <h3>Links to</h3>
+                                    {concept && (
+                                      <LinksTo referencesThing={concept}/>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3>Linked from</h3>
+                                    {conceptIndex && (
+                                      <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="px-6 mt-6">
+                                  <h2 className="text-xl">
+                                    Actions
                                   </h2>
                                 </div>
                               </div>
-                              <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                                <div>
-                                  <h3>Links to</h3>
-                                  {concept && (
-                                    <LinksTo referencesThing={concept}/>
-                                  )}
-                                </div>
-                                <div>
-                                  <h3>Linked from</h3>
-                                  {conceptIndex && (
-                                    <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="px-6 mt-6">
-                                <h2 className="text-xl">
-                                  Actions
-                                </h2>
-                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                    </Transition>
+                          )
+                        }
+                      </Transition>
+                    </div>
                   </div>
-                </div>
-              </Slate>
-            )}
-            {/*
-               <div>
-               <pre>
-               {JSON.stringify(editor.selection, null, 2)}
-               {JSON.stringify(value, null, 2)}
-               </pre>
-               </div>
-             */}
-          </div>
-        </section>
-      </div>
-    </NoteContext.Provider>
+                </Slate>
+              )}
+              {/*
+                 <div>
+                 <pre>
+                 {JSON.stringify(editor.selection, null, 2)}
+                 {JSON.stringify(value, null, 2)}
+                 </pre>
+                 </div>
+               */}
+            </div>
+          </section>
+        </div>
+      </NoteContext.Provider>
+    </WorkspaceContext.Provider>
   )
 }

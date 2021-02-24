@@ -24,12 +24,12 @@ export function profilePath(webId){
   return `/u/${webIdToHandle(webId)}`
 }
 
-export function publicNotePath(webId, name){
-  return webId && name && `${profilePath(webId)}/${conceptNameToUrlSafeId(name)}`
+export function publicNotePath(webId, workspaceSlug, name){
+  return webId && name && `${profilePath(webId)}/${workspaceSlug}/${conceptNameToUrlSafeId(name)}`
 }
 
-export function privateNotePath(name){
-  return name && `/notes/${conceptNameToUrlSafeId(name)}`
+export function privateNotePath(workspaceSlug, name){
+  return name && `/notes/${workspaceSlug}/${conceptNameToUrlSafeId(name)}`
 }
 
 export function noteUriToName(noteUri){
