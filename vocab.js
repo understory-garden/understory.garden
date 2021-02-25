@@ -14,6 +14,9 @@ export const ITME = {
   paymentPointer: `${itmeRoot}paymentPointer`,
   storedAt: `${itmeRoot}storedAt`,
   defaultNoteStorage: `${itmeRoot}defaultNoteStorage`,
+  privateStorage: `${itmeRoot}privateStorage`,
+  privateNoteStorage: `${itmeRoot}privateNoteStorage`,
+  backupsStorage: `${itmeRoot}backupsStorage`,
   hasWorkspace: `${itmeRoot}hasWorkspace`,
   conceptIndex: `${itmeRoot}conceptIndex`,
   tagIndex: `${itmeRoot}tagIndex`

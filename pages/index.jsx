@@ -23,7 +23,7 @@ import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
 import { useWorkspace } from '../hooks/app'
-import WorkspaceContext from '../contexts/WorkspaceContext'
+import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
 function LoginUI(){
   const [handle, setHandle] = useState("")
@@ -223,7 +223,7 @@ export default function IndexPage() {
               </h5>
             </div>
           </div>
-          <WorkspaceContext.Provider value={{slug: 'default'}}>
+          <WorkspaceProvider webId={webId} slug={'default'}>
             <div className="flex justify-between">
               <div className="mr-6 flex-grow">
                 <NewNoteForm />
@@ -254,7 +254,7 @@ export default function IndexPage() {
                     ))}
               </div>
             </div>
-          </WorkspaceContext.Provider>
+          </WorkspaceProvider>
         </div>
           </>
       ) : (

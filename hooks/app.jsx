@@ -43,14 +43,14 @@ export function useApp(webId){
 
 const prefsWorkspaceName = "workspace"
 
-export function useWorkspacePreferencesFileUri(webId, workspaceSlug){
+export function useWorkspacePreferencesFileUri(webId, workspaceSlug='default'){
   const { app } = useApp(webId)
   // we're ignoring the workspaceSlug parameter for now, but eventually we'll want to use this to get the currect workspace
   const { thing: workspaceInfo } = useThing(app && getUrl(app, ITME.hasWorkspace))
   return workspaceInfo && getUrl(workspaceInfo, WS.preferencesFile)
 }
 
-function ensureWorkspace(webId, workspaceSlug){
+function ensureWorkspace(webId, workspaceSlug='default'){
   const workspacePreferencesFileUri = useWorkspacePreferencesFileUri(webId, workspaceSlug)
   const {resource, save, error, ...rest} = useResource(workspacePreferencesFileUri)
 
@@ -58,9 +58,14 @@ function ensureWorkspace(webId, workspaceSlug){
     if (workspacePreferencesFileUri && error && (error.statusCode === 404)) {
       let prefsFile = createSolidDataset()
       let workspace = createThing({name: prefsWorkspaceName})
+      // this is a janky way to guess the private storage location, but I don't know a better way for now
+      const privateStorage = new URL(`../../../../../private/itme/online/workspace/${workspaceSlug}/`, workspacePreferencesFileUri).toString()
       workspace = setUrl(workspace, ITME.conceptIndex, new URL("concepts.ttl", workspacePreferencesFileUri).toString())
       workspace = setUrl(workspace, ITME.tagIndex, new URL("tags.ttl", workspacePreferencesFileUri).toString())
       workspace = setUrl(workspace, ITME.defaultNoteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
+      workspace = setUrl(workspace, ITME.privateStorage, privateStorage)
+      workspace = setUrl(workspace, ITME.privateNoteStorage, new URL(`notes/`, privateStorage).toString())
+      workspace = setUrl(workspace, ITME.backupsStorage, new URL(`backups/`, privateStorage).toString())
       prefsFile = setThing(prefsFile, workspace)
       save(prefsFile)
     }
@@ -69,7 +74,7 @@ function ensureWorkspace(webId, workspaceSlug){
   return resource && getSourceUrl(resource)
 }
 
-export function useWorkspace(webId, workspaceSlug){
+export function useWorkspace(webId, workspaceSlug='default'){
   const workspacePreferencesFileUri = ensureWorkspace(webId, workspaceSlug)
   const { thing: workspace, ...rest } = useThing(workspacePreferencesFileUri && `${workspacePreferencesFileUri}#workspace`)
 

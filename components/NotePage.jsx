@@ -9,7 +9,7 @@ import {
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl, getSourceUrl, asUrl
+  removeThing, getUrl, setDecimal, setUrl, removeUrl, getSourceUrl, asUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
@@ -23,7 +23,7 @@ import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
-import WorkspaceContext from '../contexts/WorkspaceContext'
+import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex } from '../hooks/concepts'
@@ -34,6 +34,7 @@ import {
   publicNotePath, privateNotePath, profilePath, noteUriToName,
   conceptNameToUrlSafeId, urlSafeIdToConceptName
 } from '../utils/uris'
+import { deleteResource } from '../utils/fetch'
 import { conceptNameFromUri, conceptIdFromUri } from '../model/concept'
 import { ITME } from '../vocab'
 import { sendMessage } from '../utils/message'
@@ -116,11 +117,37 @@ function getConcept(index, name){
   }
 }
 
-function defaultNoteStorageUri(workspace, name){
-  const containerUri = workspace && getUrl(workspace, ITME.defaultNoteStorage)
-  return containerUri && `${containerUri}${conceptNameToUrlSafeId(name)}.ttl#${thingName}`
+function noteStorageFileAndThingName(name){
+  return `${conceptNameToUrlSafeId(name)}.ttl#${thingName}`
 }
 
+function defaultNoteStorageUri(workspace, name){
+  const containerUri = workspace && getUrl(workspace, ITME.defaultNoteStorage)
+  return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
+}
+
+function PrivacyControl({name, concept, ...rest}){
+  const { save: saveConcept } = useThing(concept && asUrl(concept))
+  const { workspace } = useWorkspaceContext()
+
+  const privateNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.privateNoteStorage)}${noteStorageFileAndThingName(name)}`
+  const { thing: publicNote, save: savePublic } = useThing(privateNoteResourceUrl)
+  const publicNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.defaultNoteStorage)}${noteStorageFileAndThingName(name)}`
+  const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
+  const { resource: currentNoteResource } = useThing(concept && getUrl(concept, ITME.storedAt))
+
+  async function makePrivateCallback(){
+    await savePrivate(setUrl(privateNote || createThing(), ITME.noteBody, getUrl(publicNote, ITME.noteBody)))
+    await saveConcept(setUrl(concept, ITME.storedAt, privateNoteResourceUrl))
+    await savePublic(removeUrl(publicNote, ITME.noteBody))
+
+  }
+  return (
+    <button onClick={makePrivateCallback} {...rest}>
+      make private
+    </button>
+  )
+}
 
 export default function NotePage({encodedName, webId, path="/notes", readOnly=false, workspaceSlug}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
@@ -128,7 +155,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
   const concept = getConcept(conceptIndex, name)
   const conceptUri = concept && asUrl(concept)
-  const { workspace } = useWorkspace(webId)
+  const { workspace } = useWorkspace(webId, workspaceSlug)
   const noteStorageUri = conceptIndex && concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
@@ -198,12 +225,14 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
       router.push("/")
     }
   }
+
+
   const coverImage = note && getUrl(note, FOAF.img)
 
   const [reporting, setReporting] = useState(false)
   const feedAdmin = useIsFeedAdmin()
   return (
-    <WorkspaceContext.Provider value={{slug: workspaceSlug}}>
+    <WorkspaceProvider webId={webId} slug={workspaceSlug}>
       <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`, note, save}}>
         <div className="flex flex-col page">
           <WebMonetization webId={webId} />
@@ -229,20 +258,21 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                   (myWebId === webId) && (
                     <Link href={privateNotePath(workspaceSlug, name)}>
                       <a>
-                        edit link
+                        edit
                       </a>
                     </Link>
                   )
                 ) : (
                   <Link href={publicNotePath(webId, workspaceSlug, name)}>
                     <a>
-                      public link
+                      sharable link
                     </a>
                   </Link>
                 ))}
                 <a href={noteStorageUri} target="_blank" rel="noopener">
                   source
                 </a>
+                <PrivacyControl name={name} concept={concept}/>
                 <button onClick={deleteCallback}>
                   delete
                 </button>
@@ -327,6 +357,6 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
           </section>
         </div>
       </NoteContext.Provider>
-    </WorkspaceContext.Provider>
+    </WorkspaceProvider>
   )
 }
