@@ -8,14 +8,14 @@ import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } 
 
 import { MailIcon } from '../components/icons'
 import { useMyLedgerTotal } from '../hooks/feed'
-import { useApp, useWorkspacePreferencesFileUri } from '../hooks/app'
+import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 
 function DevTools(){
   const webId = useWebId()
 
   const { resource: appResource } = useApp(webId)
-  const workspacePreferencesFileUri = useWorkspacePreferencesFileUri(webId)
+  const { public: workspacePreferencesFileUri } = useWorkspacePreferencesFileUris(webId)
   return (
     <ul>
       <li>

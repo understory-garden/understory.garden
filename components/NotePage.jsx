@@ -93,28 +93,26 @@ function createOrUpdateNote(note, value){
   return newNote
 }
 
-function createConceptFor(name, conceptNames){
-  let concept = createThing({name: conceptNameToUrlSafeId(name)})
+function createConcept(prefix, name){
+  return createThing({url: `${prefix}${conceptNameToUrlSafeId(name)}`})
+}
+
+function createConceptFor(conceptPrefix, name, conceptNames){
+  let concept = createConcept(conceptPrefix, name)
   for (const conceptName of conceptNames){
-    concept = addUrl(concept, ITME.refs, createThing({name: conceptNameToUrlSafeId(conceptName)}))
+    concept = addUrl(concept, ITME.refs, createThing(conceptPrefix, name))
   }
   return concept
 }
 
-function createOrUpdateConceptIndex(conceptIndex, editor, name, storageUri){
+function createOrUpdateConceptIndex(editor, conceptIndex, conceptPrefix, name, storageUri){
   const conceptNames = getConceptNodes(editor).map(
     ([concept]) => getConceptNameFromNode(concept)
   )
-  let newConcept = createConceptFor(name, conceptNames)
+  let newConcept = createConceptFor(conceptPrefix, name, conceptNames)
   newConcept = addUrl(newConcept, ITME.storedAt, storageUri)
   newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
   return setThing(conceptIndex || createSolidDataset(), newConcept)
-}
-
-function getConcept(index, name){
-  if (index && name) {
-    return getThing(index, `${getSourceUrl(index)}#${conceptNameToUrlSafeId(name)}`)
-  }
 }
 
 function noteStorageFileAndThingName(name){
@@ -122,12 +120,12 @@ function noteStorageFileAndThingName(name){
 }
 
 function defaultNoteStorageUri(workspace, name){
-  const containerUri = workspace && getUrl(workspace, ITME.defaultNoteStorage)
+  const containerUri = workspace && getUrl(workspace, ITME.noteStorage)
   return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
 }
 
 function PrivacyControl({name, concept, ...rest}){
-  const { save: saveConcept } = useThing(concept && asUrl(concept))
+/*  const { save: saveConcept } = useThing(concept && asUrl(concept))
   const { workspace } = useWorkspaceContext()
 
   const privateNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.privateNoteStorage)}${noteStorageFileAndThingName(name)}`
@@ -135,12 +133,12 @@ function PrivacyControl({name, concept, ...rest}){
   const publicNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.defaultNoteStorage)}${noteStorageFileAndThingName(name)}`
   const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
   const { resource: currentNoteResource } = useThing(concept && getUrl(concept, ITME.storedAt))
-
+*/
   async function makePrivateCallback(){
-    await savePrivate(setUrl(privateNote || createThing(), ITME.noteBody, getUrl(publicNote, ITME.noteBody)))
+/*    await savePrivate(setUrl(privateNote || createThing(), ITME.noteBody, getUrl(publicNote, ITME.noteBody)))
     await saveConcept(setUrl(concept, ITME.storedAt, privateNoteResourceUrl))
     await savePublic(removeUrl(publicNote, ITME.noteBody))
-
+*/
   }
   return (
     <button onClick={makePrivateCallback} {...rest}>
@@ -152,10 +150,11 @@ function PrivacyControl({name, concept, ...rest}){
 export default function NotePage({encodedName, webId, path="/notes", readOnly=false, workspaceSlug}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
-  const concept = getConcept(conceptIndex, name)
-  const conceptUri = concept && asUrl(concept)
   const { workspace } = useWorkspace(webId, workspaceSlug)
+  const conceptPrefix = workspace && getUrl(workspace, ITME.conceptPrefix)
+  const conceptUri = conceptPrefix && name && `${conceptPrefix}${conceptNameToUrlSafeId(name)}`
+  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
+  const concept = conceptUri && conceptIndex && getThing(conceptIndex, conceptUri)
   const noteStorageUri = conceptIndex && concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
@@ -187,7 +186,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
-    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, name, noteStorageUri)
+    const newConceptIndex = createOrUpdateConceptIndex(editor, conceptIndex, conceptPrefix, name, noteStorageUri)
     setSaving(true)
     try {
       await save(newNote)

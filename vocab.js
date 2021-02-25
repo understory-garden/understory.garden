@@ -13,11 +13,11 @@ export const ITME = {
   refs: `${itmeRoot}refs`,
   paymentPointer: `${itmeRoot}paymentPointer`,
   storedAt: `${itmeRoot}storedAt`,
-  defaultNoteStorage: `${itmeRoot}defaultNoteStorage`,
-  privateStorage: `${itmeRoot}privateStorage`,
-  privateNoteStorage: `${itmeRoot}privateNoteStorage`,
+  noteStorage: `${itmeRoot}noteStorage`,
+  publicPrefs: `${itmeRoot}publicPrefs`,
+  privatePrefs: `${itmeRoot}privatePrefs`,
   backupsStorage: `${itmeRoot}backupsStorage`,
   hasWorkspace: `${itmeRoot}hasWorkspace`,
   conceptIndex: `${itmeRoot}conceptIndex`,
-  tagIndex: `${itmeRoot}tagIndex`
+  conceptPrefix: `${itmeRoot}conceptPrefix`
 }
