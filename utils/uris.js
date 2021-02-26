@@ -32,10 +32,6 @@ export function privateNotePath(workspaceSlug, name){
   return name && `/notes/${workspaceSlug}/${conceptNameToUrlSafeId(name)}`
 }
 
-export function noteUriToName(noteUri){
-  return decodeURIComponent(noteUri.split("/").slice(-1)[0].replace(".ttl#concept", ""))
-}
-
 export function noteUriToWebId(noteUri){
   return `https://${new URL(noteUri).hostname}/profile/card#me`
 }
@@ -45,4 +41,8 @@ export const conceptNameToUrlSafeId = (name) =>
 
 export const urlSafeIdToConceptName = (id) => {
   return new TextDecoder().decode(base58.decode(id))
+}
+
+export function conceptUriToName(conceptUri){
+  return urlSafeIdToConceptName(conceptUri.split("#").slice(-1)[0])
 }

@@ -27,11 +27,10 @@ import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceCon
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex, useConcept } from '../hooks/concepts'
-import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 import { useWorkspace } from '../hooks/app'
 
 import {
-  publicNotePath, privateNotePath, profilePath, noteUriToName,
+  publicNotePath, privateNotePath, profilePath, conceptUriToName,
   conceptNameToUrlSafeId, urlSafeIdToConceptName
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
@@ -127,9 +126,10 @@ function defaultNoteStorageUri(workspace, name){
   return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
 }
 
-function PrivacyControl({name, concept, ...rest}){
+function PrivacyControl({conceptUri, ...rest}){
   const webId = useWebId()
-  const { save: saveConcept } = useThing(concept && asUrl(concept))
+  const name = conceptUriToName(conceptUri)
+  const { thing: concept, save: saveConcept } = useThing(conceptUri)
   const { workspaceSlug } = useWorkspaceContext()
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
@@ -238,7 +238,6 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const coverImage = note && getUrl(note, FOAF.img)
 
   const [reporting, setReporting] = useState(false)
-  const feedAdmin = useIsFeedAdmin()
   return (
     <WorkspaceProvider webId={webId} slug={workspaceSlug}>
       <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`, note, save}}>
@@ -280,7 +279,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 <a href={noteStorageUri} target="_blank" rel="noopener">
                   source
                 </a>
-                <PrivacyControl name={name} concept={concept}/>
+                {conceptUri && <PrivacyControl conceptUri={conceptUri} />}
                 <button onClick={deleteCallback}>
                   delete
                 </button>

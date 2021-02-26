@@ -18,7 +18,6 @@ import Nav from '../components/nav'
 import { Loader } from '../components/elements'
 import Notes from '../components/Notes'
 import Follows from '../components/Follows'
-import Feed from '../components/Feed'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
@@ -242,8 +241,6 @@ export default function IndexPage() {
                 </div>
                 {tab === "notes" ? (
                   <Notes webId={webId}/>
-                ) : (tab === "feed" ? (
-                  <Feed/>
                 ) : (tab === "following" ? (
                   <Follows />
                 ) : (
@@ -251,7 +248,7 @@ export default function IndexPage() {
                     you are in a maze of twisty passages, all alike
                   </div>
                 )
-                    ))}
+                    )}
               </div>
             </div>
           </WorkspaceProvider>
