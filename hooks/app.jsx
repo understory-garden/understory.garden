@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useItmeContainerUri, useConceptContainerUri, useStorageContainer } from './uris'
 import { useThing, useResource, useWebId } from 'swrlit'
 import {
@@ -16,9 +16,12 @@ function ensureApp(webId){
   const appUri = appContainerUri && `${appContainerUri}app.ttl`
   const {resource, save, error, ...rest} = useResource(appUri)
   const privateAppContainerUri = useItmeContainerUri(webId, 'private')
+  const [creating, setCreating] = useState(false)
 
   useEffect(function(){
-    if (appContainerUri && error && (error.statusCode === 404)) {
+    if (!creating && appContainerUri && error && (error.statusCode === 404)) {
+      console.log("creating prefs")
+      setCreating(true)
       let app = createThing({name: appThingName})
       let defaultWorkspace = createThing()
       const prefsPath = "workspace/default/prefs.ttl"
@@ -28,7 +31,7 @@ function ensureApp(webId){
       let newResource = createSolidDataset()
       newResource = setThing(newResource, defaultWorkspace)
       newResource = setThing(newResource, app)
-      save(newResource)
+      save(newResource).then(() => setCreating(false))
     }
   }, [error, save, appContainerUri])
 
