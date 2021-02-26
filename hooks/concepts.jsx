@@ -5,6 +5,8 @@ import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl, getThing 
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { ITME } from '../vocab'
 import { conceptNameToUrlSafeId } from '../utils/uris'
+import { dataset } from "@rdfjs/dataset";
+
 
 export function useConceptIndex(webId, workspaceSlug='default', storage='public'){
   const { workspace } = useWorkspace(webId, workspaceSlug, storage)
@@ -16,6 +18,12 @@ export function useConceptIndex(webId, workspaceSlug='default', storage='public'
   } else {
     return {index: resource, error, ...rest}
   }
+}
+
+export function useCombinedConceptIndex(webId, workspaceSlug){
+  const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
+  const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
+  return {index: dataset([...privateIndex ? privateIndex.quads : [], ...publicIndex ? publicIndex.quads : []])}
 }
 
 export function useConcept(webId, workspaceSlug, name){

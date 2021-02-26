@@ -26,7 +26,7 @@ import NoteContext from '../contexts/NoteContext'
 import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex, useConcept } from '../hooks/concepts'
+import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
 import { useWorkspace } from '../hooks/app'
 
 import {
@@ -56,8 +56,11 @@ function LinkToConcept({uri, ...props}){
   )
 }
 
-function LinksTo({referencesThing}){
-  const conceptUris = getUrlAll(referencesThing, ITME.refs)
+function LinksTo({name}){
+  const webId = useWebId()
+  const { workspaceSlug } = useWorkspaceContext()
+  const { concept } = useConcept(webId, workspaceSlug, name)
+  const conceptUris = concept && getUrlAll(concept, ITME.refs)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -69,8 +72,11 @@ function LinksTo({referencesThing}){
   )
 }
 
-function LinksFrom({conceptIndex, conceptUri}){
-  const linkingConcepts = conceptIndex.match(null, null, namedNode(conceptUri))
+function LinksFrom({conceptUri}){
+  const webId = useWebId()
+  const { workspaceSlug } = useWorkspaceContext()
+  const { index } = useCombinedConceptIndex(webId, workspaceSlug)
+  const linkingConcepts = index.match(null, null, namedNode(conceptUri))
   return (
     <ul>
       {linkingConcepts && Array.from(linkingConcepts).map(({subject}) => (
@@ -337,13 +343,13 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                                   <div>
                                     <h3>Links to</h3>
                                     {concept && (
-                                      <LinksTo referencesThing={concept}/>
+                                      <LinksTo name={name}/>
                                     )}
                                   </div>
                                   <div>
                                     <h3>Linked from</h3>
                                     {conceptIndex && (
-                                      <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
+                                      <LinksFrom conceptUri={conceptUri}/>
                                     )}
                                   </div>
                                 </div>

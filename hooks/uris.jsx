@@ -9,7 +9,7 @@ export function useStorageContainer(webId) {
 
 export function useItmeContainerUri(webId, path = 'public') {
   const storageContainer = useStorageContainer(webId)
-  return useEnsured(storageContainer && `${storageContainer}${path}/itme/online/`)
+  return useEnsured(storageContainer && `${storageContainer}${path}/itmetest3/online/`)
 }
 
 export function useImageUploadUri(webId, path='public') {
