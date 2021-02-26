@@ -91,7 +91,7 @@ function NewNoteForm(){
   const router = useRouter()
   const [noteName, setNoteName] = useState("")
   const onCreate = useCallback(function onCreate(){
-    router.push(`/notes/${conceptNameToUrlSafeId(noteName)}`)
+    router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
   })
   return (
     <div className="flex flex-row m-auto my-6">

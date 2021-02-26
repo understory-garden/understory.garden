@@ -57,10 +57,10 @@ export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
 
 function useConceptPrefix(webId, workspaceSlug){
   const storageContainerUri = useStorageContainer(webId)
-  return storageContainerUri && `${storageContainerUri}/itme/${workspaceSlug}/concepts#`
+  return storageContainerUri && `${storageContainerUri}itme/${workspaceSlug}/concepts#`
 }
 
-function ensureWorkspace(webId, storage, workspaceSlug='default'){
+function ensureWorkspace(webId, workspaceSlug, storage){
   const workspacePreferencesFileUris = useWorkspacePreferencesFileUris(webId, workspaceSlug)
   const workspacePreferencesFileUri = workspacePreferencesFileUris && workspacePreferencesFileUris[storage]
   const {resource, save, error, ...rest} = useResource(workspacePreferencesFileUri && workspacePreferencesFileUri)
@@ -82,8 +82,8 @@ function ensureWorkspace(webId, storage, workspaceSlug='default'){
   return resource && getSourceUrl(resource)
 }
 
-export function useWorkspace(webId, workspaceSlug='default'){
-  const workspacePreferencesFileUri = ensureWorkspace(webId, 'public', workspaceSlug)
+export function useWorkspace(webId, workspaceSlug, storage='public'){
+  const workspacePreferencesFileUri = ensureWorkspace(webId, workspaceSlug, storage)
   const { thing: workspace, ...rest } = useThing(workspacePreferencesFileUri && `${workspacePreferencesFileUri}#workspace`)
 
   return { workspace, ...rest }

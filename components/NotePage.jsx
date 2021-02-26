@@ -26,7 +26,7 @@ import NoteContext from '../contexts/NoteContext'
 import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex } from '../hooks/concepts'
+import { useConceptIndex, useConcept } from '../hooks/concepts'
 import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
 import { useWorkspace } from '../hooks/app'
 
@@ -100,12 +100,15 @@ function createConcept(prefix, name){
 function createConceptFor(conceptPrefix, name, conceptNames){
   let concept = createConcept(conceptPrefix, name)
   for (const conceptName of conceptNames){
-    concept = addUrl(concept, ITME.refs, createThing(conceptPrefix, name))
+    concept = addUrl(concept, ITME.refs, createConcept(conceptPrefix, conceptName))
   }
   return concept
 }
 
-function createOrUpdateConceptIndex(editor, conceptIndex, conceptPrefix, name, storageUri){
+function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name){
+  const conceptPrefix = getUrl(workspace, ITME.conceptPrefix)
+  const storageUri = concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
+
   const conceptNames = getConceptNodes(editor).map(
     ([concept]) => getConceptNameFromNode(concept)
   )
@@ -151,10 +154,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
   const { workspace } = useWorkspace(webId, workspaceSlug)
-  const conceptPrefix = workspace && getUrl(workspace, ITME.conceptPrefix)
-  const conceptUri = conceptPrefix && name && `${conceptPrefix}${conceptNameToUrlSafeId(name)}`
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
-  const concept = conceptUri && conceptIndex && getThing(conceptIndex, conceptUri)
+  const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
   const noteStorageUri = conceptIndex && concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
@@ -186,7 +186,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
-    const newConceptIndex = createOrUpdateConceptIndex(editor, conceptIndex, conceptPrefix, name, noteStorageUri)
+    const newConceptIndex = createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name)
     setSaving(true)
     try {
       await save(newNote)
