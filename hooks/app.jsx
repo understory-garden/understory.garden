@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useItmeContainerUri, useConceptContainerUri, useStorageContainer } from './uris'
+import { useUnderstoryContainerUri, useConceptContainerUri, useStorageContainer } from './uris'
 import { useThing, useResource, useWebId } from 'swrlit'
 import {
   createSolidDataset, getSourceUrl, createThing, getThingAll, getDatetime, getUrl, setUrl,
@@ -7,15 +7,16 @@ import {
 } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/lit-generated-vocab-solid-common'
-import { ITME } from '../vocab'
+import { US } from '../vocab'
+import { appPrefix } from '../utils/uris'
 
 const appThingName = "app"
 
 function ensureApp(webId){
-  const appContainerUri = useItmeContainerUri(webId)
+  const appContainerUri = useUnderstoryContainerUri(webId)
   const appUri = appContainerUri && `${appContainerUri}app.ttl`
   const {resource, save, error, ...rest} = useResource(appUri)
-  const privateAppContainerUri = useItmeContainerUri(webId, 'private')
+  const privateAppContainerUri = useUnderstoryContainerUri(webId, 'private')
   const [creating, setCreating] = useState(false)
 
   useEffect(function(){
@@ -25,9 +26,9 @@ function ensureApp(webId){
       let app = createThing({name: appThingName})
       let defaultWorkspace = createThing()
       const prefsPath = "workspace/default/prefs.ttl"
-      defaultWorkspace = setUrl(defaultWorkspace, ITME.publicPrefs, `${appContainerUri}${prefsPath}`)
-      defaultWorkspace = setUrl(defaultWorkspace, ITME.privatePrefs, `${privateAppContainerUri}${prefsPath}`)
-      app = setUrl(app, ITME.hasWorkspace, defaultWorkspace)
+      defaultWorkspace = setUrl(defaultWorkspace, US.publicPrefs, `${appContainerUri}${prefsPath}`)
+      defaultWorkspace = setUrl(defaultWorkspace, US.privatePrefs, `${privateAppContainerUri}${prefsPath}`)
+      app = setUrl(app, US.hasWorkspace, defaultWorkspace)
       let newResource = createSolidDataset()
       newResource = setThing(newResource, defaultWorkspace)
       newResource = setThing(newResource, app)
@@ -51,16 +52,16 @@ const prefsWorkspaceName = "workspace"
 export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
   const { app } = useApp(webId)
   // we're ignoring the workspaceSlug parameter for now, but eventually we'll want to use this to get the currect workspace
-  const { thing: workspaceInfo } = useThing(app && getUrl(app, ITME.hasWorkspace))
+  const { thing: workspaceInfo } = useThing(app && getUrl(app, US.hasWorkspace))
   return {
-    public: workspaceInfo && getUrl(workspaceInfo, ITME.publicPrefs),
-    private: workspaceInfo && getUrl(workspaceInfo, ITME.privatePrefs)
+    public: workspaceInfo && getUrl(workspaceInfo, US.publicPrefs),
+    private: workspaceInfo && getUrl(workspaceInfo, US.privatePrefs)
   }
 }
 
 function useConceptPrefix(webId, workspaceSlug){
   const storageContainerUri = useStorageContainer(webId)
-  return storageContainerUri && `${storageContainerUri}itme/${workspaceSlug}/concepts#`
+  return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/concepts#`
 }
 
 function ensureWorkspace(webId, workspaceSlug, storage){
@@ -73,10 +74,10 @@ function ensureWorkspace(webId, workspaceSlug, storage){
     if (workspacePreferencesFileUri && conceptPrefix && error && (error.statusCode === 404)) {
       let prefsFile = createSolidDataset()
       let workspace = createThing({name: prefsWorkspaceName})
-      workspace = setUrl(workspace, ITME.conceptPrefix, conceptPrefix)
-      workspace = setUrl(workspace, ITME.conceptIndex, new URL("concepts.ttl", workspacePreferencesFileUri).toString())
-      workspace = setUrl(workspace, ITME.noteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
-      workspace = setUrl(workspace, ITME.backupsStorage, new URL(`backups/`, workspacePreferencesFileUri).toString())
+      workspace = setUrl(workspace, US.conceptPrefix, conceptPrefix)
+      workspace = setUrl(workspace, US.conceptIndex, new URL("concepts.ttl", workspacePreferencesFileUri).toString())
+      workspace = setUrl(workspace, US.noteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
+      workspace = setUrl(workspace, US.backupsStorage, new URL(`backups/`, workspacePreferencesFileUri).toString())
       prefsFile = setThing(prefsFile, workspace)
       save(prefsFile)
     }

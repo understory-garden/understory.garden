@@ -1,5 +1,7 @@
 import * as base58 from 'micro-base58'
 
+export const appPrefix = "apps/understory/garden"
+
 export function handleToWebId(handle) {
   if (handle) {
     try {

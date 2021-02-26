@@ -1,16 +1,16 @@
-import { useItmeContainerUri, useConceptContainerUri } from './uris'
+import { useConceptContainerUri } from './uris'
 import { useWorkspace } from './app'
 import { useResource, useWebId } from 'swrlit'
 import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl, getThing } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
-import { ITME } from '../vocab'
+import { US } from '../vocab'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 import { dataset } from "@rdfjs/dataset";
 
 
 export function useConceptIndex(webId, workspaceSlug='default', storage='public'){
   const { workspace } = useWorkspace(webId, workspaceSlug, storage)
-  const conceptIndexUri = workspace && getUrl(workspace, ITME.conceptIndex)
+  const conceptIndexUri = workspace && getUrl(workspace, US.conceptIndex)
   const {resource, error, ...rest} = useResource(conceptIndexUri)
   if (error && (error.statusCode === 404)) {
     const index = createSolidDataset()
@@ -28,7 +28,7 @@ export function useCombinedConceptIndex(webId, workspaceSlug){
 
 export function useConcept(webId, workspaceSlug, name){
   const { workspace } = useWorkspace(webId, workspaceSlug)
-  const conceptPrefix = workspace && getUrl(workspace, ITME.conceptPrefix)
+  const conceptPrefix = workspace && getUrl(workspace, US.conceptPrefix)
   const conceptUri = conceptPrefix && name && `${conceptPrefix}${conceptNameToUrlSafeId(name)}`
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')

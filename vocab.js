@@ -21,3 +21,18 @@ export const ITME = {
   conceptIndex: `${itmeRoot}conceptIndex`,
   conceptPrefix: `${itmeRoot}conceptPrefix`
 }
+
+const understoryRoot = "https://garden.understory.coop/vocab/garden#"
+export const US = {
+  noteBody: `${understoryRoot}noteBody`,
+  refs: `${understoryRoot}refs`,
+  paymentPointer: `${understoryRoot}paymentPointer`,
+  storedAt: `${understoryRoot}storedAt`,
+  noteStorage: `${understoryRoot}noteStorage`,
+  publicPrefs: `${understoryRoot}publicPrefs`,
+  privatePrefs: `${understoryRoot}privatePrefs`,
+  backupsStorage: `${understoryRoot}backupsStorage`,
+  hasWorkspace: `${understoryRoot}hasWorkspace`,
+  conceptIndex: `${understoryRoot}conceptIndex`,
+  conceptPrefix: `${understoryRoot}conceptPrefix`
+}

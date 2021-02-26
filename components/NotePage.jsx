@@ -35,7 +35,7 @@ import {
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
 import { conceptNameFromUri, conceptIdFromUri } from '../model/concept'
-import { ITME } from '../vocab'
+import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 
@@ -60,7 +60,7 @@ function LinksTo({name}){
   const webId = useWebId()
   const { workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
-  const conceptUris = concept && getUrlAll(concept, ITME.refs)
+  const conceptUris = concept && getUrlAll(concept, US.refs)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -94,7 +94,7 @@ function createNote(){
 
 function createOrUpdateNote(note, value){
   let newNote = note || createNote()
-  newNote = setStringNoLocale(newNote, ITME.noteBody, JSON.stringify(value))
+  newNote = setStringNoLocale(newNote, US.noteBody, JSON.stringify(value))
   return newNote
 }
 
@@ -105,20 +105,20 @@ function createConcept(prefix, name){
 function createConceptFor(conceptPrefix, name, conceptNames){
   let concept = createConcept(conceptPrefix, name)
   for (const conceptName of conceptNames){
-    concept = addUrl(concept, ITME.refs, createConcept(conceptPrefix, conceptName))
+    concept = addUrl(concept, US.refs, createConcept(conceptPrefix, conceptName))
   }
   return concept
 }
 
 function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name){
-  const conceptPrefix = getUrl(workspace, ITME.conceptPrefix)
-  const storageUri = concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
+  const conceptPrefix = getUrl(workspace, US.conceptPrefix)
+  const storageUri = concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
 
   const conceptNames = getConceptNodes(editor).map(
     ([concept]) => getConceptNameFromNode(concept)
   )
   let newConcept = createConceptFor(conceptPrefix, name, conceptNames)
-  newConcept = addUrl(newConcept, ITME.storedAt, storageUri)
+  newConcept = addUrl(newConcept, US.storedAt, storageUri)
   newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
   return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
@@ -128,7 +128,7 @@ function noteStorageFileAndThingName(name){
 }
 
 function defaultNoteStorageUri(workspace, name){
-  const containerUri = workspace && getUrl(workspace, ITME.noteStorage)
+  const containerUri = workspace && getUrl(workspace, US.noteStorage)
   return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
 }
 
@@ -141,28 +141,28 @@ function PrivacyControl({name, ...rest}){
   const { workspace: privateStorage } = useWorkspace(webId, workspaceSlug, 'private')
   const { workspace: publicStorage } = useWorkspace(webId, workspaceSlug, 'public')
 
-  const publicNoteResourceUrl = publicStorage && name && `${getUrl(publicStorage, ITME.noteStorage)}${noteStorageFileAndThingName(name)}`
+  const publicNoteResourceUrl = publicStorage && name && `${getUrl(publicStorage, US.noteStorage)}${noteStorageFileAndThingName(name)}`
   const { thing: publicNote, save: savePublic } = useThing(publicNoteResourceUrl)
 
-  const privateNoteResourceUrl = privateStorage && name && `${getUrl(privateStorage, ITME.noteStorage)}${noteStorageFileAndThingName(name)}`
+  const privateNoteResourceUrl = privateStorage && name && `${getUrl(privateStorage, US.noteStorage)}${noteStorageFileAndThingName(name)}`
   const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
 
   async function makePrivateCallback(){
-    await savePrivate(setStringNoLocale(privateNote || createThing({name: thingName}), ITME.noteBody, getStringNoLocale(publicNote, ITME.noteBody)))
+    await savePrivate(setStringNoLocale(privateNote || createThing({name: thingName}), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
     await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
-                                    setUrl(concept, ITME.storedAt, privateNoteResourceUrl)))
+                                    setUrl(concept, US.storedAt, privateNoteResourceUrl)))
     await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
     await deleteResource(publicNoteResourceUrl)
   }
   async function makePublicCallback(){
-    await savePublic(setStringNoLocale(publicNote || createThing({name: thingName1}), ITME.noteBody, getStringNoLocale(privateNote, ITME.noteBody)))
+    await savePublic(setStringNoLocale(publicNote || createThing({name: thingName1}), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
     await savePublicIndex(setThing(publicIndex || createSolidDataset(),
-                                   setUrl(concept, ITME.storedAt, publicNoteResourceUrl)))
+                                   setUrl(concept, US.storedAt, publicNoteResourceUrl)))
     await savePrivateIndex(removeThing(privateIndex || createSolidDataset(), concept))
     await deleteResource(privateNoteResourceUrl)
   }
   return concept ? (
-    (getUrl(concept, ITME.storedAt) === publicNoteResourceUrl) ? (
+    (getUrl(concept, US.storedAt) === publicNoteResourceUrl) ? (
       <button onClick={makePrivateCallback} {...rest}>
         make private
       </button>
@@ -179,10 +179,10 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const myWebId = useWebId()
   const { workspace } = useWorkspace(webId, workspaceSlug)
   const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
-  const noteStorageUri = conceptIndex && concept ? getUrl(concept, ITME.storedAt) : defaultNoteStorageUri(workspace, name)
+  const noteStorageUri = conceptIndex && concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
-  const bodyJSON = note && getStringNoLocale(note, ITME.noteBody)
+  const bodyJSON = note && getStringNoLocale(note, US.noteBody)
   const errorStatus = error && error.statusCode
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);

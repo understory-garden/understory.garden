@@ -6,7 +6,7 @@ import {
 } from '@inrupt/solid-client'
 import { FOAF, AS, RDF, RDFS, DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
-import { ITME } from "../vocab"
+import { US } from "../vocab"
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
@@ -138,7 +138,7 @@ function Name({name, save, ...props}){
 }
 
 function WebMonetizationPointer({profile, save, ...props}){
-  const paymentPointer = profile && getStringNoLocale(profile, ITME.paymentPointer)
+  const paymentPointer = profile && getStringNoLocale(profile, US.paymentPointer)
   const [newPaymentPointer, setNewPaymentPointer] = useState()
   const [editingPaymentPointer, setEditingPaymentPointer] = useState(false)
   function savePaymentPointer(){
@@ -190,7 +190,7 @@ export default function IndexPage() {
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
   }
   async function onSavePaymentPointer(newPaymentPointer){
-    return await saveProfile(setStringNoLocale(profile, ITME.paymentPointer, newPaymentPointer))
+    return await saveProfile(setStringNoLocale(profile, US.paymentPointer, newPaymentPointer))
   }
 
   const webId = useWebId()
