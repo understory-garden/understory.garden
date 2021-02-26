@@ -128,20 +128,29 @@ function defaultNoteStorageUri(workspace, name){
 }
 
 function PrivacyControl({name, concept, ...rest}){
-/*  const { save: saveConcept } = useThing(concept && asUrl(concept))
-  const { workspace } = useWorkspaceContext()
+  const webId = useWebId()
+  const { save: saveConcept } = useThing(concept && asUrl(concept))
+  const { workspaceSlug } = useWorkspaceContext()
+  const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
+  const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
+  const { workspace: privateStorage } = useWorkspace(webId, workspaceSlug, 'private')
+  const { workspace: publicStorage } = useWorkspace(webId, workspaceSlug, 'public')
 
-  const privateNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.privateNoteStorage)}${noteStorageFileAndThingName(name)}`
-  const { thing: publicNote, save: savePublic } = useThing(privateNoteResourceUrl)
-  const publicNoteResourceUrl = workspace && name && `${getUrl(workspace, ITME.defaultNoteStorage)}${noteStorageFileAndThingName(name)}`
+  const publicNoteResourceUrl = publicStorage && name && `${getUrl(publicStorage, ITME.noteStorage)}${noteStorageFileAndThingName(name)}`
+  const { thing: publicNote, save: savePublic } = useThing(publicNoteResourceUrl)
+
+  const privateNoteResourceUrl = privateStorage && name && `${getUrl(privateStorage, ITME.noteStorage)}${noteStorageFileAndThingName(name)}`
   const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
+
   const { resource: currentNoteResource } = useThing(concept && getUrl(concept, ITME.storedAt))
-*/
+
   async function makePrivateCallback(){
-/*    await savePrivate(setUrl(privateNote || createThing(), ITME.noteBody, getUrl(publicNote, ITME.noteBody)))
-    await saveConcept(setUrl(concept, ITME.storedAt, privateNoteResourceUrl))
-    await savePublic(removeUrl(publicNote, ITME.noteBody))
-*/
+    await savePrivate(setStringNoLocale(privateNote || createThing(), ITME.noteBody, getStringNoLocale(publicNote, ITME.noteBody)))
+    await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
+                                    setUrl(concept, ITME.storedAt, privateNoteResourceUrl)))
+    console.log(privateNote, publicNote, ITME.noteBody, getStringNoLocale(publicNote, ITME.noteBody))
+    await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
+    await deleteResource(publicNoteResourceUrl)
   }
   return (
     <button onClick={makePrivateCallback} {...rest}>
