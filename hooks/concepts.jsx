@@ -25,26 +25,30 @@ export function useConcept(webId, workspaceSlug, name){
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
-  if (publicIndex && getThing(publicIndex, conceptUri)){
-    return {
-      conceptUri,
-      concept: getThing(publicIndex, conceptUri),
-      index: publicIndex,
-      saveIndex: savePublicIndex
-    }
-  } else if (privateIndex && getThing(privateIndex, conceptUri)){
-    return {
-      conceptUri,
-      concept: getThing(privateIndex, conceptUri),
-      index: privateIndex,
-      saveIndex: savePrivateIndex
+  if (conceptUri) {
+    if (publicIndex && getThing(publicIndex, conceptUri)){
+      return {
+        conceptUri,
+        concept: getThing(publicIndex, conceptUri),
+        index: publicIndex,
+        saveIndex: savePublicIndex
+      }
+    } else if (privateIndex && getThing(privateIndex, conceptUri)){
+      return {
+        conceptUri,
+        concept: getThing(privateIndex, conceptUri),
+        index: privateIndex,
+        saveIndex: savePrivateIndex
+      }
+    } else {
+      return {
+        conceptUri,
+        index: publicIndex,
+        saveIndex: savePublicIndex
+      }
     }
   } else {
-    return {
-      conceptUri,
-      index: publicIndex,
-      saveIndex: savePublicIndex
-    }
+    return {}
   }
 }
 
