@@ -21,7 +21,7 @@ import Follows from '../components/Follows'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
-import { useWorkspace } from '../hooks/app'
+import { useApp, useWorkspace } from '../hooks/app'
 import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
 function LoginUI(){
@@ -181,7 +181,7 @@ function WebMonetizationPointer({profile, save, ...props}){
   )
 }
 
-export default function IndexPage() {
+function Dashboard(){
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
@@ -196,64 +196,89 @@ export default function IndexPage() {
   const webId = useWebId()
   const { workspace } = useWorkspace(webId)
   const [tab, setTab] = useState("notes")
+
+  return (
+    <>
+      <WebMonetization webId={webId}/>
+      <Nav />
+      <div className="px-6">
+        <div className="flex flex-row py-6 justify-between">
+          <div className="flex flex-row">
+            {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
+            <div className="flex flex-col mr-12">
+              <Name name={name} save={onSaveName}/>
+              <WebMonetizationPointer profile={profile} save={onSavePaymentPointer}
+                                      className="mt-2"/>
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <h5 className="text-xl text-center mb-6">
+              <Link href={`${profilePath(webId)}`}>
+                <a>
+                  public profile
+                </a>
+              </Link>
+            </h5>
+          </div>
+        </div>
+        <WorkspaceProvider webId={webId} slug={'default'}>
+          <div className="flex justify-between">
+            <div className="mr-6 flex-grow">
+              <NewNoteForm />
+              <div className="flex mb-6">
+                {/*
+                   <TabButton name="feed" activeName={tab} setTab={setTab}>
+                   feed
+                   </TabButton>
+                 */}
+                <TabButton name="notes" activeName={tab} setTab={setTab}>
+                  notes
+                </TabButton>
+                <TabButton name="following" activeName={tab} setTab={setTab}>
+                  following
+                </TabButton>
+              </div>
+              {tab === "notes" ? (
+                <Notes webId={webId}/>
+              ) : (tab === "following" ? (
+                <Follows />
+              ) : (
+                <div className="font-logo">
+                  you are in a maze of twisty passages, all alike
+                </div>
+              )
+                  )}
+            </div>
+          </div>
+        </WorkspaceProvider>
+      </div>
+    </>
+  )
+}
+
+export default function IndexPage() {
+  const loggedIn = useLoggedIn()
+  const webId = useWebId()
+  const { app, initApp, error: appError } = useApp(webId)
   return (
     <div className="page" id="page">
       { (loggedIn === true) ? (
-        <>
-          <WebMonetization webId={webId}/>
-          <Nav />
-        <div className="px-6">
-          <div className="flex flex-row py-6 justify-between">
-            <div className="flex flex-row">
-              {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
-              <div className="flex flex-col mr-12">
-                <Name name={name} save={onSaveName}/>
-                <WebMonetizationPointer profile={profile} save={onSavePaymentPointer}
-                                        className="mt-2"/>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <h5 className="text-xl text-center mb-6">
-                <Link href={`${profilePath(webId)}`}>
-                  <a>
-                    public profile
-                  </a>
-                </Link>
-              </h5>
-            </div>
-          </div>
-          <WorkspaceProvider webId={webId} slug={'default'}>
-            <div className="flex justify-between">
-              <div className="mr-6 flex-grow">
-                <NewNoteForm />
-                <div className="flex mb-6">
-                  {/*
-                     <TabButton name="feed" activeName={tab} setTab={setTab}>
-                     feed
-                     </TabButton>
-                   */}
-                  <TabButton name="notes" activeName={tab} setTab={setTab}>
-                    notes
-                  </TabButton>
-                  <TabButton name="following" activeName={tab} setTab={setTab}>
-                    following
-                  </TabButton>
+        app ? (
+          <Dashboard />
+        ) : (
+            <>
+              <Nav/>
+              { (appError && (appError.statusCode === 404)) ? (
+                <div className="text-center pt-12">
+                  <h3 className="text-xl pb-6">looks like this is your first time here!</h3>
+                  <button className="btn" onClick={initApp}>get started</button>
                 </div>
-                {tab === "notes" ? (
-                  <Notes webId={webId}/>
-                ) : (tab === "following" ? (
-                  <Follows />
-                ) : (
-                  <div className="font-logo">
-                    you are in a maze of twisty passages, all alike
-                  </div>
-                )
-                    )}
-              </div>
-            </div>
-          </WorkspaceProvider>
-        </div>
-          </>
+              ) : (
+                <Loader/>
+              )
+              }
+            </>
+        )
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
             <div className="text-center">
