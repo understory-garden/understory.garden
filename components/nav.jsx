@@ -7,7 +7,6 @@ import { Transition } from '@headlessui/react'
 import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } from 'swrlit'
 
 import { MailIcon } from '../components/icons'
-import { useMyLedgerTotal } from '../hooks/feed'
 import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 
@@ -41,7 +40,6 @@ export default function Nav() {
   const { resources } = useContainer(inboxUri)
   const hasMessages = resources && (resources.length > 0)
   const [menuOpen, setMenuOpen] = useState(false)
-  const ledgerTotal = useMyLedgerTotal()
   return (
     <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
@@ -49,15 +47,6 @@ export default function Nav() {
           <a className="font-bold font-logo text-4xl logo-bg text-transparent">itme</a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
-          { false && loggedIn && (
-            <Link href="/ledger">
-              <a>
-                <span className="text-3xl text-bold text-green-400">
-                  { ledgerTotal } 😀💰
-                </span>
-              </a>
-            </Link>
-          )}
           {loggedIn && (
             <Link href="/messages">
               <a className="text-white">
