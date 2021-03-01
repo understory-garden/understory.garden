@@ -5,6 +5,7 @@ import { getUrl, getSourceUrl } from '@inrupt/solid-client'
 import { FOAF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } from 'swrlit'
+import { useRouter } from 'next/router'
 
 import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
@@ -32,6 +33,8 @@ function DevTools(){
 }
 
 export default function Nav() {
+  const router = useRouter()
+  const { query: { devtools } } = router
   const loggedIn = useLoggedIn()
   const { logout } = useAuthentication()
   const { profile } = useMyProfile()
@@ -108,7 +111,7 @@ export default function Nav() {
           )}
         </ul>
       </ul>
-      {true && <DevTools/>}
+      {devtools && <DevTools/>}
     </nav>
   )
 }
