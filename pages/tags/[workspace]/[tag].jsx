@@ -25,7 +25,10 @@ export default function TagPage(){
     <WorkspaceProvider webId={webId} slug={workspace}>
       <div className="page">
         <Nav/>
-        <NotesFromConcepts webId={webId} concepts={concepts}/>
+        <div className="text-center py-6">
+          <h1 className="text-4xl">notes tagged with #{tag}</h1>
+          <NotesFromConcepts webId={webId} concepts={concepts}/>
+        </div>
       </div>
     </WorkspaceProvider>
   )
