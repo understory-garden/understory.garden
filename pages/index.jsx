@@ -261,7 +261,7 @@ export default function IndexPage() {
                   understory
                 </h1>
                 <h1 className="text-6xl font-bold font-logo text-transparent">
-                  online
+                  garden
                 </h1>
               </div>
               <LoginUI/>
