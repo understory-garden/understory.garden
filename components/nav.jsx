@@ -23,7 +23,7 @@ export default function Nav() {
     <nav className="pt-3">
       <ul className="flex justify-between items-center">
         <Link href="/">
-          <a className="font-bold font-logo text-4xl logo-bg text-transparent">itme</a>
+          <a className="font-bold font-logo text-4xl logo-bg text-transparent">understory</a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
           { false && loggedIn && (
