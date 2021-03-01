@@ -35,6 +35,7 @@ import {
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
 import { conceptNameFromUri, conceptIdFromUri } from '../model/concept'
+import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
@@ -42,8 +43,6 @@ import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
 import WebMonetization from '../components/WebMonetization'
 
 const emptyBody = [{ children: [{text: ""}]}]
-
-const thingName = "concept"
 
 function LinkToConcept({uri, ...props}){
   const id = conceptIdFromUri(uri)
@@ -58,7 +57,7 @@ function LinkToConcept({uri, ...props}){
 
 function LinksTo({name}){
   const webId = useWebId()
-  const { workspaceSlug } = useWorkspaceContext()
+  const { slug: workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
   const conceptUris = concept && getUrlAll(concept, US.refs)
   return (
@@ -74,7 +73,7 @@ function LinksTo({name}){
 
 function LinksFrom({conceptUri}){
   const webId = useWebId()
-  const { workspaceSlug } = useWorkspaceContext()
+  const { slug: workspaceSlug } = useWorkspaceContext()
   const { index } = useCombinedConceptIndex(webId, workspaceSlug)
   const linkingConcepts = index.match(null, null, namedNode(conceptUri))
   return (
@@ -86,10 +85,6 @@ function LinksFrom({conceptUri}){
       ))}
     </ul>
   )
-}
-
-function createNote(){
-  return createThing({name: thingName})
 }
 
 function createOrUpdateNote(note, value){
@@ -123,18 +118,9 @@ function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, na
   return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
 
-function noteStorageFileAndThingName(name){
-  return `${conceptNameToUrlSafeId(name)}.ttl#${thingName}`
-}
-
-function defaultNoteStorageUri(workspace, name){
-  const containerUri = workspace && getUrl(workspace, US.noteStorage)
-  return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
-}
-
 function PrivacyControl({name, ...rest}){
   const webId = useWebId()
-  const { workspaceSlug } = useWorkspaceContext()
+  const { slug: workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
@@ -148,14 +134,14 @@ function PrivacyControl({name, ...rest}){
   const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
 
   async function makePrivateCallback(){
-    await savePrivate(setStringNoLocale(privateNote || createThing({name: thingName}), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
+    await savePrivate(setStringNoLocale(privateNote || createNote(), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
     await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
                                     setUrl(concept, US.storedAt, privateNoteResourceUrl)))
     await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
     await deleteResource(publicNoteResourceUrl)
   }
   async function makePublicCallback(){
-    await savePublic(setStringNoLocale(publicNote || createThing({name: thingName1}), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
+    await savePublic(setStringNoLocale(publicNote || createNote(), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
     await savePublicIndex(setThing(publicIndex || createSolidDataset(),
                                    setUrl(concept, US.storedAt, publicNoteResourceUrl)))
     await savePrivateIndex(removeThing(privateIndex || createSolidDataset(), concept))
@@ -174,12 +160,13 @@ function PrivacyControl({name, ...rest}){
   ) : (<div>loading...</div>)
 }
 
-export default function NotePage({encodedName, webId, path="/notes", readOnly=false, workspaceSlug}){
+export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
+  const { slug: workspaceSlug } = useWorkspaceContext()
   const { workspace } = useWorkspace(webId, workspaceSlug)
   const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
-  const noteStorageUri = conceptIndex && concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
+  const noteStorageUri = concept && getUrl(concept, US.storedAt)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
 
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
@@ -254,7 +241,6 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const [reporting, setReporting] = useState(false)
   return (
-    <WorkspaceProvider webId={webId} slug={workspaceSlug}>
       <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`, note, save}}>
         <div className="flex flex-col page">
           <WebMonetization webId={webId} />
@@ -379,6 +365,5 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
           </section>
         </div>
       </NoteContext.Provider>
-    </WorkspaceProvider>
   )
 }

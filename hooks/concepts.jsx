@@ -1,10 +1,11 @@
 import { useConceptContainerUri } from './uris'
 import { useWorkspace } from './app'
 import { useResource, useWebId } from 'swrlit'
-import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl, getThing } from '@inrupt/solid-client'
+import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl, getThing, createThing } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { US } from '../vocab'
 import { conceptNameToUrlSafeId } from '../utils/uris'
+import { defaultNoteStorageUri } from '../model/note'
 import { dataset } from "@rdfjs/dataset";
 
 
@@ -33,6 +34,7 @@ export function useConcept(webId, workspaceSlug, name){
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
+
   if (conceptUri) {
     if (publicIndex && getThing(publicIndex, conceptUri)){
       return {
@@ -47,6 +49,13 @@ export function useConcept(webId, workspaceSlug, name){
         concept: getThing(privateIndex, conceptUri),
         index: privateIndex,
         saveIndex: savePrivateIndex
+      }
+    } else if (privateIndex && publicIndex && workspace) {
+      return {
+        conceptUri,
+        concept: setUrl(createThing({url: conceptUri}), US.storedAt, defaultNoteStorageUri(workspace, name)),
+        index: publicIndex,
+        saveIndex: savePublicIndex
       }
     } else {
       return {

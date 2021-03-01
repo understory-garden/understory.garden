@@ -45,8 +45,8 @@ const prefsWorkspaceName = "workspace"
 function createNewAppResource(appContainerUri, privateAppContainerUri){
   let app = createThing({name: appThingName})
   let defaultWorkspace = createThing()
-  defaultWorkspace = setUrl(defaultWorkspace, US.publicPrefs, `${appContainerUri}${prefsPath}`)
-  defaultWorkspace = setUrl(defaultWorkspace, US.privatePrefs, `${privateAppContainerUri}${prefsPath}`)
+  defaultWorkspace = setUrl(defaultWorkspace, US.publicPrefs, `${appContainerUri}${prefsPath}#${prefsWorkspaceName}`)
+  defaultWorkspace = setUrl(defaultWorkspace, US.privatePrefs, `${privateAppContainerUri}${prefsPath}#${prefsWorkspaceName}`)
   app = setUrl(app, US.hasWorkspace, defaultWorkspace)
   let resource = createSolidDataset()
   resource = setThing(resource, defaultWorkspace)
