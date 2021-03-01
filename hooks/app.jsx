@@ -54,9 +54,10 @@ function createNewAppResource(appContainerUri, privateAppContainerUri){
   return {app, resource}
 }
 
-function createWorkspacePrefs(conceptPrefix, workspacePreferencesFileUri){
+function createWorkspacePrefs(conceptPrefix, tagPrefix, workspacePreferencesFileUri){
   let workspace = createThing({name: prefsWorkspaceName})
   workspace = setUrl(workspace, US.conceptPrefix, conceptPrefix)
+  workspace = setUrl(workspace, US.tagPrefix, tagPrefix)
   workspace = setUrl(workspace, US.conceptIndex, new URL("concepts.ttl", workspacePreferencesFileUri).toString())
   workspace = setUrl(workspace, US.noteStorage, new URL("notes/", workspacePreferencesFileUri).toString())
   workspace = setUrl(workspace, US.backupsStorage, new URL(`backups/`, workspacePreferencesFileUri).toString())
@@ -74,13 +75,14 @@ export function useApp(webId){
   const appUri = appContainerUri && `${appContainerUri}app.ttl#${appThingName}`
   const {thing: app, saveResource: saveAppResource, ...rest} = useThing(appUri)
   const conceptPrefix = useConceptPrefix(webId, 'default')
+  const tagPrefix = useTagPrefix(webId, 'default')
 
   async function initApp(){
     const { resource: appResource } = createNewAppResource(appContainerUri, privateAppContainerUri)
     await saveAppResource(appResource)
-    const privatePrefs = createWorkspacePrefs(conceptPrefix, privateWorkspacePrefsUri)
+    const privatePrefs = createWorkspacePrefs(conceptPrefix, tagPrefix, privateWorkspacePrefsUri)
     await savePrivatePrefs(privatePrefs)
-    const publicPrefs = createWorkspacePrefs(conceptPrefix, publicWorkspacePrefsUri)
+    const publicPrefs = createWorkspacePrefs(conceptPrefix, tagPrefix, publicWorkspacePrefsUri)
     await savePublicPrefs(publicPrefs)
     console.log("initialized!")
   }
@@ -102,6 +104,11 @@ export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
 function useConceptPrefix(webId, workspaceSlug){
   const storageContainerUri = useStorageContainer(webId)
   return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/concepts#`
+}
+
+function useTagPrefix(webId, workspaceSlug){
+  const storageContainerUri = useStorageContainer(webId)
+  return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/tags#`
 }
 
 export function useWorkspace(webId, workspaceSlug, storage='public'){

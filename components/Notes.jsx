@@ -12,7 +12,7 @@ import { useConcepts } from '../hooks/concepts'
 import NoteContext from '../contexts/NoteContext'
 import { urlSafeIdToConceptName } from '../utils/uris'
 
-function Note({concept}){
+export function Note({concept}){
   const uri = asUrl(concept)
   const id = conceptIdFromUri(uri)
   const name = urlSafeIdToConceptName(id)
@@ -33,8 +33,7 @@ function Note({concept}){
   )
 }
 
-export default function Notes({path = "/notes", webId}){
-  const { concepts } = useConcepts(webId)
+export function NotesFromConcepts({path = "/notes", webId, concepts}){
   const { slug: workspaceSlug } = useContext(WorkspaceContext)
   return (
     <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`}}>
@@ -43,4 +42,9 @@ export default function Notes({path = "/notes", webId}){
       </ul>
     </NoteContext.Provider>
   )
+}
+
+export default function Notes({path = "/notes", webId}){
+  const { concepts } = useConcepts(webId)
+  return <NotesFromConcepts path={path} webId={webId} concepts={concepts}/>
 }

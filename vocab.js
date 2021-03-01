@@ -34,5 +34,7 @@ export const US = {
   backupsStorage: `${understoryRoot}backupsStorage`,
   hasWorkspace: `${understoryRoot}hasWorkspace`,
   conceptIndex: `${understoryRoot}conceptIndex`,
-  conceptPrefix: `${understoryRoot}conceptPrefix`
+  conceptPrefix: `${understoryRoot}conceptPrefix`,
+  tagged: `${understoryRoot}tagged`,
+  tagPrefix: `${understoryRoot}tagPrefix`
 }

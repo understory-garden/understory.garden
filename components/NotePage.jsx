@@ -31,14 +31,14 @@ import { useWorkspace } from '../hooks/app'
 
 import {
   publicNotePath, privateNotePath, profilePath, conceptUriToName,
-  conceptNameToUrlSafeId, urlSafeIdToConceptName
+  conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
-import { conceptNameFromUri, conceptIdFromUri } from '../model/concept'
+import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
-import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
+import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 
 import WebMonetization from '../components/WebMonetization'
 
@@ -75,12 +75,12 @@ function LinksFrom({conceptUri}){
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { index } = useCombinedConceptIndex(webId, workspaceSlug)
-  const linkingConcepts = index.match(null, null, namedNode(conceptUri))
+  const linkingConcepts = index.match(null, namedNode(US.refs), namedNode(conceptUri))
   return (
     <ul>
-      {linkingConcepts && Array.from(linkingConcepts).map(({subject}) => (
-        <li key={subject.value}>
-          <LinkToConcept uri={subject.value}/>
+      {conceptUrisThatReference(index, conceptUri).map((uri) => (
+        <li key={uri}>
+          <LinkToConcept uri={uri}/>
         </li>
       ))}
     </ul>
@@ -97,22 +97,33 @@ function createConcept(prefix, name){
   return createThing({url: `${prefix}${conceptNameToUrlSafeId(name)}`})
 }
 
-function createConceptFor(conceptPrefix, name, conceptNames){
+function createTag(prefix, name){
+  return createThing({url: `${prefix}${tagNameToUrlSafeId(name)}`})
+}
+
+function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames){
   let concept = createConcept(conceptPrefix, name)
   for (const conceptName of conceptNames){
     concept = addUrl(concept, US.refs, createConcept(conceptPrefix, conceptName))
+  }
+  for (const tagName of tagNames){
+    concept = addUrl(concept, US.tagged, createTag(tagPrefix, tagName))
   }
   return concept
 }
 
 function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name){
   const conceptPrefix = getUrl(workspace, US.conceptPrefix)
+  const tagPrefix = getUrl(workspace, US.tagPrefix)
   const storageUri = concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
 
   const conceptNames = getConceptNodes(editor).map(
     ([concept]) => getConceptNameFromNode(concept)
   )
-  let newConcept = createConceptFor(conceptPrefix, name, conceptNames)
+  const tagNames = getTagNodes(editor).map(
+    ([tag]) => getTagNameFromNode(tag)
+  )
+  let newConcept = createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames)
   newConcept = addUrl(newConcept, US.storedAt, storageUri)
   newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
   return setThing(conceptIndex || createSolidDataset(), newConcept)

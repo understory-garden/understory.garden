@@ -48,3 +48,7 @@ export const urlSafeIdToConceptName = (id) => {
 export function conceptUriToName(conceptUri){
   return urlSafeIdToConceptName(conceptUri.split("#").slice(-1)[0])
 }
+
+export function tagNameToUrlSafeId(tagName){
+  return encodeURIComponent(tagName)
+}
