@@ -17,15 +17,24 @@ function DevTools(){
   const { resource: appResource } = useApp(webId)
   const { public: workspacePreferencesFileUri } = useWorkspacePreferencesFileUris(webId)
   return (
-    <ul>
+    <ul className="flex flex-column">
+      <li className="mx-3">
+        Env: {process.env.VERCEL_ENV}
+      </li>
+      <li className="mx-3">
+        Branch: {process.env.VERCEL_GIT_COMMIT_REF}
+      </li>
+      <li className="mx-3">
+        SHA: {process.env.VERCEL_GIT_COMMIT_REF}
+      </li>
       <li>
-        <button onClick={() => deleteResource(getSourceUrl(appResource))}>
+        <button className="btn text-xs" onClick={() => deleteResource(getSourceUrl(appResource))}>
           delete app file
         </button>
       </li>
       <li>
-        <button onClick={() => deleteResource(workspacePreferencesFileUri)}>
-          delete default workspace prefs
+        <button className="btn text-xs" onClick={() => deleteResource(workspacePreferencesFileUri)}>
+          delete default workspace
         </button>
       </li>
     </ul>
