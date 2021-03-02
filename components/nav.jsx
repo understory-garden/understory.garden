@@ -11,6 +11,10 @@ import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 
+const env = process.env.VERCEL_ENV
+const branch = process.env.VERCEL_GIT_COMMIT_REF
+const sha = process.env.VERCEL_GIT_COMMIT_SHA
+
 function DevTools(){
   const webId = useWebId()
 
@@ -19,13 +23,13 @@ function DevTools(){
   return (
     <ul className="flex flex-column">
       <li className="mx-3">
-        Env: {process.env.VERCEL_ENV}
+        Env: {env}
       </li>
       <li className="mx-3">
-        Branch: {process.env.VERCEL_GIT_COMMIT_REF}
+        Branch: {branch}
       </li>
       <li className="mx-3">
-        SHA: {process.env.VERCEL_GIT_COMMIT_REF}
+        SHA: {sha}
       </li>
       <li>
         <button className="btn text-xs" onClick={() => deleteResource(getSourceUrl(appResource))}>
