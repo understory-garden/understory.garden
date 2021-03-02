@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
+import { appPrefix } from '../utils/uris'
 
 function DevTools(){
   const webId = useWebId()
@@ -19,7 +20,7 @@ function DevTools(){
   return (
     <ul className="flex flex-column">
       <li className="mx-3">
-        prefix: {process.env.NEXT_PUBLIC_APP_PREFIX}
+        prefix: {appPrefix}
       </li>
       <li>
         <button className="btn text-xs" onClick={() => deleteResource(getSourceUrl(appResource))}>
