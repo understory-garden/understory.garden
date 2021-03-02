@@ -9,7 +9,7 @@ import { US } from '../../../vocab'
 import { tagNameToUrlSafeId } from '../../../utils/uris'
 import { conceptUrisTaggedWith } from '../../../model/concept'
 import { NotesFromConcepts } from '../../../components/Notes'
-import Nav from '../../../components/Nav'
+import Nav from '../../../components/nav'
 
 export default function TagPage(){
   const router = useRouter()
