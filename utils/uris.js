@@ -1,6 +1,8 @@
 import * as base58 from 'micro-base58'
 
-export const appPrefix = "apps/understory/garden"
+console.log("APP PREFIX", process.env.NEXT_PUBLIC_APP_PREFIX)
+
+export const appPrefix = process.env.NEXT_PUBLIC_APP_PREFIX || "apps/understory/garden"
 
 export function handleToWebId(handle) {
   if (handle) {
