@@ -27,7 +27,8 @@ import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceCon
 
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
-import { useWorkspace } from '../hooks/app'
+import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
+import { useBackups, useIntervalBackups } from '../hooks/backups'
 
 import {
   publicNotePath, privateNotePath, profilePath, conceptUriToName,
@@ -41,6 +42,7 @@ import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 
 import WebMonetization from '../components/WebMonetization'
+import { Loader } from '../components/elements'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -160,27 +162,61 @@ function PrivacyControl({name, ...rest}){
   }
   return concept ? (
     (getUrl(concept, US.storedAt) === publicNoteResourceUrl) ? (
-      <button onClick={makePrivateCallback} {...rest}>
+      <button className="btn" onClick={makePrivateCallback} {...rest}>
         make private
       </button>
     ) : (
-      <button onClick={makePublicCallback} {...rest}>
+      <button className="btn" onClick={makePublicCallback} {...rest}>
         make public
       </button>
     )
-  ) : (<div>loading...</div>)
+  ) : (<Loader/>)
+}
+
+function Backup({label, backup, restoreValue}){
+  const editor = useNewEditor()
+  const bodyJSON = getStringNoLocale(backup, US.noteBody)
+  const value = JSON.parse(bodyJSON)
+  return (
+    <div className="relative flex flex-col">
+      <h4 className="text-xl">{label}</h4>
+      <button className="btn" onClick={() => restoreValue(value)}>restore</button>
+      <div className="transform scale-50 max-h-36 overflow-y-scroll">
+        <Slate
+          editor={editor}
+          value={value}>
+          <Editable readOnly editor={editor} />
+        </Slate>
+      </div>
+    </div>
+  )
+}
+
+function Backups({name, restoreValue}){
+  const { oneMinuteBackup, fiveMinuteBackup, tenMinuteBackup, thirtyMinuteBackup} = useBackups(name)
+  return (
+    <div className="text-center">
+      <h2 className="text-2xl">Backups</h2>
+      <div className="flex flex-row">
+        {oneMinuteBackup && <Backup label="One Minute" backup={oneMinuteBackup} restoreValue={restoreValue}/>}
+        {fiveMinuteBackup && <Backup label="Five Minutes" backup={fiveMinuteBackup} restoreValue={restoreValue}/>}
+        {tenMinuteBackup && <Backup label="Ten Minutes" backup={tenMinuteBackup} restoreValue={restoreValue}/>}
+        {thirtyMinuteBackup && <Backup label="Thirty Minutes" backup={thirtyMinuteBackup} restoreValue={restoreValue}/>}
+      </div>
+    </div>
+  )
 }
 
 export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
-  const { slug: workspaceSlug } = useWorkspaceContext()
-  const { workspace } = useWorkspace(webId, workspaceSlug)
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
   const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
   const noteStorageUri = concept && getUrl(concept, US.storedAt)
   const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
-
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
+  const [showBackups, setShowBackups] = useState(false)
+  useIntervalBackups(name)
   const errorStatus = error && error.statusCode
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);
@@ -291,13 +327,19 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 <a href={noteStorageUri} target="_blank" rel="noopener">
                   source
                 </a>
-                {name && <PrivacyControl name={name} />}
-                <button onClick={deleteCallback}>
-                  delete
-                </button>
+                <div className="flex flex-col">
+                  {name && <PrivacyControl name={name} />}
+                  <button className="btn" onClick={deleteCallback}>
+                    delete
+                  </button>
+                  <button className="btn" onClick={() => setShowBackups(!showBackups)}>
+                    {showBackups ? 'hide' : 'show'} backups
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+          { showBackups && <Backups name={name} restoreValue={setValue}/> }
           <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
             <div className="w-full flex flex-col flex-grow">
               {(value !== undefined) && (

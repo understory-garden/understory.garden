@@ -9,6 +9,7 @@ import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/lit-generated-vocab-solid-common'
 import { US } from '../vocab'
 import { appPrefix } from '../utils/uris'
+import { useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 const appThingName = "app"
 
@@ -111,11 +112,17 @@ function useTagPrefix(webId, workspaceSlug){
   return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/tags#`
 }
 
-export function useWorkspace(webId, workspaceSlug, storage='public'){
-  const workspacePreferencesFileUris = useWorkspacePreferencesFileUris(webId, workspaceSlug)
+export function useWorkspace(webId, slug, storage='public'){
+  const workspacePreferencesFileUris = useWorkspacePreferencesFileUris(webId, slug)
   const workspacePreferencesFileUri = workspacePreferencesFileUris && workspacePreferencesFileUris[storage]
   const { thing: workspace, ...rest } = useThing(workspacePreferencesFileUri)
 
-  return { workspace, ...rest }
+  return { workspace, slug, ...rest }
 
+}
+
+export function useCurrentWorkspace(storage='public'){
+  const webId = useWebId()
+  const { slug: workspaceSlug } = useWorkspaceContext()
+  return useWorkspace(webId, workspaceSlug, storage)
 }
