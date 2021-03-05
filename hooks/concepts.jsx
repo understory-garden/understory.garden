@@ -1,12 +1,14 @@
-import { useConceptContainerUri } from './uris'
-import { useWorkspace } from './app'
-import { useResource, useWebId } from 'swrlit'
+import { dataset } from "@rdfjs/dataset";
 import { createSolidDataset, getThingAll, getDatetime, getUrl, setUrl, getThing, createThing } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import { useResource, useWebId } from 'swrlit'
+
+import { useConceptContainerUri } from './uris'
+import { useWorkspace } from './app'
 import { US } from '../vocab'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 import { defaultNoteStorageUri } from '../model/note'
-import { dataset } from "@rdfjs/dataset";
+import { useCurrentWorkspace } from './app'
 
 
 export function useConceptIndex(webId, workspaceSlug='default', storage='public'){
@@ -27,9 +29,15 @@ export function useCombinedConceptIndex(webId, workspaceSlug){
   return {index: dataset([...privateIndex ? privateIndex.quads : [], ...publicIndex ? publicIndex.quads : []])}
 }
 
-export function useConcept(webId, workspaceSlug, name){
+export function useConceptPrefix(webId, workspaceSlug){
   const { workspace } = useWorkspace(webId, workspaceSlug)
   const conceptPrefix = workspace && getUrl(workspace, US.conceptPrefix)
+  return conceptPrefix
+}
+
+export function useConcept(webId, workspaceSlug, name){
+  const { workspace } = useWorkspace(webId, workspaceSlug)
+  const conceptPrefix = useConceptPrefix(webId, workspaceSlug)
   const conceptUri = conceptPrefix && name && `${conceptPrefix}${conceptNameToUrlSafeId(name)}`
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
@@ -85,4 +93,10 @@ export function useConcepts(webId, workspaceSlug='default'){
     (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
   )
   return { concepts }
+}
+
+export function useConceptInCurrentWorkspace(name){
+  const webId = useWebId()
+  const { slug: workspaceSlug } = useCurrentWorkspace()
+  return useConcept(webId, workspaceSlug, name)
 }

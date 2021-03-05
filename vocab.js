@@ -1,11 +1,13 @@
-export const noteBody = "https://face.baby/vocab#noteBody"
-export const refs = "https://face.baby/vocab#refs"
-export const hasFeedItem = "https://face.baby/vocab#hasFeedItem"
-export const Credit = "https://face.baby/vocab#Credit"
-export const Debit = "https://face.baby/vocab#Debit"
-export const amount = "https://face.baby/vocab#amount"
-export const accountOf = "https://face.baby/vocab#accountOf"
-
+const fbRoot = "https://face.baby/vocab#"
+export const FB = {
+  noteBody : `${fbRoot}noteBody`,
+  refs : `${fbRoot}refs`,
+  hasFeedItem : `${fbRoot}hasFeedItem`,
+  Credit : `${fbRoot}Credit`,
+  Debit : `${fbRoot}Debit`,
+  amount : `${fbRoot}amount`,
+  accountOf : `${fbRoot}accountOf`
+}
 
 const itmeRoot = "https://itme.online/vocab#"
 export const ITME = {
@@ -22,10 +24,10 @@ export const ITME = {
   conceptPrefix: `${itmeRoot}conceptPrefix`
 }
 
-const understoryRoot = "https://garden.understory.coop/vocab/garden#"
+const understoryRoot = "https://understory.coop/vocab/garden#"
 export const US = {
   noteBody: `${understoryRoot}noteBody`,
-  refs: `${understoryRoot}refs`,
+  refersTo: `${understoryRoot}refersTo`,
   paymentPointer: `${understoryRoot}paymentPointer`,
   storedAt: `${understoryRoot}storedAt`,
   noteStorage: `${understoryRoot}noteStorage`,

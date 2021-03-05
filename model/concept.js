@@ -11,7 +11,7 @@ export function conceptNameFromUri(uri){
 }
 
 export function conceptUrisThatReference(index, conceptUri){
-  return Array.from(index.match(null, namedNode(US.refs), namedNode(conceptUri))).map(({subject}) => subject.value)
+  return Array.from(index.match(null, namedNode(US.refersTo), namedNode(conceptUri))).map(({subject}) => subject.value)
 }
 
 export function conceptUrisTaggedWith(index, tagUri){
