@@ -1,7 +1,7 @@
 import { useWebId, useThing, useResource } from 'swrlit'
 import { getUrlAll, getThing, getDecimal, getThingAll, getUrl } from '@inrupt/solid-client'
-import { hasFeedItem, accountOf, amount } from '../vocab'
-
+import { FB } from '../vocab'
+const { hasFeedItem, accountOf, amount } = FB
 const feedItems = [
   "https://cassette.loves.face.baby/public/itme/facebaby/concepts/SHOCKING%20REVEAL!!!%20100%25%20GENUINE!.ttl#concept",
   "https://www.loves.face.baby/public/itme/facebaby/concepts/soul%20monetization.ttl#concept",
