@@ -62,7 +62,7 @@ function LoginUI(){
       <h3 className="text-3xl my-6">OR</h3>
       <h3 className="text-3xl mb-3 text-gray-800">login with your handle</h3>
        */}
-      <h3 className="text-3xl mb-3 text-gray-700">Welcome to itme.online! 👋</h3>
+      <h3 className="text-3xl mb-3 text-gray-700">Welcome to understory.garden (formerly itme.online)! 👋</h3>
       <h3 className="text-lg mb-3 text-gray-600">We're hard at work laying the foundations for you to build your new <a href="https://itme.company/">Home on the Web</a>.</h3>
       <h3 className="text-lg mb-3 text-gray-600">If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname as your "handle" below. If you don't have a Pod, you can get one from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web, but please be warned that the user experience is currently pretty rough! We're working on it 😉</h3>
       <h3 className="text-lg mb-12 text-gray-600">Please note that we can't provide any guarantees as to the safety or security of your Pod data at this point - there may be bugs that delete all of your data or expose it to the open Web, so for now please just treat this like a sandbox.</h3>
@@ -284,10 +284,10 @@ export default function IndexPage() {
             <div className="text-center">
               <div className="my-12 logo-bg">
                 <h1 className="text-9xl font-bold font-logo text-transparent">
-                  itme
+                  understory
                 </h1>
                 <h1 className="text-6xl font-bold font-logo text-transparent">
-                  online
+                  garden
                 </h1>
               </div>
               <LoginUI/>

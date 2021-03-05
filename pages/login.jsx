@@ -67,13 +67,13 @@ export default function RegistrationPage(){
           <div className="flex flex-col">
             <label className="text-2xl mb-6" htmlFor="username">username</label>
             <Field id="username" name="username"
-                   className="bg-gray-800 py-2 px-2"
+                   className="py-2 px-2"
                    placeholder="what's your username" />
             {errors.username && touched.username ? <div className="text-red-500">{errors.username}</div> : null}
 
             <label className="text-2xl mb-6 mt-12" htmlFor="email">email</label>
             <Field
-              className="bg-gray-800 border-0"
+              className="border-0"
               id="email"
               name="email"
               placeholder="what's your email"
