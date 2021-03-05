@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
+import { useResource, useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
 import {
   setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid, getThingAll, asUrl,
   getDatetime
@@ -21,6 +21,7 @@ import Follows from '../components/Follows'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
+import { useItmeOnlineConceptIndex, ItmeOnlineMigrator } from '../components/ItmeOnlineMigrator'
 import { useApp, useWorkspace } from '../hooks/app'
 import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
@@ -196,6 +197,7 @@ function Dashboard(){
   const webId = useWebId()
   const { workspace } = useWorkspace(webId)
   const [tab, setTab] = useState("notes")
+  const { index: oldConceptIndex } = useItmeOnlineConceptIndex()
 
   return (
     <>
@@ -224,6 +226,12 @@ function Dashboard(){
         <WorkspaceProvider webId={webId} slug={'default'}>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
+              {oldConceptIndex && (
+                <div>
+                  It looks like you have some itme.online data. You can
+                  visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
+                </div>
+              )}
               <NewNoteForm />
               <div className="flex mb-6">
                 {/*
@@ -256,6 +264,28 @@ function Dashboard(){
   )
 }
 
+function InitPage({initApp}){
+  return (
+    <>
+      <Nav/>
+      <div className="text-center pt-12">
+        <h3 className="text-xl pb-6">looks like this is your first time here!</h3>
+        <button className="btn" onClick={initApp}>get started</button>
+      </div>
+    </>
+  )
+}
+
+function LoadingPage(){
+  return (
+    <>
+      <div className="text-center pt-12">
+        <Loader/>
+      </div>
+    </>
+  )
+}
+
 export default function IndexPage() {
   const loggedIn = useLoggedIn()
   const webId = useWebId()
@@ -265,19 +295,11 @@ export default function IndexPage() {
       { (loggedIn === true) ? (
         app ? (
           <Dashboard />
+        ) : ((appError && (appError.statusCode === 404)) ? (
+          <InitPage initApp={initApp}/>
         ) : (
-            <>
-              <Nav/>
-              { (appError && (appError.statusCode === 404)) ? (
-                <div className="text-center pt-12">
-                  <h3 className="text-xl pb-6">looks like this is your first time here!</h3>
-                  <button className="btn" onClick={initApp}>get started</button>
-                </div>
-              ) : (
-                <Loader/>
-              )
-              }
-            </>
+          <LoadingPage/>
+        )
         )
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
