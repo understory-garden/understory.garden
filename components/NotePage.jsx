@@ -61,7 +61,7 @@ function LinksTo({name}){
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
-  const conceptUris = concept && getUrlAll(concept, US.refs)
+  const conceptUris = concept && getUrlAll(concept, US.refersTo)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -77,7 +77,7 @@ function LinksFrom({conceptUri}){
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { index } = useCombinedConceptIndex(webId, workspaceSlug)
-  const linkingConcepts = index.match(null, namedNode(US.refs), namedNode(conceptUri))
+  const linkingConcepts = index.match(null, namedNode(US.refersTo), namedNode(conceptUri))
   return (
     <ul>
       {conceptUrisThatReference(index, conceptUri).map((uri) => (
@@ -106,7 +106,7 @@ function createTag(prefix, name){
 function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames){
   let concept = createConcept(conceptPrefix, name)
   for (const conceptName of conceptNames){
-    concept = addUrl(concept, US.refs, createConcept(conceptPrefix, conceptName))
+    concept = addUrl(concept, US.refersTo, createConcept(conceptPrefix, conceptName))
   }
   for (const tagName of tagNames){
     concept = addUrl(concept, US.tagged, createTag(tagPrefix, tagName))
