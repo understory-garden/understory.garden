@@ -13,33 +13,6 @@ import { useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 const appThingName = "app"
 
-function ensureApp(webId){
-  const appContainerUri = useUnderstoryContainerUri(webId)
-  const appUri = appContainerUri && `${appContainerUri}app.ttl`
-  const {resource, save, error, ...rest} = useResource(appUri)
-  const privateAppContainerUri = useUnderstoryContainerUri(webId, 'private')
-  const [creating, setCreating] = useState(false)
-
-  useEffect(function(){
-    if (!creating && appContainerUri && error && (error.statusCode === 404)) {
-      console.log("creating prefs")
-      setCreating(true)
-      let app = createThing({name: appThingName})
-      let defaultWorkspace = createThing()
-      const prefsPath = "workspace/default/prefs.ttl"
-      defaultWorkspace = setUrl(defaultWorkspace, US.publicPrefs, `${appContainerUri}${prefsPath}`)
-      defaultWorkspace = setUrl(defaultWorkspace, US.privatePrefs, `${privateAppContainerUri}${prefsPath}`)
-      app = setUrl(app, US.hasWorkspace, defaultWorkspace)
-      let newResource = createSolidDataset()
-      newResource = setThing(newResource, defaultWorkspace)
-      newResource = setThing(newResource, app)
-      save(newResource).then(() => setCreating(false))
-    }
-  }, [error, save, appContainerUri])
-
-  return resource && getSourceUrl(resource)
-}
-
 const prefsPath = "workspace/default/prefs.ttl"
 const prefsWorkspaceName = "workspace"
 
