@@ -26,10 +26,11 @@ import { useApp, useWorkspace } from '../hooks/app'
 import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
 function LoginUI(){
-  const [handle, setHandle] = useState("")
+  const [username, setUsername] = useState("")
   const [badHandle, setBadHandle] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
   const { loginHandle, logout } = useAuthentication()
+  const handle = username.includes(".") ? username : `${username}.myunderstory.com`
   async function logIn(){
     setBadHandle(false)
     setLoggingIn(true)
@@ -42,7 +43,7 @@ function LoginUI(){
     }
   }
   function onChange(e){
-    setHandle(e.target.value)
+    setUsername(e.target.value)
     setBadHandle(false)
   }
   function onKeyPress(e){
@@ -68,11 +69,11 @@ function LoginUI(){
       <h3 className="text-lg mb-3 text-gray-600">If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname as your "handle" below. If you don't have a Pod, you can get one from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web, but please be warned that the user experience is currently pretty rough! We're working on it 😉</h3>
       <h3 className="text-lg mb-12 text-gray-600">Please note that we can't provide any guarantees as to the safety or security of your Pod data at this point - there may be bugs that delete all of your data or expose it to the open Web, so for now please just treat this like a sandbox.</h3>
       <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
-             placeholder="what's your handle?"
-             value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
+             placeholder="what's your username?"
+             value={username} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
         <p className="text-red-500 m-auto mt-2">
-          hm, I don't recognize that handle
+          hm, I don't recognize that username
         </p>
       )}
       {loggingIn ? (
