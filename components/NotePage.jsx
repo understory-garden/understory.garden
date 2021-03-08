@@ -132,6 +132,7 @@ function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, na
 }
 
 function PrivacyControl({name, ...rest}){
+  const [saving, setSaving] = useState(false)
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
@@ -147,28 +148,35 @@ function PrivacyControl({name, ...rest}){
   const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
 
   async function makePrivateCallback(){
+    setSaving(true)
     await savePrivate(setStringNoLocale(privateNote || createNote(), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
     await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
                                     setUrl(concept, US.storedAt, privateNoteResourceUrl)))
     await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
     await deleteResource(publicNoteResourceUrl)
+    setSaving(false)
   }
   async function makePublicCallback(){
+    setSaving(true)
     await savePublic(setStringNoLocale(publicNote || createNote(), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
     await savePublicIndex(setThing(publicIndex || createSolidDataset(),
                                    setUrl(concept, US.storedAt, publicNoteResourceUrl)))
     await savePrivateIndex(removeThing(privateIndex || createSolidDataset(), concept))
     await deleteResource(privateNoteResourceUrl)
+    setSaving(false)
   }
-  return concept ? (
+  return (concept && !saving) ? (
     (getUrl(concept, US.storedAt) === publicNoteResourceUrl) ? (
       <button className="btn" onClick={makePrivateCallback} {...rest}>
         make private
       </button>
-    ) : (
+    ) : ((getUrl(concept, US.storedAt) === privateNoteResourceUrl) ? (
       <button className="btn" onClick={makePublicCallback} {...rest}>
         make public
       </button>
+    ) : (
+      <span>bad storage url: {getUrl(concept, US.storedAt)}</span>
+    )
     )
   ) : (<Loader/>)
 }
