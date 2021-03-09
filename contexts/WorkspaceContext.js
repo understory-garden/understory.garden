@@ -6,8 +6,7 @@ const WorkspaceContext = createContext({slug: 'default', workspace: null})
 
 
 export function WorkspaceProvider({webId, slug, ...rest}){
-  const { workspace } = useWorkspace(webId, slug)
-  const value = useMemo(() => ({webId, slug, workspace}), [webId, slug, workspace && asUrl(workspace)])
+  const value = useMemo(() => ({webId, slug}), [webId, slug])
   return (
       <WorkspaceContext.Provider value={value} {...rest}/>
   )

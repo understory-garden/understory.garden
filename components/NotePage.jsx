@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react'
+import { useMemo, useState, useEffect, useCallback, createContext, useContext } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
@@ -28,7 +28,6 @@ import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceCon
 import { useConceptContainerUri } from '../hooks/uris'
 import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
 import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
-import { useBackups, useIntervalBackups } from '../hooks/backups'
 
 import {
   publicNotePath, privateNotePath, profilePath, conceptUriToName,
@@ -40,6 +39,7 @@ import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '
 import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
+import { useBackups } from '../hooks/backups'
 
 import WebMonetization from '../components/WebMonetization'
 import { Loader } from '../components/elements'
@@ -220,12 +220,14 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const myWebId = useWebId()
   const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
   const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
+
   const noteStorageUri = concept && getUrl(concept, US.storedAt)
-  const { error, resource, thing: note, save, isValidating } = useThing(noteStorageUri)
+
+  const { error, thing: note, save } = useThing(noteStorageUri)
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
   const [showBackups, setShowBackups] = useState(false)
-  useIntervalBackups(name)
   const errorStatus = error && error.statusCode
+
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);
   const [saving, setSaving] = useState(false)
@@ -249,7 +251,6 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const { profile: authorProfile } = useProfile(webId)
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
-
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
     const newConceptIndex = createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name)
@@ -263,7 +264,6 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
       setSaving(false)
     }
   }
-
   useEffect(function saveAfterDebounce(){
     if (debouncedValue){
       const isInitialNoteState = (
@@ -291,12 +291,10 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
     }
   }
 
-
   const coverImage = note && getUrl(note, FOAF.img)
-
-  const [reporting, setReporting] = useState(false)
+  const noteContext = useMemo(() => ({ path: `${path}/${workspaceSlug}`, note, save }), [path, workspaceSlug, note, save])
   return (
-      <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`, note, save}}>
+      <NoteContext.Provider value={noteContext}>
         <div className="flex flex-col page">
           <WebMonetization webId={webId} />
           <Nav />

@@ -9,7 +9,8 @@ import { US } from '../vocab'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 import { defaultNoteStorageUri } from '../model/note'
 import { useCurrentWorkspace } from './app'
-
+import { useMemoCompare } from './react'
+import equal from 'fast-deep-equal/es6'
 
 export function useConceptIndex(webId, workspaceSlug='default', storage='public'){
   const { workspace } = useWorkspace(webId, workspaceSlug, storage)
@@ -35,6 +36,10 @@ export function useConceptPrefix(webId, workspaceSlug){
   return conceptPrefix
 }
 
+function maybeNewConcept(url, workspace, name){
+  return url && workspace && name && setUrl(createThing({url}), US.storedAt, defaultNoteStorageUri(workspace, name))
+}
+
 export function useConcept(webId, workspaceSlug, name){
   const { workspace } = useWorkspace(webId, workspaceSlug)
   const conceptPrefix = useConceptPrefix(webId, workspaceSlug)
@@ -42,26 +47,29 @@ export function useConcept(webId, workspaceSlug, name){
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
-
+  const publicConcept = publicIndex && getThing(publicIndex, conceptUri)
+  const privateConcept = privateIndex && getThing(privateIndex, conceptUri)
+  const thisConcept = publicConcept || privateConcept || maybeNewConcept(conceptUri, workspace, name)
+  const concept = useMemoCompare(thisConcept, equal)
   if (conceptUri) {
-    if (publicIndex && getThing(publicIndex, conceptUri)){
+    if (publicConcept){
       return {
         conceptUri,
-        concept: getThing(publicIndex, conceptUri),
+        concept,
         index: publicIndex,
         saveIndex: savePublicIndex
       }
-    } else if (privateIndex && getThing(privateIndex, conceptUri)){
+    } else if (privateConcept){
       return {
         conceptUri,
-        concept: getThing(privateIndex, conceptUri),
+        concept,
         index: privateIndex,
         saveIndex: savePrivateIndex
       }
     } else if (privateIndex && publicIndex && workspace) {
       return {
         conceptUri,
-        concept: setUrl(createThing({url: conceptUri}), US.storedAt, defaultNoteStorageUri(workspace, name)),
+        concept,
         index: publicIndex,
         saveIndex: savePublicIndex
       }
