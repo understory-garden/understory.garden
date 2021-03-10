@@ -9,13 +9,13 @@ import {
   conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../../../utils/uris'
 
-
-function EditableNotePage({webId, encodedName}){
+function Backups({encodedName}){
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   useIntervalBackups(name)
-  return (
-    <NotePageComponent webId={webId} encodedName={encodedName} />
-  )
+  // don't return anything for now, this component is pure side
+  // effect, but in its own tree to avoid re-rendering everything below this
+  // level
+  return (<></>)
 }
 
 export default function NotePage(){
@@ -24,7 +24,8 @@ export default function NotePage(){
   const webId = useWebId()
   return (
     <WorkspaceProvider webId={webId} slug={workspace}>
-      <EditableNotePage webId={webId} encodedName={name} />
+      <NotePageComponent webId={webId} encodedName={name} />
+      <Backups encodedName={name}/>
     </WorkspaceProvider>
   )
 }
