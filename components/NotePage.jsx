@@ -307,14 +307,16 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                   <h1 className="text-5xl font-bold text-gray-800">
                     {name}
                   </h1>
-                  <div className="text-lg text-gray-800">
-                    by&nbsp;
-                    <Link href={profilePath(webId)}>
-                      <a>
-                        {authorName || "someone cool"}
-                      </a>
-                    </Link>
-                  </div>
+                  {authorName && (
+                    <div className="text-lg text-gray-800">
+                      by&nbsp;
+                      <Link href={profilePath(webId)}>
+                        <a>
+                          {authorName}
+                        </a>
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 {name && (readOnly ? (
                   (myWebId === webId) && (
@@ -334,17 +336,19 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 <a href={noteStorageUri} target="_blank" rel="noopener">
                   source
                 </a>
-                <div className="flex flex-col">
-                  <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
-                    {showPrivacy ? 'hide' : 'show'} privacy control
-                  </button>
-                  <button className="btn" onClick={deleteCallback}>
-                    delete
-                  </button>
-                  <button className="btn" onClick={() => setShowBackups(!showBackups)}>
-                    {showBackups ? 'hide' : 'show'} backups
-                  </button>
-                </div>
+                {!readOnly && (
+                  <div className="flex flex-col">
+                    <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
+                      {showPrivacy ? 'hide' : 'show'} privacy control
+                    </button>
+                    <button className="btn" onClick={deleteCallback}>
+                      delete
+                    </button>
+                    <button className="btn" onClick={() => setShowBackups(!showBackups)}>
+                      {showBackups ? 'hide' : 'show'} backups
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
