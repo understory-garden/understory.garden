@@ -226,6 +226,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const { error, thing: note, save } = useThing(noteStorageUri)
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
   const [showBackups, setShowBackups] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
   const errorStatus = error && error.statusCode
 
   const [value, setValue] = useState(undefined)
@@ -334,7 +335,9 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                   source
                 </a>
                 <div className="flex flex-col">
-                  {name && <PrivacyControl name={name} />}
+                  <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
+                    {showPrivacy ? 'hide' : 'show'} privacy control
+                  </button>
                   <button className="btn" onClick={deleteCallback}>
                     delete
                   </button>
@@ -346,6 +349,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
             </div>
           </div>
           { showBackups && <Backups name={name} restoreValue={setValue}/> }
+          { showPrivacy && <PrivacyControl name={name} />}
           <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
             <div className="w-full flex flex-col flex-grow">
               {(value !== undefined) && (
