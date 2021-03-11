@@ -18,6 +18,31 @@ input {
     @apply rounded-md;
 }
 
+body {
+    @apply font-semibold;
+}
+
+@font-face {
+    font-family: Marisa;
+    font-weight: 300;
+    src: url(/fonts/marisa/MarisaLight.woff) format("woff");
+}
+@font-face {
+    font-family: Marisa;
+    font-weight: 400;
+    src: url(/fonts/marisa/MarisaRegular.woff) format("woff");
+}
+@font-face {
+    font-family: Marisa;
+    font-weight: 500;
+    src: url(/fonts/marisa/MarisaMedium.woff) format("woff");
+}
+@font-face {
+    font-family: Marisa;
+    font-weight: 700;
+    src: url(/fonts/marisa/MarisaBold.woff) format("woff");
+}
+
 /* Start purging... */
 @tailwind components;
 /* Stop purging. */
@@ -80,5 +105,5 @@ input {
 /* Your own custom utilities */
 
 .logo-bg {
-    @apply bg-gradient-to-br from-green-400 via-purple-500 to-pink-500 bg-clip-text;
+    @apply bg-gradient-to-b from-green-400 via-purple-500 to-pink-500 bg-clip-text;
 }

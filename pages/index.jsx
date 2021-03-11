@@ -306,10 +306,10 @@ export default function IndexPage() {
         ((loggedIn === false) || (loggedIn === null)) ? (
             <div className="text-center">
               <div className="my-12 logo-bg">
-                <h1 className="text-9xl font-bold font-logo text-transparent">
+                <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-logo text-transparent">
                   understory
                 </h1>
-                <h1 className="text-6xl font-bold font-logo text-transparent">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-logo text-transparent">
                   garden
                 </h1>
               </div>

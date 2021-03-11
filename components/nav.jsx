@@ -11,6 +11,7 @@ import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 import { appPrefix } from '../utils/uris'
+import Image from 'next/image'
 
 function DevTools(){
   const webId = useWebId()
@@ -51,7 +52,13 @@ export default function Nav() {
     <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
         <Link href="/">
-          <a className="font-bold font-logo text-4xl logo-bg text-transparent">understory</a>
+          <a>
+            <Image src="/logo.png"
+                   alt="a logo consisting of a multi-colored mushroom with roots digging deep into the understory"
+                   width={60}
+                   height={60}
+            />
+          </a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
           {loggedIn && (
