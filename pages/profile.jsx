@@ -11,8 +11,9 @@ import { US } from "../vocab"
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
 import { profilePath } from '../utils/uris'
+import { useImageUploadUri } from '../hooks/uris'
 import { EditIcon } from '../components/icons'
-import { ImageUploader } from '../components/ImageUploader';
+import { ImageUploadAndEditor } from '../components/ImageUploader';
 
 function Name({name, save, ...props}){
   const [newName, setNewName] = useState()
@@ -96,20 +97,22 @@ function WebMonetizationPointer({profile, save, ...props}){
 function ProfileImage({profile, save, ...props}){
   const profileImage = profile && getUrl(profile, FOAF.img)
   const [editingProfileImage, setEditingProfileImage] = useState(false)
-  function saveProfileImage(newProfileImage){
-    save(newProfileImage)
+  const webId = useWebId()
+  const imageUploadContainer = useImageUploadUri(webId)
+  function saveProfileImage(newProfileImageUri){
+    save(new URL(newProfileImageUri, webId).toString())
     setEditingProfileImage(false)
   }
   function onEdit(){
-    setNewProfileImage(profileImage)
     setEditingProfileImage(true)
   }
   return (
     <div {...props}>
       {editingProfileImage ? (
         <div className="flex flex-row justify-center">
-
-          IMAGE UPLOADER/EDITOR HERE
+          <ImageUploadAndEditor onSave={saveProfileImage}
+                                imageUploadContainerUri={imageUploadContainer}
+                                onClose={() => setEditingProfileImage(false)} />
         </div>
       ): (
         <div className="relative flex flex-row">
