@@ -3,7 +3,7 @@ import { useUnderstoryContainerUri, useConceptContainerUri, useStorageContainer 
 import { useThing, useResource, useWebId } from 'swrlit'
 import {
   createSolidDataset, getSourceUrl, createThing, getThingAll, getDatetime, getUrl, setUrl,
-  setThing
+  setThing, getThing
 } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/lit-generated-vocab-solid-common'
@@ -40,8 +40,8 @@ function createWorkspacePrefs(conceptPrefix, tagPrefix, workspacePreferencesFile
 
 export function useApp(webId){
   const appContainerUri = useUnderstoryContainerUri(webId)
-  const privateAppContainerUri = useUnderstoryContainerUri(webId, 'private')
 
+  const privateAppContainerUri = useUnderstoryContainerUri(webId, 'private')
   const publicWorkspacePrefsUri = appContainerUri && `${appContainerUri}${prefsPath}#${prefsWorkspaceName}`
   const {save: savePublicPrefs} = useThing(publicWorkspacePrefsUri)
   const privateWorkspacePrefsUri = privateAppContainerUri && `${privateAppContainerUri}${prefsPath}#${prefsWorkspaceName}`
@@ -98,4 +98,20 @@ export function useCurrentWorkspace(storage='public'){
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   return useWorkspace(webId, workspaceSlug, storage)
+}
+
+function createSettings(){
+  return createThing({name: "settings"})
+}
+
+export function useAppSettings(webId){
+  const { app, resource: appResource, saveResource: saveAppResource } = useApp(webId)
+  const settingsUri = app && getUrl(app, US.hasSettings)
+  const settings = app && (settingsUri ? getThing(appResource, settingsUri) : createSettings())
+  const save = (newSettings) => {
+    let newAppResource = setThing(appResource, newSettings)
+    newAppResource = setThing(newAppResource, setUrl(app, US.hasSettings, newSettings))
+    return saveAppResource(newAppResource)
+  }
+  return { settings,  save }
 }

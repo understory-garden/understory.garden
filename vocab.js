@@ -38,5 +38,7 @@ export const US = {
   conceptIndex: `${understoryRoot}conceptIndex`,
   conceptPrefix: `${understoryRoot}conceptPrefix`,
   tagged: `${understoryRoot}tagged`,
-  tagPrefix: `${understoryRoot}tagPrefix`
+  tagPrefix: `${understoryRoot}tagPrefix`,
+  hasSettings: `${understoryRoot}hasSettings`,
+  devMode: `${understoryRoot}devMode`
 }
