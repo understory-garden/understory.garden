@@ -28,3 +28,10 @@ export async function sendMagicLink(username, email) {
     returnToUrl: `https://itme.online/login/${username}.coop.itme.host`
   })
 }
+
+export async function deleteResource(uri){
+  return fetch(uri, {
+    method: 'DELETE',
+  })
+
+}

@@ -305,7 +305,6 @@ const wrapConcept = (editor, {at = editor.selection} = {}) => {
 }
 
 export const removeConcept = (editor) => {
-
   unwrapConcept(editor)
 }
 
@@ -360,6 +359,52 @@ export const withConcepts = editor => {
         }
       } else {
         Transforms.unwrapNodes(editor, { match: n => n.type === 'concept' })
+        return
+      }
+    }
+
+    normalizeNode(entry)
+  }
+
+  return editor
+}
+
+const tagRegex = /\B\#([a-zA-Z]+\b)./
+
+function hasTagParent(editor, path){
+  const parent = Node.get(editor, path.slice(0, -1))
+  if (parent.type === "tag"){
+    return true
+  } else {
+    return false
+  }
+}
+
+export const withTags = editor => {
+  const { isInline, insertText, deleteBackward, normalizeNode } = editor
+
+  editor.isInline = element => (element.type === 'tag') ? true : isInline(element)
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry
+    if (Text.isText(node) && !hasTagParent(editor, path)){
+      const tagMatch = node.text.match(tagRegex)
+      if (tagMatch){
+        const {index, 0: match, 1: name} = tagMatch
+        const at = {anchor: {path, offset: index}, focus: {path, offset: index + match.length}}
+        Transforms.wrapNodes(editor, {type: "tag", children: []}, { at, split: true })
+        return
+      }
+    } else if (node.type === "tag"){
+      const tagMatch = Node.string(node).match(tagRegex)
+      if (tagMatch){
+        const [_, name] = tagMatch
+        if (node.name !== name){
+          Transforms.setNodes(editor, {name}, {at: path})
+          return
+        }
+      } else {
+        Transforms.unwrapNodes(editor, { match: n => n.type === 'tag' })
         return
       }
     }

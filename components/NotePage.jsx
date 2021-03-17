@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react'
+import { useMemo, useState, useEffect, useCallback, createContext, useContext } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { Transforms } from 'slate'
@@ -9,7 +9,7 @@ import {
 import {
   createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
   addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl
+  removeThing, getUrl, setDecimal, setUrl, removeUrl, getSourceUrl, asUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
 import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
@@ -23,44 +23,45 @@ import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
+import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex } from '../hooks/concepts'
-import { useIsFeedAdmin, useFeed, useLedger } from '../hooks/feed'
+import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
+import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 
-import { publicNotePath, privateNotePath, profilePath, noteUriToName } from '../utils/uris'
-import { conceptNameFromUri } from '../model/concept'
-import { noteBody,  refs, hasFeedItem, Credit, amount, accountOf } from '../vocab'
+import {
+  publicNotePath, privateNotePath, profilePath, conceptUriToName,
+  conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
+} from '../utils/uris'
+import { deleteResource } from '../utils/fetch'
+import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
+import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
+import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
-import { getConceptNodes, getConceptNameFromNode } from '../utils/slate'
+import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
+import { useBackups } from '../hooks/backups'
 
 import WebMonetization from '../components/WebMonetization'
+import { Loader } from '../components/elements'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
-const thingName = "concept"
-
-function createConceptReferencesFor(noteUri, conceptUris){
-  var conceptReferences = createThing({url: noteUri})
-  for (const uri of conceptUris){
-    conceptReferences = addUrl(conceptReferences, refs, uri)
-  }
-  return conceptReferences
-}
-
 function LinkToConcept({uri, ...props}){
-  const nameInUri = conceptNameFromUri(uri)
-  const name = decodeURIComponent(nameInUri)
+  const id = conceptIdFromUri(uri)
+  const name = urlSafeIdToConceptName(id)
   const { path } = useContext(NoteContext)
   return (
-    <Link href={`${path}/${nameInUri}`}>
+    <Link href={`${path}/${id}`}>
       <a className="text-blue-500 underline">[[{name}]]</a>
     </Link>
   )
 }
 
-function LinksTo({referencesThing}){
-  const conceptUris = getUrlAll(referencesThing, refs)
+function LinksTo({name}){
+  const webId = useWebId()
+  const { slug: workspaceSlug } = useWorkspaceContext()
+  const { concept } = useConcept(webId, workspaceSlug, name)
+  const conceptUris = concept && getUrlAll(concept, US.refersTo)
   return (
     <ul>
       {conceptUris && conceptUris.map(uri => (
@@ -72,109 +73,162 @@ function LinksTo({referencesThing}){
   )
 }
 
-function LinksFrom({conceptIndex, conceptUri}){
-  const linkingConcepts = conceptIndex.match(null, null, namedNode(conceptUri))
+function LinksFrom({conceptUri}){
+  const webId = useWebId()
+  const { slug: workspaceSlug } = useWorkspaceContext()
+  const { index } = useCombinedConceptIndex(webId, workspaceSlug)
+  const linkingConcepts = index.match(null, namedNode(US.refersTo), namedNode(conceptUri))
   return (
     <ul>
-      {linkingConcepts && Array.from(linkingConcepts).map(({subject}) => (
-        <li key={subject.value}>
-          <LinkToConcept uri={subject.value}/>
+      {conceptUrisThatReference(index, conceptUri).map((uri) => (
+        <li key={uri}>
+          <LinkToConcept uri={uri}/>
         </li>
       ))}
     </ul>
   )
 }
 
-function createNote(){
-  return createThing({name: thingName})
-}
-
 function createOrUpdateNote(note, value){
   let newNote = note || createNote()
-  newNote = setStringNoLocale(newNote, noteBody, JSON.stringify(value))
+  newNote = setStringNoLocale(newNote, US.noteBody, JSON.stringify(value))
   return newNote
 }
 
-function createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri){
-  const concepts = getConceptNodes(editor).map(
-    ([concept]) => `${conceptContainerUri}${encodeURIComponent(getConceptNameFromNode(concept))}.ttl#${thingName}`)
-  let newConceptReferences = createConceptReferencesFor(conceptUri, concepts)
-  newConceptReferences = setDatetime(newConceptReferences, DCTERMS.modified, new Date())
-  return setThing(conceptIndex || createSolidDataset(), newConceptReferences)
+function createConcept(prefix, name){
+  return createThing({url: `${prefix}${conceptNameToUrlSafeId(name)}`})
 }
 
-function ReportDialog({conceptUri, close}){
-  const [message, setMessage] = useState("")
-  const [reported, setReported] = useState(false)
-  function report(){
-    console.log("reporting", message)
-    setReported(true)
+function createTag(prefix, name){
+  return createThing({url: `${prefix}${tagNameToUrlSafeId(name)}`})
+}
+
+function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames){
+  let concept = createConcept(conceptPrefix, name)
+  for (const conceptName of conceptNames){
+    concept = addUrl(concept, US.refersTo, createConcept(conceptPrefix, conceptName))
   }
-  function onClose(){
-    close()
+  for (const tagName of tagNames){
+    concept = addUrl(concept, US.tagged, createTag(tagPrefix, tagName))
   }
+  return concept
+}
+
+function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name){
+  const conceptPrefix = getUrl(workspace, US.conceptPrefix)
+  const tagPrefix = getUrl(workspace, US.tagPrefix)
+  const storageUri = concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
+
+  const conceptNames = getConceptNodes(editor).map(
+    ([concept]) => getConceptNameFromNode(concept)
+  )
+  const tagNames = getTagNodes(editor).map(
+    ([tag]) => getTagNameFromNode(tag)
+  )
+  let newConcept = createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames)
+  newConcept = addUrl(newConcept, US.storedAt, storageUri)
+  newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
+  return setThing(conceptIndex || createSolidDataset(), newConcept)
+}
+
+function PrivacyControl({name, ...rest}){
+  const [saving, setSaving] = useState(false)
+  const webId = useWebId()
+  const { slug: workspaceSlug } = useWorkspaceContext()
+  const { concept } = useConcept(webId, workspaceSlug, name)
+  const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
+  const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
+  const { workspace: privateStorage } = useWorkspace(webId, workspaceSlug, 'private')
+  const { workspace: publicStorage } = useWorkspace(webId, workspaceSlug, 'public')
+
+  const publicNoteResourceUrl = publicStorage && name && `${getUrl(publicStorage, US.noteStorage)}${noteStorageFileAndThingName(name)}`
+  const { thing: publicNote, save: savePublic } = useThing(publicNoteResourceUrl)
+
+  const privateNoteResourceUrl = privateStorage && name && `${getUrl(privateStorage, US.noteStorage)}${noteStorageFileAndThingName(name)}`
+  const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
+
+  async function makePrivateCallback(){
+    setSaving(true)
+    await savePrivate(setStringNoLocale(privateNote || createNote(), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
+    await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
+                                    setUrl(concept, US.storedAt, privateNoteResourceUrl)))
+    await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
+    await deleteResource(publicNoteResourceUrl)
+    setSaving(false)
+  }
+  async function makePublicCallback(){
+    setSaving(true)
+    await savePublic(setStringNoLocale(publicNote || createNote(), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
+    await savePublicIndex(setThing(publicIndex || createSolidDataset(),
+                                   setUrl(concept, US.storedAt, publicNoteResourceUrl)))
+    await savePrivateIndex(removeThing(privateIndex || createSolidDataset(), concept))
+    await deleteResource(privateNoteResourceUrl)
+    setSaving(false)
+  }
+  return (concept && !saving) ? (
+    (getUrl(concept, US.storedAt) === publicNoteResourceUrl) ? (
+      <button className="btn" onClick={makePrivateCallback} {...rest}>
+        make private
+      </button>
+    ) : ((getUrl(concept, US.storedAt) === privateNoteResourceUrl) ? (
+      <button className="btn" onClick={makePublicCallback} {...rest}>
+        make public
+      </button>
+    ) : (
+      <span>bad storage url: {getUrl(concept, US.storedAt)}</span>
+    )
+    )
+  ) : (<Loader/>)
+}
+
+function Backup({label, backup, restoreValue}){
+  const editor = useNewEditor()
+  const bodyJSON = getStringNoLocale(backup, US.noteBody)
+  const value = JSON.parse(bodyJSON)
   return (
-    <div className="w-full flex flex-col">
-      {reported ? (
-        <>
-          <p className="text-xl mt-6 text-center">
-            Thank you for your report! The offending parties will be harshly dealt with.
-          </p>
-          <button onClick={close} className="bg-purple-100 p-6 rounded-lg mt-6">
-            Close
-          </button>
-        </>
-      ) : (
-        <>
-          <h3 className="text-center text-3xl">
-            REPORT THIS CONTENT
-          </h3>
-          <textarea value={message} onChange={e => setMessage(e.target.value)}
-                    className="mt-6 w-full h-36" />
-          <button onClick={report} className="bg-purple-100 m-auto p-6 rounded-lg mt-6">
-            Submit Report
-          </button>
-        </>
-      )}
+    <div className="relative flex flex-col">
+      <h4 className="text-xl">{label}</h4>
+      <button className="btn" onClick={() => restoreValue(value)}>restore</button>
+      <div className="transform scale-50 max-h-36 overflow-y-scroll">
+        <Slate
+          editor={editor}
+          value={value}>
+          <Editable readOnly editor={editor} />
+        </Slate>
+      </div>
     </div>
   )
 }
 
-function BuyButton({authorWebId, conceptUri, className='', ...rest}){
-  const myWebId = useWebId()
-  const { profile } = useProfile(authorWebId)
-  const inboxUri = profile && getUrl(profile, LDP.inbox)
-
-  const { feed, save: saveFeed } = useFeed()
-  const { ledger, save: saveLedger } = useLedger()
-  async function buy(){
-    await saveFeed(addUrl(feed || createThing({name: "feed"}), hasFeedItem, conceptUri))
-    let ledgerEntry = createThing()
-    ledgerEntry = setUrl(ledgerEntry, RDF.type, Credit)
-    const award = 42.0
-    ledgerEntry = setDecimal(ledgerEntry, amount, award)
-    ledgerEntry = setUrl(ledgerEntry, accountOf, authorWebId)
-    ledgerEntry = setDatetime(ledgerEntry, DCTERMS.date, new Date())
-    await saveLedger(setThing(ledger || createSolidDataset(), ledgerEntry))
-    sendMessage(inboxUri, myWebId,
-                "congratulations!",
-                `you've been awarded ${award} facebux for note '${noteUriToName(conceptUri)}'`)
-  }
+function Backups({name, restoreValue}){
+  const { oneMinuteBackup, fiveMinuteBackup, tenMinuteBackup, thirtyMinuteBackup} = useBackups(name)
   return (
-    <div className={`${className} flex flex-row`}>
-      <button className="btn" onClick={buy}>buy</button>
+    <div className="text-center">
+      <h2 className="text-2xl">Backups</h2>
+      <div className="flex flex-row">
+        {oneMinuteBackup && <Backup label="One Minute" backup={oneMinuteBackup} restoreValue={restoreValue}/>}
+        {fiveMinuteBackup && <Backup label="Five Minutes" backup={fiveMinuteBackup} restoreValue={restoreValue}/>}
+        {tenMinuteBackup && <Backup label="Ten Minutes" backup={tenMinuteBackup} restoreValue={restoreValue}/>}
+        {thirtyMinuteBackup && <Backup label="Thirty Minutes" backup={thirtyMinuteBackup} restoreValue={restoreValue}/>}
+      </div>
     </div>
   )
 }
 
-export default function NotePage({name, webId, path="/notes", readOnly=false}){
+export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
+  const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
-  const conceptContainerUri = useConceptContainerUri(webId)
-  const conceptDocUri = conceptContainerUri && `${conceptContainerUri}${encodeURIComponent(name)}.ttl`
-  const conceptUri = conceptDocUri && `${conceptDocUri}#${thingName}`
-  const { error, resource, thing: note, save, isValidating } = useThing(conceptUri)
-  const bodyJSON = note && getStringNoLocale(note, noteBody)
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
+  const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
+
+  const noteStorageUri = concept && getUrl(concept, US.storedAt)
+
+  const { error, thing: note, save } = useThing(noteStorageUri)
+  const bodyJSON = note && getStringNoLocale(note, US.noteBody)
+  const [showBackups, setShowBackups] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
   const errorStatus = error && error.statusCode
+
   const [value, setValue] = useState(undefined)
   const [debouncedValue] = useDebounce(value, 1500);
   const [saving, setSaving] = useState(false)
@@ -198,12 +252,9 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   const { profile: authorProfile } = useProfile(webId)
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
-  const {index: conceptIndex, save: saveConceptIndex} = useConceptIndex(webId)
-  const conceptReferences = conceptIndex && conceptUri && getThing(conceptIndex, conceptUri)
-
   const saveCallback = async function saveNote(){
     const newNote = createOrUpdateNote(note, value)
-    const newConceptIndex = createOrUpdateConceptIndex(conceptIndex, editor, conceptContainerUri, conceptUri)
+    const newConceptIndex = createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name)
     setSaving(true)
     try {
       await save(newNote)
@@ -214,7 +265,6 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
       setSaving(false)
     }
   }
-
   useEffect(function saveAfterDebounce(){
     if (debouncedValue){
       const isInitialNoteState = (
@@ -233,156 +283,154 @@ export default function NotePage({name, webId, path="/notes", readOnly=false}){
   async function deleteCallback(){
     if (confirm(`Are you sure you want to delete ${name} ?`)){
       // don't wait for this to return: we don't care
-      fetch(conceptUri, { method: 'DELETE' })
+      fetch(noteStorageUri, { method: 'DELETE' })
       // do wait for this to return so it doesn't show up on the homepage
-      if (conceptReferences){
-        await saveConceptIndex(removeThing(conceptIndex, conceptReferences))
+      if (concept){
+        await saveConceptIndex(removeThing(conceptIndex, concept))
       }
       router.push("/")
     }
   }
-  const coverImage = note && getUrl(note, FOAF.img)
 
-  const [reporting, setReporting] = useState(false)
-  const feedAdmin = useIsFeedAdmin()
+  const coverImage = note && getUrl(note, FOAF.img)
+  const noteContext = useMemo(() => ({ path: `${path}/${workspaceSlug}`, note, save }), [path, workspaceSlug, note, save])
   return (
-    <NoteContext.Provider value={{path, note, save}}>
-      <div className="flex flex-col page">
-        <WebMonetization webId={webId} />
-        <Nav />
-        <div className="relative overflow-y-hidden flex-none h-56">
-          {coverImage && <img className="w-full" src={coverImage}/>}
-          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
-            <div className="flex flex-row justify-between h-44 overflow-y-hidden">
-              <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-gray-800">
-                  {name}
-                </h1>
-                <div className="text-lg text-gray-800">
-                  by&nbsp;
-                  <Link href={profilePath(webId)}>
-                    <a>
-                      {authorName || "someone cool"}
-                    </a>
-                  </Link>
+      <NoteContext.Provider value={noteContext}>
+        <div className="flex flex-col page">
+          <WebMonetization webId={webId} />
+          <Nav />
+          <div className="relative overflow-y-hidden flex-none h-56">
+            {coverImage && <img className="w-full" src={coverImage}/>}
+            <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
+              <div className="flex flex-row justify-between h-44 overflow-y-hidden">
+                <div className="flex flex-col">
+                  <h1 className="text-5xl font-bold text-gray-800">
+                    {name}
+                  </h1>
+                  {authorName && (
+                    <div className="text-lg text-gray-800">
+                      by&nbsp;
+                      <Link href={profilePath(webId)}>
+                        <a>
+                          {authorName}
+                        </a>
+                      </Link>
+                    </div>
+                  )}
                 </div>
-              </div>
-              {readOnly ? (
-                (myWebId === webId) && (
-                  <Link href={privateNotePath(name)}>
+                {name && (readOnly ? (
+                  (myWebId === webId) && (
+                    <Link href={privateNotePath(workspaceSlug, name)}>
+                      <a>
+                        edit
+                      </a>
+                    </Link>
+                  )
+                ) : (
+                  <Link href={publicNotePath(webId, workspaceSlug, name)}>
                     <a>
-                      edit link
+                      sharable link
                     </a>
                   </Link>
-                )
-              ) : (
-                <Link href={publicNotePath(webId, name)}>
-                  <a>
-                    public link
-                  </a>
-                </Link>
-              )}
-              {/*
-              <a href={conceptDocUri} target="_blank" rel="noopener">
-                source
-              </a>
-               */}
-              <ReactModal isOpen={reporting} >
-                <ReportDialog conceptUri={conceptUri} close={() => setReporting(false)}/>
-              </ReactModal>
-            </div>
-            <div class="flex flex-row">
-              {/*
-                 <button className="btn w-20 mt-6 flex-none" onClick={() => setReporting(true)}>
-                 report
-                 </button>
-               */}
-              {feedAdmin && (
-                <BuyButton conceptUri={conceptUri} authorWebId={webId} className="ml-6"/>
-              )}
+                ))}
+                <a href={noteStorageUri} target="_blank" rel="noopener">
+                  source
+                </a>
+                {!readOnly && (
+                  <div className="flex flex-col">
+                    <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
+                      {showPrivacy ? 'hide' : 'show'} privacy control
+                    </button>
+                    <button className="btn" onClick={deleteCallback}>
+                      delete
+                    </button>
+                    <button className="btn" onClick={() => setShowBackups(!showBackups)}>
+                      {showBackups ? 'hide' : 'show'} backups
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
-          <div className="w-full flex flex-col flex-grow">
-            {(value !== undefined) && (
-              <Slate
-                editor={editor}
-                value={value}
-                onChange={newValue => setValue(newValue)}
-              >
-                {!readOnly && (
-                  <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                                 className="sticky top-0 z-20"/>
-                )}
-                <div className="flex-grow flex flex-row mt-3">
-                  <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
-                  <div className="relative">
-                    <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
-                      {sidebarOpen ? ">>" : "<<"}
-                    </button>
-                    <Transition
-                      show={sidebarOpen}
-                      enter="transform transition ease-in-out duration-500 sm:duration-700"
-                      enterFrom="translate-x-full"
-                      enterTo="translate-x-0"
-                      leave="transform transition ease-in-out duration-500 sm:duration-700"
-                      leaveFrom="translate-x-0"
-                      leaveTo="translate-x-full">
-                      {
-                        (ref) => (
-                          <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                            <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                              <div className="px-6 sm:px-6">
-                                <div className="flex items-start justify-between">
-                                  <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                                    Links
+          { showBackups && <Backups name={name} restoreValue={setValue}/> }
+          { showPrivacy && <PrivacyControl name={name} />}
+          <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
+            <div className="w-full flex flex-col flex-grow">
+              {(value !== undefined) && (
+                <Slate
+                  editor={editor}
+                  value={value}
+                  onChange={newValue => setValue(newValue)}
+                >
+                  {!readOnly && (
+                    <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                                   className="sticky top-0 z-20"/>
+                  )}
+                  <div className="flex-grow flex flex-row mt-3">
+                    <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
+                    <div className="relative">
+                      <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                              className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
+                        {sidebarOpen ? ">>" : "<<"}
+                      </button>
+                      <Transition
+                        show={sidebarOpen}
+                        enter="transform transition ease-in-out duration-500 sm:duration-700"
+                        enterFrom="translate-x-full"
+                        enterTo="translate-x-0"
+                        leave="transform transition ease-in-out duration-500 sm:duration-700"
+                        leaveFrom="translate-x-0"
+                        leaveTo="translate-x-full">
+                        {
+                          (ref) => (
+                            <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                              <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                                <div className="px-6 sm:px-6">
+                                  <div className="flex items-start justify-between">
+                                    <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                      Links
+                                    </h2>
+                                  </div>
+                                </div>
+                                <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                                  <div>
+                                    <h3>Links to</h3>
+                                    {concept && (
+                                      <LinksTo name={name}/>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3>Linked from</h3>
+                                    {conceptIndex && (
+                                      <LinksFrom conceptUri={conceptUri}/>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="px-6 mt-6">
+                                  <h2 className="text-xl">
+                                    Actions
                                   </h2>
                                 </div>
                               </div>
-                              <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                                <div>
-                                  <h3>Links to</h3>
-                                  {conceptReferences && (
-                                    <LinksTo referencesThing={conceptReferences}/>
-                                  )}
-                                </div>
-                                <div>
-                                  <h3>Linked from</h3>
-                                  {conceptIndex && (
-                                    <LinksFrom conceptIndex={conceptIndex} conceptUri={conceptUri}/>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="px-6 mt-6">
-                                <h2 className="text-xl">
-                                  Actions
-                                </h2>
-                                <button className="btn" onClick={deleteCallback}>
-                                  delete
-                                </button>
-                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                    </Transition>
+                          )
+                        }
+                      </Transition>
+                    </div>
                   </div>
-                </div>
-              </Slate>
-            )}
-            {/*
-               <div>
-               <pre>
-               {JSON.stringify(editor.selection, null, 2)}
-               {JSON.stringify(value, null, 2)}
-               </pre>
-               </div>
-             */}
-          </div>
-        </section>
-      </div>
-    </NoteContext.Provider>
+                </Slate>
+              )}
+              {/*
+                 <div>
+                 <pre>
+                 {JSON.stringify(editor.selection, null, 2)}
+                 {JSON.stringify(value, null, 2)}
+                 </pre>
+                 </div>
+               */}
+            </div>
+          </section>
+        </div>
+      </NoteContext.Provider>
   )
 }

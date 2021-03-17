@@ -1,33 +1,36 @@
 import { useState, useCallback } from 'react'
-import { useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
+import { useResource, useAuthentication, useLoggedIn, useMyProfile, useProfile, useWebId, useEnsured } from 'swrlit'
 import {
   setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid, getThingAll, asUrl,
   getDatetime
 } from '@inrupt/solid-client'
 import { FOAF, AS, RDF, RDFS, DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/vocab-solid-common'
-import { ITME } from "../vocab"
+import { US } from "../vocab"
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import { useConceptIndex } from '../hooks/concepts'
-import { useStorageContainer, useFacebabyContainerUri } from '../hooks/uris'
+import { useStorageContainer } from '../hooks/uris'
 import { conceptNameFromUri } from '../model/concept'
-import { profilePath } from '../utils/uris'
+import { profilePath, conceptNameToUrlSafeId } from '../utils/uris'
 import Nav from '../components/nav'
 import { Loader } from '../components/elements'
 import Notes from '../components/Notes'
 import Follows from '../components/Follows'
-import Feed from '../components/Feed'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
+import { useItmeOnlineConceptIndex, ItmeOnlineMigrator } from '../components/ItmeOnlineMigrator'
+import { useApp, useWorkspace } from '../hooks/app'
+import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
 function LoginUI(){
-  const [handle, setHandle] = useState("")
+  const [username, setUsername] = useState("")
   const [badHandle, setBadHandle] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
   const { loginHandle, logout } = useAuthentication()
+  const handle = username.includes(".") ? username : `${username}.myunderstory.com`
   async function logIn(){
     setBadHandle(false)
     setLoggingIn(true)
@@ -40,7 +43,7 @@ function LoginUI(){
     }
   }
   function onChange(e){
-    setHandle(e.target.value)
+    setUsername(e.target.value)
     setBadHandle(false)
   }
   function onKeyPress(e){
@@ -66,11 +69,11 @@ function LoginUI(){
       <h3 className="text-lg mb-3 text-gray-600">If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname as your "handle" below. If you don't have a Pod, you can get one from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web, but please be warned that the user experience is currently pretty rough! We're working on it 😉</h3>
       <h3 className="text-lg mb-12 text-gray-600">Please note that we can't provide any guarantees as to the safety or security of your Pod data at this point - there may be bugs that delete all of your data or expose it to the open Web, so for now please just treat this like a sandbox.</h3>
       <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
-             placeholder="what's your handle?"
-             value={handle} onChange={onChange} onKeyPress={onKeyPress}/>
+             placeholder="what's your username?"
+             value={username} onChange={onChange} onKeyPress={onKeyPress}/>
       {badHandle && (
         <p className="text-red-500 m-auto mt-2">
-          hm, I don't recognize that handle
+          hm, I don't recognize that username
         </p>
       )}
       {loggingIn ? (
@@ -89,7 +92,7 @@ function NewNoteForm(){
   const router = useRouter()
   const [noteName, setNoteName] = useState("")
   const onCreate = useCallback(function onCreate(){
-    router.push(`/notes/${encodeURIComponent(noteName)}`)
+    router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
   })
   return (
     <div className="flex flex-row m-auto my-6">
@@ -137,7 +140,7 @@ function Name({name, save, ...props}){
 }
 
 function WebMonetizationPointer({profile, save, ...props}){
-  const paymentPointer = profile && getStringNoLocale(profile, ITME.paymentPointer)
+  const paymentPointer = profile && getStringNoLocale(profile, US.paymentPointer)
   const [newPaymentPointer, setNewPaymentPointer] = useState()
   const [editingPaymentPointer, setEditingPaymentPointer] = useState(false)
   function savePaymentPointer(){
@@ -180,7 +183,7 @@ function WebMonetizationPointer({profile, save, ...props}){
   )
 }
 
-export default function IndexPage() {
+function Dashboard(){
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
@@ -189,46 +192,53 @@ export default function IndexPage() {
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
   }
   async function onSavePaymentPointer(newPaymentPointer){
-    return await saveProfile(setStringNoLocale(profile, ITME.paymentPointer, newPaymentPointer))
+    return await saveProfile(setStringNoLocale(profile, US.paymentPointer, newPaymentPointer))
   }
 
   const webId = useWebId()
-  const appContainerUri = useFacebabyContainerUri(webId)
+  const { workspace } = useWorkspace(webId)
   const [tab, setTab] = useState("notes")
+  const { index: oldConceptIndex } = useItmeOnlineConceptIndex()
+
   return (
-    <div className="page" id="page">
-      { (loggedIn === true) ? (
-        <>
-          <WebMonetization webId={webId}/>
-          <Nav />
-        <div className="px-6">
-          <div className="flex flex-row py-6 justify-between">
-            <div className="flex flex-row">
-              {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
-              <div className="flex flex-col mr-12">
-                <Name name={name} save={onSaveName}/>
-                <WebMonetizationPointer profile={profile} save={onSavePaymentPointer}
-                                        className="mt-2"/>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <h5 className="text-xl text-center mb-6">
-                <Link href={`${profilePath(webId)}`}>
-                  <a>
-                    public profile
-                  </a>
-                </Link>
-              </h5>
+    <>
+      <WebMonetization webId={webId}/>
+      <Nav />
+      <div className="px-6">
+        <div className="flex flex-row py-6 justify-between">
+          <div className="flex flex-row">
+            {profileImage && <img className="rounded-full h-36 w-36 object-cover mr-12" src={profileImage} /> }
+            <div className="flex flex-col mr-12">
+              <Name name={name} save={onSaveName}/>
+              <WebMonetizationPointer profile={profile} save={onSavePaymentPointer}
+                                      className="mt-2"/>
             </div>
           </div>
+          <div className="flex flex-col">
+            <h5 className="text-xl text-center mb-6">
+              <Link href={`${profilePath(webId)}`}>
+                <a>
+                  public profile
+                </a>
+              </Link>
+            </h5>
+          </div>
+        </div>
+        <WorkspaceProvider webId={webId} slug={'default'}>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
+              {oldConceptIndex && (
+                <div>
+                  It looks like you have some itme.online data. You can
+                  visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
+                </div>
+              )}
               <NewNoteForm />
               <div className="flex mb-6">
                 {/*
-                <TabButton name="feed" activeName={tab} setTab={setTab}>
-                  feed
-                </TabButton>
+                   <TabButton name="feed" activeName={tab} setTab={setTab}>
+                   feed
+                   </TabButton>
                  */}
                 <TabButton name="notes" activeName={tab} setTab={setTab}>
                   notes
@@ -239,8 +249,6 @@ export default function IndexPage() {
               </div>
               {tab === "notes" ? (
                 <Notes webId={webId}/>
-              ) : (tab === "feed" ? (
-                <Feed/>
               ) : (tab === "following" ? (
                 <Follows />
               ) : (
@@ -248,19 +256,60 @@ export default function IndexPage() {
                   you are in a maze of twisty passages, all alike
                 </div>
               )
-              ))}
+                  )}
             </div>
           </div>
-        </div>
-          </>
+        </WorkspaceProvider>
+      </div>
+    </>
+  )
+}
+
+function InitPage({initApp}){
+  return (
+    <>
+      <Nav/>
+      <div className="text-center pt-12">
+        <h3 className="text-xl pb-6">looks like this is your first time here!</h3>
+        <button className="btn" onClick={initApp}>get started</button>
+      </div>
+    </>
+  )
+}
+
+function LoadingPage(){
+  return (
+    <>
+      <div className="text-center pt-12">
+        <Loader/>
+      </div>
+    </>
+  )
+}
+
+export default function IndexPage() {
+  const loggedIn = useLoggedIn()
+  const webId = useWebId()
+  const { app, initApp, error: appError } = useApp(webId)
+  return (
+    <div className="page" id="page">
+      { (loggedIn === true) ? (
+        app ? (
+          <Dashboard />
+        ) : ((appError && (appError.statusCode === 404)) ? (
+          <InitPage initApp={initApp}/>
+        ) : (
+          <LoadingPage/>
+        )
+        )
       ) : (
         ((loggedIn === false) || (loggedIn === null)) ? (
             <div className="text-center">
               <div className="my-12 logo-bg">
-                <h1 className="text-9xl font-bold font-logo text-transparent">
+                <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-logo text-transparent">
                   understory
                 </h1>
-                <h1 className="text-6xl font-bold font-logo text-transparent">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-logo text-transparent">
                   garden
                 </h1>
               </div>

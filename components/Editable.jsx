@@ -7,12 +7,13 @@ import { withHistory } from 'slate-history';
 
 import {
   withImages, withLinks, withChecklists, withLists, toggleMark,
-  withTables, withConcepts, withShortcuts
+  withTables, withConcepts, withShortcuts, withTags
 } from '../utils/editor';
 
 import ChecklistItemElement from './edit/ChecklistItemElement'
 import LinkElement from './edit/LinkElement'
 import ConceptElement from './edit/ConceptElement'
+import TagElement from './edit/TagElement'
 import ImageElement from './edit/ImageElement'
 import VideoElement from './edit/VideoElement'
 import Block from './edit/Block'
@@ -69,6 +70,8 @@ const Element = (props) => {
       return <LinkElement {...props} />
     case 'concept':
       return <ConceptElement {...props} />
+  case 'tag':
+    return <TagElement {...props} />
     case 'check-list-item':
       return <Block element={element}><ChecklistItemElement {...props} /></Block>
     case 'table':
@@ -88,23 +91,25 @@ const Element = (props) => {
 
 export const useNewEditor = () => useMemo(
   () => withConcepts(
-    //  withTables(
-    withShortcuts(
-      withLists(
-        withChecklists(
-          withLinks(
-            withImages(
-              withReact(
-                withHistory(
-                  createEditor()
+    withTags(
+      //  withTables(
+      withShortcuts(
+        withLists(
+          withChecklists(
+            withLinks(
+              withImages(
+                withReact(
+                  withHistory(
+                    createEditor()
+                  )
                 )
               )
             )
           )
         )
       )
+      //  )
     )
-    //  )
   ),
   []
 )

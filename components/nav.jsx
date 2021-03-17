@@ -1,15 +1,45 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { getUrl } from '@inrupt/solid-client'
+import { getUrl, getSourceUrl } from '@inrupt/solid-client'
 import { FOAF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
-import { useAuthentication, useLoggedIn, useMyProfile, useContainer } from 'swrlit'
+import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } from 'swrlit'
+import { useRouter } from 'next/router'
 
 import { MailIcon } from '../components/icons'
-import { useMyLedgerTotal } from '../hooks/feed'
+import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
+import { deleteResource } from '../utils/fetch'
+import { appPrefix } from '../utils/uris'
+import Image from 'next/image'
+
+function DevTools(){
+  const webId = useWebId()
+
+  const { resource: appResource } = useApp(webId)
+  const { public: workspacePreferencesFileUri } = useWorkspacePreferencesFileUris(webId)
+  return (
+    <ul className="flex flex-column">
+      <li className="mx-3">
+        prefix: {appPrefix}
+      </li>
+      <li>
+        <button className="btn text-xs" onClick={() => deleteResource(getSourceUrl(appResource))}>
+          delete app file
+        </button>
+      </li>
+      <li>
+        <button className="btn text-xs" onClick={() => deleteResource(workspacePreferencesFileUri)}>
+          delete default workspace
+        </button>
+      </li>
+    </ul>
+  )
+}
 
 export default function Nav() {
+  const router = useRouter()
+  const { query: { devtools } } = router
   const loggedIn = useLoggedIn()
   const { logout } = useAuthentication()
   const { profile } = useMyProfile()
@@ -18,23 +48,19 @@ export default function Nav() {
   const { resources } = useContainer(inboxUri)
   const hasMessages = resources && (resources.length > 0)
   const [menuOpen, setMenuOpen] = useState(false)
-  const ledgerTotal = useMyLedgerTotal()
   return (
-    <nav className="pt-3">
+    <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
         <Link href="/">
-          <a className="font-bold font-logo text-4xl logo-bg text-transparent">understory</a>
+          <a>
+            <Image src="/logo.png"
+                   alt="a logo consisting of a multi-colored mushroom with roots digging deep into the understory"
+                   width={60}
+                   height={60}
+            />
+          </a>
         </Link>
         <ul className="flex justify-between items-center space-x-4">
-          { false && loggedIn && (
-            <Link href="/ledger">
-              <a>
-                <span className="text-3xl text-bold text-green-400">
-                  { ledgerTotal } 😀💰
-                </span>
-              </a>
-            </Link>
-          )}
           {loggedIn && (
             <Link href="/messages">
               <a className="text-white">
@@ -96,6 +122,7 @@ export default function Nav() {
           )}
         </ul>
       </ul>
+      {devtools && <DevTools/>}
     </nav>
   )
 }

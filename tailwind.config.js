@@ -7,8 +7,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ['basic-sans', 'sans-serif'],
-      logo: ['chaloops', 'sans-serif'],
+      sans: ['omnes-pro', 'sans-serif'],
+      logo: ['Marisa', 'sans-serif'],
       mono: ['fira-mono', 'monospace']
     },
   },
