@@ -100,7 +100,8 @@ export function useConcepts(webId, workspaceSlug='default'){
   const concepts = (publicConcepts || privateConcepts ) && [...(publicConcepts || []), ...(privateConcepts || [])].sort(
     (a, b) => (getDatetime(b, DCTERMS.modified) - getDatetime(a, DCTERMS.modified))
   )
-  return { concepts }
+  const result = useMemoCompare({concepts}, equal)
+  return result
 }
 
 export function useConceptInCurrentWorkspace(name){

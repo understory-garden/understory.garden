@@ -317,10 +317,19 @@ export const isConceptActive = editor => {
   return !!activeConceptEntry(editor)
 }
 
-export const insertConcept = (editor) => {
+export const makeSelectionConcept = (editor) => {
   if (editor.selection) {
     wrapConcept(editor)
   }
+}
+
+export const insertConcept = (editor, name) => {
+  const concept = {
+    type: 'concept',
+    name,
+    children: [{ text: `[[${name}]]` }],
+  }
+  Transforms.insertNodes(editor, concept)
 }
 
 const conceptRegex = /\[\[(.*)\]\]/

@@ -8,7 +8,7 @@ import ReactModal from 'react-modal';
 import {
   isMarkActive, toggleMark, isBlockActive, toggleBlock, insertImage,
   isLinkActive, activeLink, insertLink, removeLink, setLinkUrl,
-  isConceptActive, insertConcept, removeConcept
+  isConceptActive, makeSelectionConcept, removeConcept
 } from '../utils/editor'
 
 const MarkButton = ({ format, ...props }) => {
@@ -122,7 +122,7 @@ function ConceptLink(){
     if (isConceptActive(editor)){
       removeConcept(editor)
     } else {
-      insertConcept(editor)
+      makeSelectionConcept(editor)
     }
   }
   return (
