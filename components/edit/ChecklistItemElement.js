@@ -4,7 +4,6 @@ import {
   useEditor, useReadOnly, ReactEditor
 } from 'slate-react';
 import { Transforms } from 'slate';
-import Checkbox from '../Checkbox';
 
 export default function CheckListItemElement({ attributes, children, element }) {
   const editor = useEditor()
@@ -12,11 +11,8 @@ export default function CheckListItemElement({ attributes, children, element }) 
   const { checked } = element
   return (
     <div {...attributes}>
-      <Checkbox
-        contentEditable={false}
+      <input type="checkbox" class="form-checkbox h-5 w-5 mr-2"
         checked={!!checked}
-        color="default"
-        size="small"
         onChange={event => {
           const path = ReactEditor.findPath(editor, element)
           Transforms.setNodes(
@@ -24,8 +20,7 @@ export default function CheckListItemElement({ attributes, children, element }) 
             { checked: event.target.checked },
             { at: path }
           )
-        }}
-      />
+        }} />
       <span
         contentEditable={!readOnly}
         suppressContentEditableWarning
