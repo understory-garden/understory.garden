@@ -145,7 +145,8 @@ export const withImages = editor => {
   editor.isVoid = element => {
     return element.type === 'image' ? true : isVoid(element)
   }
-
+/*
+  // this currently inserts images inline in the page which is not at all ideal, disable for now
   editor.insertData = data => {
     const text = data.getData('text/plain')
     const { files } = data
@@ -170,7 +171,7 @@ export const withImages = editor => {
       insertData(data)
     }
   }
-
+*/
   return editor
 }
 
