@@ -227,7 +227,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const noteStorageUri = concept && getUrl(concept, US.storedAt)
 
-  const { error, thing: note, save } = useThing(noteStorageUri)
+  const { error, thing: note, save, mutate: mutateNote } = useThing(noteStorageUri)
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
   const [showBackups, setShowBackups] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
@@ -286,12 +286,13 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const router = useRouter()
   async function deleteCallback(){
     if (confirm(`Are you sure you want to delete ${name} ?`)){
-      // don't wait for this to return: we don't care
-      fetch(noteStorageUri, { method: 'DELETE' })
-      // do wait for this to return so it doesn't show up on the homepage
-      if (concept){
-        await saveConceptIndex(removeThing(conceptIndex, concept))
-      }
+      await Promise.all([
+        fetch(noteStorageUri, { method: 'DELETE' }),
+        concept && saveConceptIndex(removeThing(conceptIndex, concept))
+      ])
+      // mutate to invalidate the cache for the note
+      mutateNote()
+
       router.push("/")
     }
   }
