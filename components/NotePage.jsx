@@ -338,7 +338,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                   {authorName && (
                     <div className="text-lg text-gray-800">
                       by&nbsp;
-                      <Link href={profilePath(webId)}>
+                      <Link href={profilePath(webId) || ""}>
                         <a>
                           {authorName}
                         </a>
@@ -348,14 +348,14 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 </div>
                 {name && (readOnly ? (
                   (myWebId === webId) && (
-                    <Link href={privateNotePath(workspaceSlug, name)}>
+                    <Link href={privateNotePath(workspaceSlug, name) || ""}>
                       <a>
                         edit
                       </a>
                     </Link>
                   )
                 ) : (
-                  <Link href={publicNotePath(webId, workspaceSlug, name)}>
+                  <Link href={publicNotePath(webId, workspaceSlug, name) || ""}>
                     <a>
                       sharable link
                     </a>
