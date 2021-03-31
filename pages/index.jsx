@@ -122,7 +122,7 @@ function Dashboard(){
         <WorkspaceProvider webId={webId} slug={'default'}>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
-              {oldConceptIndex && (
+              {false && oldConceptIndex && (
                 <div>
                   It looks like you have some itme.online data. You can
                   visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
