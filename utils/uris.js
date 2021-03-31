@@ -1,3 +1,4 @@
+
 import * as base58 from 'micro-base58'
 
 export const appPrefix = process.env.NEXT_PUBLIC_APP_PREFIX || "apps/understory/env/dev"
@@ -39,15 +40,16 @@ export function noteUriToWebId(noteUri){
 }
 
 export const conceptNameToUrlSafeId = (name) =>
-  base58.encode(name)
+  base58.encode(name.toLowerCase())
 
-export const urlSafeIdToConceptName = (id) => {
-  return new TextDecoder().decode(base58.decode(id))
-}
+export const urlSafeIdToConceptName = (id) =>
+  new TextDecoder().decode(base58.decode(id))
 
-export function conceptUriToName(conceptUri){
-  return urlSafeIdToConceptName(conceptUri.split("#").slice(-1)[0])
-}
+export const conceptUriToId = (conceptUri) =>
+  conceptUri.split("#").slice(-1)[0]
+
+export const conceptUriToName = (conceptUri) =>
+    urlSafeIdToConceptName(conceptUriToId(conceptUri))
 
 export function tagNameToUrlSafeId(tagName){
   return encodeURIComponent(tagName)
