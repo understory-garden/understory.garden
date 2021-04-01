@@ -1,13 +1,14 @@
-# itme.online
+# understory.garden
 
-itme.online is your new home on the web. it's a social
+Understory is a digital garden, a micro-publishing space for you to plant the seeds
+of your ideas and grow them into bi-directionally linked web portals. It's a social
 [zettelkasten](https://zettelkasten.de/) that lets users use [Web
 Monetization](https://webmonetization.org/) to get paid when people
 spend time with their content.
 
-if you think this sounds neat, check out our hosted instance at
+If you think this sounds neat, check out our hosted instance at
 
-### [itme.online](https://itme.online)
+### [understory.garden](https://understory.garden)
 
 # Running locally
 
@@ -31,9 +32,9 @@ npm start
 
 Add http://localhost:3000 into trusted applications:
 
-![doc/add_trusted_app.png]()
+![Trusted Apps](/doc/add-trusted-app.png)
 
-Log in with your WebID, like `https://agentydragon.solidcommunity.net`.
+Log in with your WebID, like `tobytoberson.solidcommunity.net`.
 You should see a home screen like this:
 
-![doc/home_screen.png]()
+![Home Screen](/doc/home_screen.png)
