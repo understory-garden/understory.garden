@@ -6,9 +6,7 @@ of your ideas and grow them into bi-directionally linked web portals. It's a soc
 Monetization](https://webmonetization.org/) to get paid when people
 spend time with their content.
 
-If you think this sounds neat, check out our hosted instance at
-
-### [understory.garden](https://understory.garden)
+If you think this sounds neat, check out our hosted instance at [understory.garden](https://understory.garden)
 
 # Running locally
 
