@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { getUrl, getSourceUrl } from '@inrupt/solid-client'
+import { getUrl, getSourceUrl, getBoolean } from '@inrupt/solid-client'
 import { FOAF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useAuthentication, useLoggedIn, useMyProfile, useContainer, useWebId } from 'swrlit'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { MailIcon } from '../components/icons'
-import { useApp, useWorkspacePreferencesFileUris } from '../hooks/app'
+import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 import { appPrefix } from '../utils/uris'
-import Image from 'next/image'
+import { US } from '../vocab'
 
 function DevTools(){
   const webId = useWebId()
@@ -40,6 +41,9 @@ function DevTools(){
 export default function Nav() {
   const router = useRouter()
   const { query: { devtools } } = router
+  const webId = useWebId()
+  const { settings } = useAppSettings(webId)
+  const devModeSetting = settings && getBoolean(settings, US.devMode)
   const loggedIn = useLoggedIn()
   const { logout } = useAuthentication()
   const { profile } = useMyProfile()
@@ -99,16 +103,26 @@ export default function Nav() {
                 leaveTo="transform opacity-0 scale-95">
                 {
                   (ref) => (
-                    <div ref={ref} className="z-30 bg-gray-800 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                        <a href="/privacy" className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                    <div ref={ref} className="z-30 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                      <div className="p-1 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <Link href="/profile">
+                          <a className="block hover:bg-gray-100 hover:text-gray-900">
+                            edit profile
+                          </a>
+                        </Link>
+                        <Link href="/settings">
+                          <a className="block hover:bg-gray-100 hover:text-gray-900">
+                            settings
+                          </a>
+                        </Link>
+                        <a href="/privacy" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                           privacy
                         </a>
-                        <a href="/tos" className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                        <a href="/tos" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                           terms of service
                         </a>
                         {loggedIn && (
-                          <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
+                          <button type="submit" className="block w-full text-left text-purple-500 font-semibold hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
                                   onClick={logout}>
                             log out
                           </button>
@@ -122,7 +136,7 @@ export default function Nav() {
           )}
         </ul>
       </ul>
-      {devtools && <DevTools/>}
+      {(devtools || devModeSetting) && <DevTools/>}
     </nav>
   )
 }

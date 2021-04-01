@@ -10,21 +10,15 @@ export function useStorageContainer(webId) {
 
 export function useUnderstoryContainerUri(webId, path = 'public') {
   const storageContainer = useStorageContainer(webId)
-  return useEnsured(storageContainer && `${storageContainer}${path}/${appPrefix}/`)
+  return storageContainer && `${storageContainer}${path}/${appPrefix}/`
 }
 
 export function useImageUploadUri(webId, path='public') {
   const understoryContainerUri = useUnderstoryContainerUri(webId, path)
-  return useEnsured(understoryContainerUri && `${understoryContainerUri}images/`)
+  return understoryContainerUri && `${understoryContainerUri}images/`
 }
 
-export function useConceptContainerUri(webId, path='public') {
-  const understoryContainerUri = useUnderstoryContainerUri(webId, path)
-  return useEnsured(understoryContainerUri && `${understoryContainerUri}concepts/`)
-}
-
-export function useArchiveContainerUri() {
-  const webId = useWebId()
-  const understoryContainerUri = useUnderstoryContainerUri(webId, "private")
-  return useEnsured(understoryContainerUri && `${understoryContainerUri}archive/`)
+export function useArchiveContainerUri(webId, path = 'public') {
+  const storageContainer = useStorageContainer(webId)
+  return storageContainer && `${storageContainer}${path}/${appPrefix}/messages/archive`
 }

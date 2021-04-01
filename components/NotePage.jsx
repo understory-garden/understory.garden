@@ -1,8 +1,8 @@
-import { useMemo, useState, useEffect, useCallback, createContext, useContext } from 'react'
+import { useMemo, useState, useEffect, useCallback, createContext, useContext, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Transforms } from 'slate'
-import { Slate, withReact } from 'slate-react'
+import { Editor, Transforms, Range } from 'slate'
+import { ReactEditor, Slate, withReact } from 'slate-react'
 import {
   useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile
 } from 'swrlit'
@@ -16,6 +16,7 @@ import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
 import ReactModal from 'react-modal'
+import Fuse from 'fuse.js'
 
 import EditorToolbar from "./EditorToolbar"
 import Editable, { useNewEditor } from "./Editable";
@@ -26,7 +27,7 @@ import NoteContext from '../contexts/NoteContext'
 import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
 
 import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
+import { useConceptIndex, useCombinedConceptIndex, useConcept, useConcepts } from '../hooks/concepts'
 import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 
 import {
@@ -38,11 +39,14 @@ import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '
 import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 import { sendMessage } from '../utils/message'
+import { insertConcept } from '../utils/editor'
+
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
+import { useConceptAutocomplete } from '../hooks/editor'
 
 import WebMonetization from '../components/WebMonetization'
-import { Loader } from '../components/elements'
+import { Loader, Portal } from '../components/elements'
 
 const emptyBody = [{ children: [{text: ""}]}]
 
@@ -223,7 +227,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const noteStorageUri = concept && getUrl(concept, US.storedAt)
 
-  const { error, thing: note, save } = useThing(noteStorageUri)
+  const { error, thing: note, save, mutate: mutateNote } = useThing(noteStorageUri)
   const bodyJSON = note && getStringNoLocale(note, US.noteBody)
   const [showBackups, setShowBackups] = useState(false)
   const [showPrivacy, setShowPrivacy] = useState(false)
@@ -282,18 +286,42 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const router = useRouter()
   async function deleteCallback(){
     if (confirm(`Are you sure you want to delete ${name} ?`)){
-      // don't wait for this to return: we don't care
-      fetch(noteStorageUri, { method: 'DELETE' })
-      // do wait for this to return so it doesn't show up on the homepage
-      if (concept){
-        await saveConceptIndex(removeThing(conceptIndex, concept))
-      }
+      await Promise.all([
+        fetch(noteStorageUri, { method: 'DELETE' }),
+        concept && saveConceptIndex(removeThing(conceptIndex, concept))
+      ])
+      // mutate to invalidate the cache for the note
+      mutateNote()
+
       router.push("/")
     }
   }
 
   const coverImage = note && getUrl(note, FOAF.img)
   const noteContext = useMemo(() => ({ path: `${path}/${workspaceSlug}`, note, save }), [path, workspaceSlug, note, save])
+
+  const {
+    names: matchingConceptNames, onChange: conceptAutocompleteOnChange, onKeyDown,
+    target: popoverTarget, selectionIndex: popoverSelectionIndex
+  } = useConceptAutocomplete(editor)
+  const showPopover = popoverTarget && matchingConceptNames && (matchingConceptNames.length > 0)
+  const popoverRef = useRef()
+  useEffect(() => {
+    if (showPopover) {
+      const el = popoverRef.current
+      const domRange = ReactEditor.toDOMRange(editor, popoverTarget)
+      const rect = domRange.getBoundingClientRect()
+      el.style.top = `${rect.top + window.pageYOffset + 24}px`
+      el.style.left = `${rect.left + window.pageXOffset}px`
+    }
+  }, [editor, popoverTarget])
+
+  const onChange = useCallback(function onChange(newValue){
+    setValue(newValue)
+    conceptAutocompleteOnChange && conceptAutocompleteOnChange(editor)
+  }, [editor, conceptAutocompleteOnChange])
+
+
   return (
       <NoteContext.Provider value={noteContext}>
         <div className="flex flex-col page">
@@ -310,7 +338,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                   {authorName && (
                     <div className="text-lg text-gray-800">
                       by&nbsp;
-                      <Link href={profilePath(webId)}>
+                      <Link href={profilePath(webId) || ""}>
                         <a>
                           {authorName}
                         </a>
@@ -320,14 +348,14 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 </div>
                 {name && (readOnly ? (
                   (myWebId === webId) && (
-                    <Link href={privateNotePath(workspaceSlug, name)}>
+                    <Link href={privateNotePath(workspaceSlug, name) || ""}>
                       <a>
                         edit
                       </a>
                     </Link>
                   )
                 ) : (
-                  <Link href={publicNotePath(webId, workspaceSlug, name)}>
+                  <Link href={publicNotePath(webId, workspaceSlug, name) || ""}>
                     <a>
                       sharable link
                     </a>
@@ -360,14 +388,17 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                 <Slate
                   editor={editor}
                   value={value}
-                  onChange={newValue => setValue(newValue)}
+                  onChange={onChange}
                 >
                   {!readOnly && (
                     <EditorToolbar saving={saving} saved={saved} save={saveCallback}
                                    className="sticky top-0 z-20"/>
                   )}
                   <div className="flex-grow flex flex-row mt-3">
-                    <Editable readOnly={readOnly} editor={editor} className="flex-grow text-gray-900" />
+                    <Editable readOnly={readOnly}
+                              onKeyDown={onKeyDown}
+                              editor={editor}
+                              className="flex-grow text-gray-900" />
                     <div className="relative">
                       <button onClick={() => setSidebarOpen(!sidebarOpen)}
                               className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
@@ -430,6 +461,24 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                */}
             </div>
           </section>
+          {showPopover && (
+            <Portal>
+              <div ref={popoverRef}
+                   className="bg-white p-1 border-2"
+                   style={{
+                     top: '-9999px',
+                     left: '-9999px',
+                     position: 'absolute',
+                     zIndex: 1,
+                   }}>
+                {matchingConceptNames && matchingConceptNames.map((name, i) => (
+                  <div key={name} className={`${(i === popoverSelectionIndex) ? 'bg-purple-300' : 'bg-white'}`}>
+                    {name}
+                  </div>
+                ))}
+              </div>
+            </Portal>
+          )}
         </div>
       </NoteContext.Provider>
   )

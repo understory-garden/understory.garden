@@ -38,7 +38,7 @@ const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
         ) : (
             <>
               <button className="btn mr-3" onClick={save}>
-                save
+                done editing
               </button>
               <button className="btn" onClick={onClose}>
                 cancel
@@ -96,6 +96,32 @@ const uploadFromCanvas = (canvas, uri, type, { fetch: passedFetch } = {} ) => ne
 
 })
 
+const uploadToContainerFromCanvas = (canvas, containerUri, type, { fetch: passedFetch } = {} ) => new Promise((resolve, reject) => {
+  const myFetch = passedFetch || fetch
+  canvas.toBlob(async (blob) => {
+// uncomment if we find we need blob scaling
+//    console.log("scaling blob")
+//    const scaledBlob = await newBlobReducer().toBlob(blob, {max: 600})
+//    console.log("scaled blob")
+    const response = await myFetch(containerUri, {
+      method: 'POST',
+      force: true,
+      headers: {
+        'content-type': type,
+        credentials: 'include'
+      },
+      body: blob
+    });
+    if (response.ok) {
+      resolve(response)
+    } else {
+      reject(response)
+      console.log("image upload failed: ", response)
+    }
+  }, type, 1)
+
+})
+
 const uploadFromFile = (file, uri, { fetch: passedFetch } = {}) => new Promise((resolve, reject) => {
   const reader = new FileReader()
   const myFetch = passedFetch || fetch
@@ -138,7 +164,6 @@ const uriForOriginal = (editedUri) => {
 
 
 export default function ImageUploader({ element, onClose, onUpload, uploadDirectory, ...props }){
-  const inputRef = useRef()
   const [file, setFile] = useState()
   const editor = useEditor()
   const [originalSrc, setOriginalSrc] = useState()
@@ -150,19 +175,12 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
   const insert = async () => {
     const editedUri = `${uploadDirectory}${nameForFile(file)}`
     const originalUri = uriForOriginal(editedUri)
-    console.log("uploading from file")
     uploadFromFile(file, originalUri)
-    console.log("uploading from canvas")
     const response = await uploadFromCanvas(croppedCanvas, editedUri, file.type)
-    console.log("on upload")
     onUpload && onUpload(response, file.type)
-    console.log("inserting ")
     const insertAt = insertionPoint(editor, element)
-    console.log("inserting at")
     insertImage(editor, {url: editedUri, originalUrl: originalUri, alt: altText, mime: file.type}, insertAt);
-    console.log("transforms select")
     Transforms.select(editor, insertAt)
-    console.log("on close", onClose)
     onClose && onClose()
   }
 
@@ -206,9 +224,9 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
                 <img src={previewSrc} className="h-32 object-contain" alt="your new profile" />
               )}
               <div className="flex flex-row">
-                <button className="btn mr-3" onClick={() => inputRef.current.click()}>
+                <UploadFileButton className="btn mr-3" onFileChanged={onFileChanged}>
                   pick a file
-                </button>
+                </UploadFileButton>
                 {croppedCanvas &&
                   <>
                     <button className="btn mr-3" onClick={() => setEditing(true)}>
@@ -223,16 +241,104 @@ export default function ImageUploader({ element, onClose, onUpload, uploadDirect
                   cancel
                 </button>
               </div>
-              <input
-                ref={inputRef}
-                accept="image/*"
-                style={{ display: 'none' }}
-                type="file"
-                onChange={onFileChanged}
-              />
             </div>
           )
       }
+    </>
+  )
+}
+
+function UploadFileButton({onFileChanged, ...rest}){
+  const inputRef = useRef()
+  return (
+    <>
+      <button {...rest} onClick={() => inputRef.current.click()}>
+        pick a file
+      </button>
+      <input
+        ref={inputRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        type="file"
+        onChange={onFileChanged}
+      />
+    </>
+  )
+}
+
+export function ImageUploadAndEditor({onSave, onClose, imageUploadContainerUri}){
+  const [editing, setEditing] = useState(false)
+  const [originalSrc, setOriginalSrc] = useState()
+  const [previewSrc, setPreviewSrc] = useState()
+  const [croppedCanvas, setCroppedCanvas] = useState()
+
+  const [file, setFile] = useState()
+  const onFileChanged = event => {
+    if (event.target.files) {
+      const file = event.target.files[0]
+      setFile(file)
+    }
+  }
+
+  useEffect(() => {
+    let objectUrl;
+    if (file) {
+      objectUrl = URL.createObjectURL(file)
+      setOriginalSrc(objectUrl)
+      setPreviewSrc(objectUrl)
+      setEditing(true)
+    }
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [file])
+
+  async function save(){
+    console.log("SAVE")
+    const response = await uploadToContainerFromCanvas(croppedCanvas, imageUploadContainerUri, file.type)
+    const newImagePath = response.headers.get("location")
+    onSave && onSave(newImagePath)
+    //console.log("RESPONSE", response && response.headers.get("location"))
+  }
+
+  return (
+    <>
+      {editing ? (
+        <ImageEditingModule open={editing} src={originalSrc}
+                            onClose={onClose}
+                            onSave={async (canvas) => {
+                              setPreviewSrc(canvas.toDataURL(file.type))
+                              setCroppedCanvas(canvas)
+                              setEditing(false)
+                            }} />
+
+      ) : (
+        <div>
+          {previewSrc && (
+            <img src={previewSrc} className="h-32 object-contain" alt="your new profile" />
+          )}
+          <div className="flex flex-row">
+            <UploadFileButton className="btn mr-3" onFileChanged={onFileChanged}>
+              pick a file
+            </UploadFileButton>
+            {croppedCanvas &&
+             <>
+               <button className="btn mr-3" onClick={() => setEditing(true)}>
+                 edit
+               </button>
+               <button className="btn mr-3" onClick={save}>
+                 save
+               </button>
+             </>
+            }
+            <button onClick={() => onClose && onClose()}>
+              cancel
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

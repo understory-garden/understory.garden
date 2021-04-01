@@ -44,22 +44,8 @@ export default function ProfilePage(){
             {name && (
               <h3 className="text-4xl text-center">{name}</h3>
             )}
-            {/*
-            <span className="text-3xl text-bold text-green-200">
-              { ledgerTotal } 😀💰
-            </span>
-             */}
           </div>
         </div>
-        {/*
-        <h5 className="text-xl text-center">
-          <Link href={`${profilePath(webId)}/message`}>
-            <a>
-              send message
-            </a>
-          </Link>
-        </h5>
-         */}
         {(follows && !isMyProfile) && (
           alreadyFollowing ? (
             <button className="btn py-1" onClick={unfollow}>

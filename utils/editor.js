@@ -145,7 +145,8 @@ export const withImages = editor => {
   editor.isVoid = element => {
     return element.type === 'image' ? true : isVoid(element)
   }
-
+/*
+  // this currently inserts images inline in the page which is not at all ideal, disable for now
   editor.insertData = data => {
     const text = data.getData('text/plain')
     const { files } = data
@@ -170,7 +171,7 @@ export const withImages = editor => {
       insertData(data)
     }
   }
-
+*/
   return editor
 }
 
@@ -317,10 +318,19 @@ export const isConceptActive = editor => {
   return !!activeConceptEntry(editor)
 }
 
-export const insertConcept = (editor) => {
+export const makeSelectionConcept = (editor) => {
   if (editor.selection) {
     wrapConcept(editor)
   }
+}
+
+export const insertConcept = (editor, name) => {
+  const concept = {
+    type: 'concept',
+    name,
+    children: [{ text: `[[${name}]]` }],
+  }
+  Transforms.insertNodes(editor, concept)
 }
 
 const conceptRegex = /\[\[(.*)\]\]/
