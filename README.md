@@ -1,6 +1,6 @@
-# understory.garden
+# Understory Garden
 
-Understory is a digital garden, a micro-publishing space for you to plant the seeds
+Understory is a [digital garden](https://maggieappleton.com/garden), a micro-publishing space for you to plant the seeds
 of your ideas and grow them into bi-directionally linked web portals. It's a social
 [zettelkasten](https://zettelkasten.de/) that lets users use [Web
 Monetization](https://webmonetization.org/) to get paid when people
