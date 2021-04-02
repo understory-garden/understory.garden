@@ -16,23 +16,21 @@ Install dependencies:
 npm install
 ```
 
-Create a production build:
+Run in development mode:
 
 ```bash
-npm run-script build
+npm run dev
 ```
 
-Run the local server:
+Log in with the hostname of your WebID:
 
-```bash
-npm start
-```
+![Login](/doc/login.png)
+![Pod Login](/doc/pod-login.png)
 
-Add http://localhost:3000 into trusted applications:
+Give localhost access to your Pod:
 
 ![Trusted Apps](/doc/add-trusted-app.png)
 
-Log in with your WebID, like `tobytoberson.solidcommunity.net`.
 You should see a home screen like this:
 
-![Home Screen](/doc/home_screen.png)
+![Home Screen](/doc/home-screen.png)
