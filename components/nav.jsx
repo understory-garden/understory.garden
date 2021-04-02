@@ -11,19 +11,40 @@ import Image from 'next/image'
 import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
-import { appPrefix } from '../utils/uris'
+import { appPrefix, conceptNameToUrlSafeId } from '../utils/uris'
 import { US } from '../vocab'
 
 function NewNoteForm() {
   const router = useRouter()
   const [noteName, setNoteName] = useState("")
-  const onCreate = useCallback(() => {
+  const gotoNote = useCallback((noteName) => {
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
-  })
+  }, [router])
+  const onCreate = useCallback(() => {
+    gotoNote(noteName)
+  }, [noteName])
+
+  const onKeyDown = useCallback(
+    event => {
+      switch (event.key) {
+        case 'Enter':
+          event.preventDefault()
+          gotoNote(event.target.value)
+          break;
+      }
+    },
+    []
+  )
   return (
     <div className="flex flex-row max-h-9 self-center">
-      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Note Name" />
-      <button className="btn" onClick={onCreate} disabled={noteName === ""}>
+      <input value={noteName}
+        onChange={e => setNoteName(e.target.value)}
+        onKeyDown={onKeyDown}
+        className="input-text mr-3" type="text"
+        placeholder="New Note Name" />
+      <button className="btn"
+        onClick={onCreate}
+        disabled={noteName === ""}>
         Create Note
       </button>
     </div>
@@ -81,7 +102,7 @@ export default function Nav() {
               />
             </a>
           </Link>
-          <NewNoteForm/>
+          <NewNoteForm />
         </li>
         <li>
           <ul className="flex justify-between items-center space-x-4">
