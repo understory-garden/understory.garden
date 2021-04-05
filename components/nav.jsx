@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 
 import { getUrl, getSourceUrl, getBoolean } from '@inrupt/solid-client'
@@ -11,10 +11,79 @@ import Image from 'next/image'
 import { MailIcon } from '../components/icons'
 import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
-import { appPrefix } from '../utils/uris'
+import { appPrefix, conceptNameToUrlSafeId } from '../utils/uris'
 import { US } from '../vocab'
+import { useConceptNamesMatching } from '../hooks/concepts'
 
-function DevTools(){
+
+function NewNoteForm() {
+  const router = useRouter()
+  const [displayedName, setDisplayedName] = useState("")
+  const gotoNote = useCallback((noteName) => {
+    router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
+    setDisplayedName("")
+  }, [router])
+
+  const [selectionIndex, setSelectionIndex] = useState(0)
+  const matchingConceptNames = useConceptNamesMatching(displayedName)
+  const onKeyDown = useCallback(
+    event => {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault()
+          const prevIndex = selectionIndex >= matchingConceptNames.length ? 0 : selectionIndex + 1
+          setSelectionIndex(prevIndex)
+          break
+        case 'ArrowUp':
+          event.preventDefault()
+          const nextIndex = selectionIndex <= 0 ? matchingConceptNames.length : selectionIndex - 1
+          setSelectionIndex(nextIndex)
+          break
+        case 'Enter':
+          event.preventDefault()
+          const targetNote = (selectionIndex > 0) ? matchingConceptNames[selectionIndex - 1] : event.target.value
+          gotoNote(targetNote)
+          setDisplayedName("")
+          break
+      }
+    },
+    [matchingConceptNames, selectionIndex]
+  )
+
+  const selectedNote = (matchingConceptNames && (selectionIndex > 0)) ? matchingConceptNames[selectionIndex - 1] : displayedName
+  const onClick = useCallback(() => {
+    gotoNote(selectedNote)
+  }, [selectedNote])
+  return (
+    <div className="flex flex-row max-h-9 self-center">
+      <div className="relative overflow-y-visible">
+        <input value={displayedName}
+          onChange={e => setDisplayedName(e.target.value)}
+          onKeyDown={onKeyDown}
+          className="input-text mr-3 max-h-8" type="text"
+          placeholder="Note Name" />
+        <ul className="z-30 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+          {matchingConceptNames && matchingConceptNames.map((name, i) => (
+            <li key={name}
+                onClick={() => setSelectionIndex(i + 1)}
+              className={`m-1 p-1 ${(selectionIndex - 1) === i ? 'bg-purple-500 text-white' : ''}`}>
+              {name}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {(displayedName !== "") && (
+        <button className="btn"
+          onClick={onClick}
+          disabled={displayedName === ""}>
+          {(selectionIndex === 0) ? 'create' : 'goto'} {selectedNote}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function DevTools() {
   const webId = useWebId()
 
   const { resource: appResource } = useApp(webId)
@@ -55,88 +124,93 @@ export default function Nav() {
   return (
     <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
-        <Link href="/">
-          <a>
-            <Image src="/logo.png"
-                   alt="a logo consisting of a multi-colored mushroom with roots digging deep into the understory"
-                   width={60}
-                   height={60}
-            />
-          </a>
-        </Link>
-        <ul className="flex justify-between items-center space-x-4">
-          {loggedIn && (
-            <Link href="/messages">
-              <a className="text-white">
-                <div className="relative">
-                  <MailIcon className="w-12"/>
-                  {hasMessages && (
-                    <div className="absolute top-0 right-0 block h-5 w-5 rounded-full ring-2 ring-white bg-red-400 pl-2 leading-3 pt-0.5">
-                      { resources.length }
-                    </div>
-                  )}
-                </div>
-              </a>
-            </Link>
-          )}
-          {loggedIn && (
-            <div>
-              {profileImage ? (
-                <img src={profileImage}
-                     onClick={() => setMenuOpen(!menuOpen)}
-                     className="rounded-full h-12 w-12 object-cover cursor-pointer" />
-              ) : (
-                <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100 cursor-pointer"
-                      onClick={() => setMenuOpen(!menuOpen)}>
-                  <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                </span>
-              )}
-              <Transition
-                show={menuOpen}
-                enter="transition ease-out duration-100"
-                enterFrom="translate-x-transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95">
-                {
-                  (ref) => (
-                    <div ref={ref} className="z-30 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                      <div className="p-1 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                        <Link href="/profile">
-                          <a className="block hover:bg-gray-100 hover:text-gray-900">
-                            edit profile
-                          </a>
-                        </Link>
-                        <Link href="/settings">
-                          <a className="block hover:bg-gray-100 hover:text-gray-900">
-                            settings
-                          </a>
-                        </Link>
-                        <a href="/privacy" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                          privacy
-                        </a>
-                        <a href="/tos" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                          terms of service
-                        </a>
-                        {loggedIn && (
-                          <button type="submit" className="block w-full text-left text-purple-500 font-semibold hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
-                                  onClick={logout}>
-                            log out
-                          </button>
-                        )}
+        <li className="flex flex-row">
+          <Link href="/">
+            <a className="mr-6">
+              <Image src="/logo.png"
+                alt="a logo consisting of a multi-colored mushroom with roots digging deep into the understory"
+                width={60}
+                height={60}
+              />
+            </a>
+          </Link>
+          <NewNoteForm />
+        </li>
+        <li>
+          <ul className="flex justify-between items-center space-x-4">
+            {loggedIn && (
+              <Link href="/messages">
+                <a className="text-white">
+                  <div className="relative">
+                    <MailIcon className="w-12" />
+                    {hasMessages && (
+                      <div className="absolute top-0 right-0 block h-5 w-5 rounded-full ring-2 ring-white bg-red-400 pl-2 leading-3 pt-0.5">
+                        { resources.length}
                       </div>
-                    </div>
-                  )
-                }
-              </Transition>
-            </div>
-          )}
-        </ul>
+                    )}
+                  </div>
+                </a>
+              </Link>
+            )}
+            {loggedIn && (
+              <div>
+                {profileImage ? (
+                  <img src={profileImage}
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="rounded-full h-12 w-12 object-cover cursor-pointer" />
+                ) : (
+                  <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100 cursor-pointer"
+                    onClick={() => setMenuOpen(!menuOpen)}>
+                    <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </span>
+                )}
+                <Transition
+                  show={menuOpen}
+                  enter="transition ease-out duration-100"
+                  enterFrom="translate-x-transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95">
+                  {
+                    (ref) => (
+                      <div ref={ref} className="z-30 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="p-1 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                          <Link href="/profile">
+                            <a className="block hover:bg-gray-100 hover:text-gray-900">
+                              edit profile
+                          </a>
+                          </Link>
+                          <Link href="/settings">
+                            <a className="block hover:bg-gray-100 hover:text-gray-900">
+                              settings
+                          </a>
+                          </Link>
+                          <a href="/privacy" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                            privacy
+                        </a>
+                          <a href="/tos" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                            terms of service
+                        </a>
+                          {loggedIn && (
+                            <button type="submit" className="block w-full text-left text-purple-500 font-semibold hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
+                              onClick={logout}>
+                              log out
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  }
+                </Transition>
+              </div>
+            )}
+          </ul>
+        </li>
       </ul>
-      {(devtools || devModeSetting) && <DevTools/>}
-    </nav>
+      { (devtools || devModeSetting) && <DevTools />}
+    </nav >
   )
 }

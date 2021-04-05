@@ -88,22 +88,6 @@ function LoginUI(){
   )
 }
 
-function NewNoteForm(){
-  const router = useRouter()
-  const [noteName, setNoteName] = useState("")
-  const onCreate = useCallback(function onCreate(){
-    router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
-  })
-  return (
-    <div className="flex flex-row m-auto my-6">
-      <input value={noteName} onChange={e => setNoteName(e.target.value)} className="input-text mr-3" type="text" placeholder="New Note Name" />
-      <button className="btn" onClick={onCreate} disabled={noteName === ""}>
-        Create Note
-      </button>
-    </div>
-  )
-}
-
 function Dashboard(){
   const webId = useWebId()
   const loggedIn = useLoggedIn()
@@ -128,7 +112,6 @@ function Dashboard(){
                   visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
                 </div>
               )}
-              <NewNoteForm />
               <div className="flex mb-6">
                 {/*
                    <TabButton name="feed" activeName={tab} setTab={setTab}>
