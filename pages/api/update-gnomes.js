@@ -16,8 +16,6 @@
   -> parse data
   -> setup github
      -> clone template repo over github project, setup if necessary
-     # generate github ops account we can burn if needed
-     # generate github api key for said disposable account
   -> setup vercel
      -> call vercel api to setup project
      -> call vercel project to set webid env variable
@@ -26,27 +24,17 @@
 
 */
 
+const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || 'https://github.com/understory-garden/'
+const GnomesOrg = process.env.GITHUB_GNOMES_ORG || 'https://github.com/understory-gnomes/'
+const GnomeKingToken + process.env.GITHUB_TOKEN_UGK || ''
 
-const projects = {
-  {
-    template: "nextjs-swrlit-tailwindcss",
-    cloneFrom: "https://github.com/understory-garden/nextjs-swrlit-tailwindcss",
-  }
+function githubProjectForTemplate(templateName) {
+  return TemplateOrg + templateName
 }
 
-const {
-  APP_ID: appId,
-  KEY: key,
-  SECRET: secret,
-  CLUSTER: cluster,
-} = process.env;
-
-const pusher = new Pusher({
-  appId,
-  key,
-  secret,
-  cluster,
-});
+function githubProjectForWebID(webid) {
+  return GnomesOrg + webid // TODO: webid won't work here. Hash or encode somehow?
+}
 
 module.exports = async (req, res) => {
   const { webid } = req.body;
