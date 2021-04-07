@@ -5,18 +5,25 @@
   Instead, this function is simply a trigger,
   which then reads the config file directly from the users solid pod.
 
-  General overview of Gnome config file (gnomes.ttl):
+  For now, we only support one Gnome type (WebsiteGnome):
 
-  For now, we only support one Gnome type (Website)
+    WebsiteGnome:
+      template:  nextjs-swrlit-tailwindcss // maps to github.com/understory-garden/nextjs-swrlit-tailwindcss
 
-  WebsiteGnome:
-    template:  nextjs-swrlit-tailwindcss // maps to github.com/understory-garden/nextjs-swrlit-tailwindcss
-  ensure github project is setup
-  call vercel api to set env variable to webid.
+  POST /api/update-gnomes
 
-  Github Gnome and Vercel Gnome
+  -> grab gnomes.ttl file
+  -> parse data
+  -> setup github
+     -> clone template repo over github project, setup if necessary
+     # generate github ops account we can burn if needed
+     # generate github api key for said disposable account
+  -> setup vercel
+     -> call vercel api to setup project
+     -> call vercel project to set webid env variable
+      # add github ops user to vercel team
 
-  What this Gnome type will do is clone the nexts repo from the list below
+
 */
 
 
