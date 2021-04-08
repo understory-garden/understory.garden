@@ -21,7 +21,13 @@
      -> call vercel project to set webid env variable
       # add github ops user to vercel team
 
+https://github.com/solid/web-access-control-tests/blob/main/test/helpers/env.ts#L19
 
+https://github.com/solid/solid-auth-fetcher/blob/master/src/obtainAuthHeaders.ts#L57
+
+Talk with Jeff Zucker about node auth
+
+https://github.com/solid/solid-node-client
 */
 
 import { OcktoKit } from "@ocktokit/core"
