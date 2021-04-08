@@ -28,15 +28,16 @@ import { OcktoKit } from "@ocktokit/core"
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || "understory-garden"
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG || "understory-gnomes"
-const GnomeKingToken + process.env.GITHUB_TOKEN_UGK || ""
+const GnomeKingToken = process.env.GITHUB_TOKEN_UGK || ""
+const UserAgent = "UnderstoryGnomes v0.0.1"
 
 const octokit = new OctoKit({
   auth: GnomeKingToken,
-  userAgent: "UnderstoryGnomes v0.0.1",
+  userAgent: UserAgent
 })
 
 function templateID(template) {
-  return TemplateOrg + "/" + template
+  return `${TemplateOrg}/${template}`
 }
 
 function gnomesRepoName (webid) {
@@ -82,14 +83,24 @@ async function findOrCreateGnomesRepo(webid, template) {
   if (exists) {
     return exists
   } else {
-    return createGnomesRepoFromTemplate(webid, template)
+    return await createGnomesRepoFromTemplate(webid, template)
   }
+}
+
+async function configureGnomesRepo(webid, template) {
+  const findOrCreate = await findOrCreateGnomesRepo(webid, template)
+  return await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+    owner: GnomesOrg,
+    repo: gnomesRepoName(webid),
+    path: "config.json", // TODO: json-ld?
+    message: UserAgent,
+    content: `{ webid: ${webid}, templateID: ${templateID(template)}}`
+  })
 }
 
 async function updateGnomes(webid) {
   const { template } = await readPublicGnomesConfig(webid)
-  const template = gnomesConfig.template
-  const gnomesRepo = await findOrCreateGnomesRepo(webid, template)
+  const gnomesRepo = await configureGnomesRepo(webid, template)
 }
 
 module.exports = async (req, res) => {
