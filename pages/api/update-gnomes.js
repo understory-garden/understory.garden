@@ -24,9 +24,16 @@
 
 */
 
-const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || 'https://github.com/understory-garden/'
-const GnomesOrg = process.env.GITHUB_GNOMES_ORG || 'https://github.com/understory-gnomes/'
-const GnomeKingToken + process.env.GITHUB_TOKEN_UGK || ''
+import { OcktoKit } from "@ocktokit/core"
+
+const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || "understory-garden"
+const GnomesOrg = process.env.GITHUB_GNOMES_ORG || "understory-gnomes"
+const GnomeKingToken + process.env.GITHUB_TOKEN_UGK || ""
+
+const octokit = new OctoKit({
+  auth: GnomeKingToken,
+  userAgent: "UnderstoryGnomes v0.0.1",
+})
 
 function githubProjectForTemplate(templateName) {
   return TemplateOrg + templateName
@@ -36,21 +43,53 @@ function githubProjectForWebID(webid) {
   return GnomesOrg + webid // TODO: webid won't work here. Hash or encode somehow?
 }
 
+async function readPublicGnomeConfig(webid) {
+  const gnomesConfigPath = webid + "/public/gnomes.ttl" // TODO: this probably needs to be fixed
+  // await fetch gnomesConfigPath, convert to gnomes js obj
+}
+
+async function findGithubProject(webid) {
+  return await octokit.request('GET /repos/{owner}/{repo}', {
+    owner: GnomesOrg,
+    repo: githubProjectForWebID(webid)
+  })
+}
+
+async function createGithubProjectFromTemplate(webid, template) {
+  return await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
+    template_owner: TemplateOrg,
+    template_repo: template,
+    owner: GnomesOrg,
+    name: githubProjectForWebID(webid),
+    description: TemplateOrg + "/" + template, // TODO: this can be used later to check what template was used
+    private: true,
+    mediaType: {
+      previews: [
+        'baptiste' // TODO: This is apparently an experimental github API feature. Probably shouldn't rely on it but it's the easist for now.
+      ]
+    }
+  })
+}
+
+async function findOrCreateGithubProjectForWebID(webid, template) {
+  const exists = await findGithubProjectForWebID(webid, template)
+  if (exists) {
+    return exists
+  } else {
+    return createGithubProjectFromTemplate(webid, template)
+  }
+}
+
 module.exports = async (req, res) => {
   const { webid } = req.body;
   try {
     await new Promise((resolve, reject) => {
-      pusher.trigger(
-        'drawing-events',
-        'drawing',
-        { x0, x1, y0, y1, color },
-        err => {
+        const err => {
           if (err) return reject(err);
           resolve();
         }
       );
     });
-    res.status(200).end('sent event succesfully');
   } catch (e) {
     console.log(e.message);
   }
