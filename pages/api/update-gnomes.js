@@ -35,33 +35,39 @@ const octokit = new OctoKit({
   userAgent: "UnderstoryGnomes v0.0.1",
 })
 
-function githubProjectForTemplate(templateName) {
-  return TemplateOrg + templateName
+function templateID(template) {
+  return TemplateOrg + "/" + template
 }
 
-function githubProjectForWebID(webid) {
-  return GnomesOrg + webid // TODO: webid won't work here. Hash or encode somehow?
+function gnomesRepoName (webid) {
+  return webid // TODO: webid won't work here. Hash or encode somehow?
 }
 
-async function readPublicGnomeConfig(webid) {
+async function readPublicGnomesConfig(webid) {
   const gnomesConfigPath = webid + "/public/gnomes.ttl" // TODO: this probably needs to be fixed
   // await fetch gnomesConfigPath, convert to gnomes js obj
+  // returns an onject with a .template property.
 }
 
-async function findGithubProject(webid) {
-  return await octokit.request('GET /repos/{owner}/{repo}', {
+async function findGnomesRepo(webid, template) {
+  const repo = await octokit.request('GET /repos/{owner}/{repo}', {
     owner: GnomesOrg,
-    repo: githubProjectForWebID(webid)
+    repo: gnomesRepoName(webid)
   })
+
+  if (repo.description != templateID(template)) {
+    throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
+  }
+  return repo
 }
 
-async function createGithubProjectFromTemplate(webid, template) {
+async function createGnomesRepoFromTemplate(webid, template) {
   return await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
     template_owner: TemplateOrg,
     template_repo: template,
     owner: GnomesOrg,
-    name: githubProjectForWebID(webid),
-    description: TemplateOrg + "/" + template, // TODO: this can be used later to check what template was used
+    name: gnomesRepoName(webid),
+    description: templateID(template), // this is used to check what template was used.
     private: true,
     mediaType: {
       previews: [
@@ -71,26 +77,26 @@ async function createGithubProjectFromTemplate(webid, template) {
   })
 }
 
-async function findOrCreateGithubProjectForWebID(webid, template) {
-  const exists = await findGithubProjectForWebID(webid, template)
+async function findOrCreateGnomesRepo(webid, template) {
+  const exists = await findGnomesRepo(webid, template)
   if (exists) {
     return exists
   } else {
-    return createGithubProjectFromTemplate(webid, template)
+    return createGnomesRepoFromTemplate(webid, template)
   }
 }
 
+async function updateGnomes(webid) {
+  const { template } = await readPublicGnomesConfig(webid)
+  const template = gnomesConfig.template
+  const gnomesRepo = await findOrCreateGnomesRepo(webid, template)
+}
+
 module.exports = async (req, res) => {
-  const { webid } = req.body;
+  const { webid } = req.body
   try {
-    await new Promise((resolve, reject) => {
-        const err => {
-          if (err) return reject(err);
-          resolve();
-        }
-      );
-    });
+    updateGnomes(webid)
   } catch (e) {
-    console.log(e.message);
+    console.log(e.message)
   }
 };
