@@ -4,6 +4,7 @@ import {
   getStringNoLocale, setStringNoLocale, setThing, addUrl, removeAll, removeThing
 } from '@inrupt/solid-client'
 import { useWebId, useResource, useAuthentication, useThing, useMyProfile } from 'swrlit'
+import { SWRConfig } from 'swr'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { US } from '../vocab'
 
@@ -27,15 +28,11 @@ function newConceptUriFromOld(oldConceptUri) {
   return oldConceptUri.replace(oldId, newId)
 }
 
-function Concept({ conceptUri }) {
+function MigrateButton({ conceptUri, newId }) {
+  const newName = urlSafeIdToConceptName(newId)
+
   const [migrating, setMigrating] = useState(false)
   const webId = useWebId()
-  const currentId = conceptUri && conceptUriToId(conceptUri)
-  const currentName = urlSafeIdToConceptName(currentId)
-  const newId = conceptNameToUrlSafeId(currentName)
-  const newName = urlSafeIdToConceptName(newId)
-  const needsMigration = (newId !== currentId)
-
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, 'default', 'public')
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, 'default', 'private')
 
@@ -48,7 +45,7 @@ function Concept({ conceptUri }) {
   const oldNoteUri = oldConcept && getUrl(oldConcept, US.storedAt)
   const { thing: oldNote } = useThing(oldNoteUri)
 
-  const newNoteUri = newNoteUriFromOld(oldNoteUri)
+  const newNoteUri = oldNoteUri && newNoteUriFromOld(oldNoteUri)
   const { thing: newNote, save: saveNote } = useThing(newNoteUri)
 
   const { concept: newConcept } = useConceptInCurrentWorkspace(newName)
@@ -56,7 +53,7 @@ function Concept({ conceptUri }) {
   async function migrateConcept() {
 
     setMigrating(true)
-    let updatedNote = newNote || createThing({url: newNoteUri})
+    let updatedNote = newNote || createThing({ url: newNoteUri })
     updatedNote = setStringNoLocale(updatedNote, US.noteBody, getStringNoLocale(oldNote, US.noteBody))
     await saveNote(updatedNote)
 
@@ -76,24 +73,40 @@ function Concept({ conceptUri }) {
     setMigrating(false)
 
   }
-  const [showContent, setShowContent] = useState(false)
+  const loading = !(newNoteUri && oldNote && oldConcept && oldNoteUri && index)
+  return (
+    <>
+      {(loading || migrating) ? (
+        <Loader />
+      ) : (
+        <button className="btn" disabled={!migratable} onClick={migrateConcept}>migrate to {newName}</button>
+      )}
+    </>
+  )
+}
+
+function Concept({ conceptUri }) {
+
+  const currentId = conceptUri && conceptUriToId(conceptUri)
+  const currentName = urlSafeIdToConceptName(currentId)
+  const newId = conceptNameToUrlSafeId(currentName)
+  const needsMigration = (newId !== currentId)
+
   return (
     <div>
       {currentName}
-      {migrating ? (
-        <Loader/>
-      ) : (
+      {
         needsMigration && (
           <>
-            <button className="btn" disabled={!migratable} onClick={migrateConcept}>migrate to {newName}</button>
+            <MigrateButton conceptUri={conceptUri} newId={newId} />
           </>
         )
-      )}
+      }
     </div>
   )
 }
 
-export function useNeedsDowncaseMigration(){
+export function useNeedsDowncaseMigration() {
   const webId = useWebId()
   const { concepts } = useConcepts(webId)
   let needsMigration = false
@@ -123,12 +136,14 @@ export function DowncaseMigrator() {
         would like to keep them both, please contact <a href="mailto:support@understory.coop">support</a>
       </p>
       <div>
-        {concepts && concepts.map(concept => (
-          <Concept conceptUri={asUrl(concept)} key={asUrl(concept)} />
-        ))}
+        <SWRConfig value={{ shouldRetryOnError: false }}>
+          {concepts && concepts.map(concept => (
+            <Concept conceptUri={asUrl(concept)} key={asUrl(concept)} />
+          ))}
+        </SWRConfig>
       </div>
     </div>
   ) : (
-      <Loader />
-    )
+    <Loader />
+  )
 }
