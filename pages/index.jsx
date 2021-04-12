@@ -21,17 +21,17 @@ import Follows from '../components/Follows'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
-import { useItmeOnlineConceptIndex, ItmeOnlineMigrator } from '../components/ItmeOnlineMigrator'
+import { useNeedsDowncaseMigration } from '../components/DowncaseMigrator'
 import { useApp, useWorkspace } from '../hooks/app'
 import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
-function LoginUI(){
+function LoginUI() {
   const [username, setUsername] = useState("")
   const [badHandle, setBadHandle] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
   const { loginHandle, logout } = useAuthentication()
   const handle = username.includes(".") ? username : `${username}.myunderstory.com`
-  async function logIn(){
+  async function logIn() {
     setBadHandle(false)
     setLoggingIn(true)
     try {
@@ -42,12 +42,12 @@ function LoginUI(){
       setLoggingIn(false)
     }
   }
-  function onChange(e){
+  function onChange(e) {
     setUsername(e.target.value)
     setBadHandle(false)
   }
-  function onKeyPress(e){
-    if (e.key === "Enter"){
+  function onKeyPress(e) {
+    if (e.key === "Enter") {
       logIn()
     }
   }
@@ -69,29 +69,29 @@ function LoginUI(){
       <h3 className="text-lg mb-3 text-gray-600">If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname as your "handle" below. If you don't have a Pod, you can get one from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web, but please be warned that the user experience is currently pretty rough! We're working on it 😉</h3>
       <h3 className="text-lg mb-12 text-gray-600">Please note that we can't provide any guarantees as to the safety or security of your Pod data at this point - there may be bugs that delete all of your data or expose it to the open Web, so for now please just treat this like a sandbox.</h3>
       <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
-             placeholder="what's your username?"
-             value={username} onChange={onChange} onKeyPress={onKeyPress}/>
+        placeholder="what's your username?"
+        value={username} onChange={onChange} onKeyPress={onKeyPress} />
       {badHandle && (
         <p className="text-red-500 m-auto mt-2">
           hm, I don't recognize that username
         </p>
       )}
       {loggingIn ? (
-        <Loader className="flex flex-row justify-center"/>
+        <Loader className="flex flex-row justify-center" />
       ) : (
-        <button className="btn mt-6 p-3 text-3xl flex-auto block m-auto hover:shadow-md" onClick={logIn}>
-          log in
-        </button>
-      )}
+          <button className="btn mt-6 p-3 text-3xl flex-auto block m-auto hover:shadow-md" onClick={logIn}>
+            log in
+          </button>
+        )}
       <p className="mt-3 text-gray-500">By logging in you agree to be bound by our <a href="/tos">Terms of Service</a></p>
     </>
   )
 }
 
-function NewNoteForm(){
+function NewNoteForm() {
   const router = useRouter()
   const [noteName, setNoteName] = useState("")
-  const onCreate = useCallback(function onCreate(){
+  const onCreate = useCallback(function onCreate() {
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
   })
   return (
@@ -104,18 +104,17 @@ function NewNoteForm(){
   )
 }
 
-function Dashboard(){
+function Dashboard() {
   const webId = useWebId()
   const loggedIn = useLoggedIn()
   const { profile, save: saveProfile } = useMyProfile()
   const name = profile && getStringNoLocale(profile, FOAF.name)
   const { workspace } = useWorkspace(webId)
   const [tab, setTab] = useState("notes")
-  const { index: oldConceptIndex } = useItmeOnlineConceptIndex()
-
+  const needsDowncaseMigration = useNeedsDowncaseMigration()
   return (
     <>
-      <WebMonetization webId={webId}/>
+      <WebMonetization webId={webId} />
       <Nav />
       <div className="px-6">
         <h3 className="text-xl">hi {name}!</h3>
@@ -128,30 +127,39 @@ function Dashboard(){
                   visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
                 </div>
               )}
-              <NewNoteForm />
-              <div className="flex mb-6">
-                {/*
-                   <TabButton name="feed" activeName={tab} setTab={setTab}>
-                   feed
-                   </TabButton>
-                 */}
-                <TabButton name="notes" activeName={tab} setTab={setTab}>
-                  notes
-                </TabButton>
-                <TabButton name="following" activeName={tab} setTab={setTab}>
-                  following
-                </TabButton>
-              </div>
-              {tab === "notes" ? (
-                <Notes webId={webId}/>
-              ) : (tab === "following" ? (
-                <Follows />
+              {needsDowncaseMigration ? (
+                <>
+                <h2 className="text-2xl mb-1">migration required</h2>
+                <p className="font-normal mb-1">
+                  Hello! Before you use Understory Garden you'll need to migrate your
+                  data to the new format. Please head to <Link href="/migrate"><a>the migration page</a></Link>
+                  &nbsp;to complete the migration.
+                </p>
+                </>
               ) : (
-                <div className="font-logo">
-                  you are in a maze of twisty passages, all alike
-                </div>
-              )
-                  )}
+                  <>
+                    <NewNoteForm />
+                    <div className="flex mb-6">
+                      <TabButton name="notes" activeName={tab} setTab={setTab}>
+                        notes
+                      </TabButton>
+                      <TabButton name="following" activeName={tab} setTab={setTab}>
+                        following
+                      </TabButton>
+                    </div>
+                    {tab === "notes" ? (
+                      <Notes webId={webId} />
+                    ) : (tab === "following" ? (
+                      <Follows />
+                    ) : (
+                        <div className="font-logo">
+                          you are in a maze of twisty passages, all alike
+                        </div>
+                      )
+                      )}
+                  </>
+                )}
+
             </div>
           </div>
         </WorkspaceProvider>
@@ -160,10 +168,10 @@ function Dashboard(){
   )
 }
 
-function InitPage({initApp}){
+function InitPage({ initApp }) {
   return (
     <>
-      <Nav/>
+      <Nav />
       <div className="text-center pt-12">
         <h3 className="text-xl pb-6">looks like this is your first time here!</h3>
         <button className="btn" onClick={initApp}>get started</button>
@@ -172,11 +180,11 @@ function InitPage({initApp}){
   )
 }
 
-function LoadingPage(){
+function LoadingPage() {
   return (
     <>
       <div className="text-center pt-12">
-        <Loader/>
+        <Loader />
       </div>
     </>
   )
@@ -188,17 +196,17 @@ export default function IndexPage() {
   const { app, initApp, error: appError } = useApp(webId)
   return (
     <div className="page" id="page">
-      { (loggedIn === true) ? (
+      {(loggedIn === true) ? (
         app ? (
           <Dashboard />
         ) : ((appError && (appError.statusCode === 404)) ? (
-          <InitPage initApp={initApp}/>
+          <InitPage initApp={initApp} />
         ) : (
-          <LoadingPage/>
-        )
-        )
+            <LoadingPage />
+          )
+          )
       ) : (
-        ((loggedIn === false) || (loggedIn === null)) ? (
+          ((loggedIn === false) || (loggedIn === null)) ? (
             <div className="text-center">
               <div className="my-12 logo-bg">
                 <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-logo text-transparent">
@@ -208,12 +216,12 @@ export default function IndexPage() {
                   garden
                 </h1>
               </div>
-              <LoginUI/>
+              <LoginUI />
             </div>
-        ) : (
-          <Loader className="flex flex-row justify-center mt-36"/>
-        )
-      ) }
+          ) : (
+              <Loader className="flex flex-row justify-center mt-36" />
+            )
+        )}
     </div>
   )
 }
