@@ -11,8 +11,9 @@ import { conceptIdFromUri } from '../model/concept'
 import { useConcepts } from '../hooks/concepts'
 import NoteContext from '../contexts/NoteContext'
 import { urlSafeIdToConceptName } from '../utils/uris'
+import NewNoteForm from './NewNoteForm'
 
-export function Note({concept}){
+export function Note({ concept }) {
   const uri = asUrl(concept)
   const id = conceptIdFromUri(uri)
   const name = urlSafeIdToConceptName(id)
@@ -33,18 +34,27 @@ export function Note({concept}){
   )
 }
 
-export function NotesFromConcepts({path = "/notes", webId, concepts}){
+export function NotesFromConcepts({ path = "/notes", webId, concepts }) {
   const { slug: workspaceSlug } = useContext(WorkspaceContext)
   return (
-    <NoteContext.Provider value={{path: `${path}/${workspaceSlug}`}}>
+    <NoteContext.Provider value={{ path: `${path}/${workspaceSlug}` }}>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept}/>)}
+        {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept} />)}
       </ul>
     </NoteContext.Provider>
   )
 }
 
-export default function Notes({path = "/notes", webId}){
+export default function Notes({ path = "/notes", webId }) {
   const { concepts } = useConcepts(webId)
-  return <NotesFromConcepts path={path} webId={webId} concepts={concepts}/>
+  return (<>
+    { concepts && (concepts.length > 0) ? (
+      <NotesFromConcepts path={path} webId={webId} concepts={concepts} />
+    ) : (
+      <div>
+        <h2 className="text-2xl mb-2">Create a New Note</h2>
+        <NewNoteForm />
+      </div>
+    )}
+  </>)
 }
