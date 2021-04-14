@@ -5,9 +5,9 @@ import { useDrag, useDrop } from 'react-dnd'
 import { Transition } from '@headlessui/react'
 
 
-import {Menu, MenuItem} from '../menus';
+import { Menu, MenuItem } from '../menus';
 
-import {AddIcon, DragIcon} from '../icons';
+import { AddIcon, DragIcon } from '../icons';
 
 import IconButton from '../IconButton';
 import InsertMenu from './InsertMenu'
@@ -29,30 +29,30 @@ const BlockMenu = ({ element, open, className, onClose, ...props }) => {
         (ref) => (
           <div ref={ref} className={`${className} flex flex-col`} {...props}>
             <ul className="flex flex-row"
-                  onClose={() => {
-                    setTurnIntoMenuOpen(false)
-                    onClose()
-                  }}>
+              onClose={() => {
+                setTurnIntoMenuOpen(false)
+                onClose()
+              }}>
               <li className="rounded-md border-solid border-2"
                 onClick={() => {
-                          Transforms.removeNodes(editor, {
-                            at: ReactEditor.findPath(editor, element)
-                          })
-                        }}>
+                  Transforms.removeNodes(editor, {
+                    at: ReactEditor.findPath(editor, element)
+                  })
+                }}>
                 delete
               </li>
               <li className="rounded-md border-solid border-2"
-                  onClick={() => setTurnIntoMenuOpen(!turnIntoMenuOpen)}>
+                onClick={() => setTurnIntoMenuOpen(!turnIntoMenuOpen)}>
                 turn into
               </li>
             </ul>
             {turnIntoMenuOpen && (
               <TurnIntoMenu element={element}
-                            onMouseEnter={() => setTurnIntoMenuOpen(true)}
-                            open={turnIntoMenuOpen} onClose={() => {
-                              setTurnIntoMenuOpen(false)
-                              onClose()
-                            }} />
+                onMouseEnter={() => setTurnIntoMenuOpen(true)}
+                open={turnIntoMenuOpen} onClose={() => {
+                  setTurnIntoMenuOpen(false)
+                  onClose()
+                }} />
             )}
           </div>
         )}
@@ -94,15 +94,17 @@ const Block = ({ children, element }) => {
     <div className={`block ${isOver ? 'is-over' : ''}`} ref={drop}>
       {!readOnly && (
         <>
-          <BlockMenu contentEditable={false}
-                     className="select-none"
-                     element={element}
-                     open={menuOpen}
-                     onClose={() => setMenuOpen(false)} />
+          {menuOpen && (
+            <BlockMenu contentEditable={false}
+              className="select-none"
+              element={element}
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)} />
+          )}
           <div contentEditable={false} className="absolute left-0">
             <button className="block-sidebar-button"
-                    onClick={() => setInsertMenuOpen(!insertMenuOpen)}
-                    title="insert">
+              onClick={() => setInsertMenuOpen(!insertMenuOpen)}
+              title="insert">
               <AddIcon></AddIcon>
             </button>
             <button
@@ -118,14 +120,14 @@ const Block = ({ children, element }) => {
       <div ref={preview} className="ml-6">
         {children}
       </div>
-      {!readOnly && (
+      {!readOnly && insertMenuOpen && (
         <InsertMenu element={element}
-                    contentEditable={false}
-                    className="select-none"
-                    open={insertMenuOpen}
-                    onClose={() => {
-                      setInsertMenuOpen(false)
-                    }} />
+          contentEditable={false}
+          className="select-none"
+          open={insertMenuOpen}
+          onClose={() => {
+            setInsertMenuOpen(false)
+          }} />
       )}
     </div>
   )

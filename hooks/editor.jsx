@@ -1,11 +1,7 @@
 import { useCallback, useState, useMemo } from 'react'
 import { Editor, Transforms, Range } from 'slate'
-import Fuse from 'fuse.js'
-import { useWebId } from 'swrlit'
-import { asUrl } from '@inrupt/solid-client'
 
-import { conceptIdFromUri } from '../model/concept'
-import { urlSafeIdToConceptName } from '../utils/uris'
+import { useConceptNamesMatching } from '../hooks/concepts'
 import { insertConcept } from '../utils/editor'
 
 import { useConcepts } from './concepts'
@@ -32,21 +28,6 @@ function searchForOpenConcepts(editor){
     }
   }
 }
-
-function useConceptNamesMatching(search){
-  const [fuse] = useState(new Fuse([], {includeScore: true}))
-  const webId = useWebId()
-  const { concepts } = useConcepts(webId)
-  return useMemo(function findMatchingConceptNames(){
-    if (search){
-      const names = concepts && concepts.map(concept => urlSafeIdToConceptName(conceptIdFromUri(asUrl(concept))))
-      fuse.setCollection(names)
-      const result = fuse.search(search)
-      return result.map(({item}) => item)
-    }
-  }, [concepts, search])
-}
-
 
 export function useConceptAutocomplete(editor){
   const [target, setTarget] = useState()
