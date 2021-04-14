@@ -38,10 +38,10 @@ import * as base58 from 'micro-base58'
 import { getThing } from '@inrupt/solid-client'
 import US from '../vocab'
 
-const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || "understory-garden"
-const GnomesOrg = process.env.GITHUB_GNOMES_ORG || "understory-gnomes"
-const GithubToken = process.env.GITHUB_TOKEN_UGK || ""
-const VercelToken = process.env.VERCEL_TOKEN_UGK || ""
+const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
+const GnomesOrg = process.env.GITHUB_GNOMES_ORG
+const GithubToken = process.env.GITHUB_TOKEN_UGK
+const VercelToken = process.env.VERCEL_TOKEN_UGK
 const UserAgent = "UnderstoryGnomes v0.0.1"
 
 const octokit = new OctoKit({
