@@ -41,13 +41,8 @@ import US from '../vocab'
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
 const GithubToken = process.env.GITHUB_TOKEN_UGK
+const GithubAuthHeaders = { authorization: `token ${GithubToken}` }
 const VercelToken = process.env.VERCEL_TOKEN_UGK
-const UserAgent = "UnderstoryGnomes v0.0.1"
-
-const octokit = new OctoKit({
-  auth: GithubToken,
-  userAgent: UserAgent
-})
 
 function templateID(template) {
   return `${TemplateOrg}/${template}`
@@ -73,19 +68,21 @@ async function readPublicGnomeConfig(url) {
 }
 
 async function findGnomesRepo(repo, template) {
-  const repo = await octokit.request('GET /repos/{owner}/{repo}', {
+  const { data } = await octokit.request('GET /repos/{owner}/{repo}', {
+    headers: GithubAuthHeaders,
     owner: GnomesOrg,
     repo: repo
   })
 
-  if (repo.description != templateID(template)) {
+  if (data.description != templateID(template)) {
     throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
   }
-  return repo
+  return data
 }
 
 async function createGnomesRepo(repo, template) {
-  return await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
+  const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
+    headers: GithubAuthHeaders,
     template_owner: TemplateOrg,
     template_repo: template,
     owner: GnomesOrg,
@@ -98,6 +95,7 @@ async function createGnomesRepo(repo, template) {
       ]
     }
   })
+  return data
 }
 
 async function findOrCreateGnomesRepo(repo, template) {
@@ -115,9 +113,9 @@ async function setupPublicGnome(gnomeConfigURL) {
 }
 
 module.exports = async (req, res) => {
-  const { webid } = req.body
+  const { url } = req.body
   try {
-    setupPublicGnome(gnomeConfigURL)
+    setupPublicGnome(url)
   } catch (e) {
     console.log(e.message)
   }
