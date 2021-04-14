@@ -33,8 +33,10 @@ Recommended links from Michiel on supporting non-public gnomes:
   - https://github.com/solid/solid-node-client
 */
 
-import { OcktoKit } from "@ocktokit/core"
+import { OcktoKit } from '@ocktokit/core'
 import * as base58 from 'micro-base58'
+import { getThing } from '@inrupt/solid-client'
+import US from '../vocab'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || "understory-garden"
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG || "understory-gnomes"
@@ -55,13 +57,19 @@ function repoID(gnomeConfigURL) {
   return base58.encode(gnomeConfigURL)
 }
 
-async function readPublicGnomeConfig(gnomeConfigURL) {
-  // await fetch gnomesConfigPath, convert to gnomes js obj
-  // returns an onject with a .template property.
-  return {
-    template: "",
-    repo: repoID(gnomeConfigURL)
+async function readPublicGnomeConfig(url) {
+  const gnomeConfigResource = await getSolidDataset(url)
+  const gnomeConfigThing = getThing(gnomeConfigResource, uri)
+  const gnomeConfig = {
+    url,
+    type: getStringNoLocale(gnomeConfigThing, UG.hasGnomeType),
+    template: getStringNoLocale(gnomeConfigThing, UG.usesGateTemplate),
+    repo: repoID(url)
   }
+  if (gnomeConfig.type !== "gate") {
+    throw new Error(`Only gnomes of type Gate are currently supported.`)
+  }
+  return gnomeConfig
 }
 
 async function findGnomesRepo(repo, template) {
