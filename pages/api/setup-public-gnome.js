@@ -5,12 +5,17 @@
   Instead, this function is simply a trigger,
   which then reads the config file directly from the users solid pod.
 
-  For now, we only support one Gnome type (WebsiteGnome):
+  For now, we only support one Gnome type: Gates
 
-    WebsiteGnome:
-      template:  nextjs-swrlit-tailwindcss // maps to github.com/understory-garden/nextjs-swrlit-tailwindcss
+    workspace/gnomes/gate.ttl
+      type: gate
+      template: single-page-gate // matches github.com/understory-garden/single-page-gate
 
-  POST /api/update-gnomes
+
+  POST /api/setup-gnome
+    data {
+      gnomeConfigUrl
+    }
 
   -> grab gnomes.ttl file
   -> parse data
@@ -21,16 +26,15 @@
      -> call vercel project to set webid env variable
       # add github ops user to vercel team
 
-https://github.com/solid/web-access-control-tests/blob/main/test/helpers/env.ts#L19
-
-https://github.com/solid/solid-auth-fetcher/blob/master/src/obtainAuthHeaders.ts#L57
-
-Talk with Jeff Zucker about node auth
-
-https://github.com/solid/solid-node-client
+Recommended links from Michiel on supporting non-public gnomes:
+  - https://github.com/solid/web-access-control-tests/blob/main/test/helpers/env.ts#L19
+  - https://github.com/solid/solid-auth-fetcher/blob/master/src/obtainAuthHeaders.ts#L57
+  - Talk with Jeff Zucker about node auth
+  - https://github.com/solid/solid-node-client
 */
 
 import { OcktoKit } from "@ocktokit/core"
+import * as base58 from 'micro-base58'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG || "understory-garden"
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG || "understory-gnomes"
@@ -47,20 +51,23 @@ function templateID(template) {
   return `${TemplateOrg}/${template}`
 }
 
-function gnomesRepoName (webid) {
-  return webid // TODO: webid won't work here. Hash or encode somehow?
+function repoID(gnomeConfigURL) {
+  return base58.encode(gnomeConfigURL)
 }
 
-async function readPublicGnomesConfig(webid) {
-  const gnomesConfigPath = webid + "/public/gnomes.ttl" // TODO: this probably needs to be fixed
+async function readPublicGnomeConfig(gnomeConfigURL) {
   // await fetch gnomesConfigPath, convert to gnomes js obj
   // returns an onject with a .template property.
+  return {
+    template: "",
+    repo: repoID(gnomeConfigURL)
+  }
 }
 
-async function findGnomesRepo(webid, template) {
+async function findGnomesRepo(repo, template) {
   const repo = await octokit.request('GET /repos/{owner}/{repo}', {
     owner: GnomesOrg,
-    repo: gnomesRepoName(webid)
+    repo: repo
   })
 
   if (repo.description != templateID(template)) {
@@ -69,12 +76,12 @@ async function findGnomesRepo(webid, template) {
   return repo
 }
 
-async function createGnomesRepoFromTemplate(webid, template) {
+async function createGnomesRepo(repo, template) {
   return await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
     template_owner: TemplateOrg,
     template_repo: template,
     owner: GnomesOrg,
-    name: gnomesRepoName(webid),
+    name: repo,
     description: templateID(template), // this is used to check what template was used.
     private: true,
     mediaType: {
@@ -85,35 +92,24 @@ async function createGnomesRepoFromTemplate(webid, template) {
   })
 }
 
-async function findOrCreateGnomesRepo(webid, template) {
-  const exists = await findGnomesRepo(webid, template)
+async function findOrCreateGnomesRepo(repo, template) {
+  const exists = await findGnomesRepo(repo, template)
   if (exists) {
     return exists
   } else {
-    return await createGnomesRepoFromTemplate(webid, template)
+    return await createGnomesRepo(repo, template)
   }
 }
 
-async function configureGnomesRepo(webid, template) {
-  const findOrCreate = await findOrCreateGnomesRepo(webid, template)
-  return await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
-    owner: GnomesOrg,
-    repo: gnomesRepoName(webid),
-    path: "config.json", // TODO: json-ld?
-    message: UserAgent,
-    content: `{ webid: ${webid}, templateID: ${templateID(template)}}`
-  })
-}
-
-async function updateGnomes(webid) {
-  const { template } = await readPublicGnomesConfig(webid)
-  const gnomesRepo = await configureGnomesRepo(webid, template)
+async function setupPublicGnome(gnomeConfigURL) {
+  const { template , destinationRepo } = await readPublicGnomeConfig(gnomeConfigURL)
+  const gnomesRepo = await findOrCreateGnomesRepo(template, destinationRepo)
 }
 
 module.exports = async (req, res) => {
   const { webid } = req.body
   try {
-    updateGnomes(webid)
+    setupPublicGnome(gnomeConfigURL)
   } catch (e) {
     console.log(e.message)
   }
