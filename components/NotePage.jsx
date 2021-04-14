@@ -48,9 +48,9 @@ import { useConceptAutocomplete } from '../hooks/editor'
 import WebMonetization from '../components/WebMonetization'
 import { Loader, Portal } from '../components/elements'
 
-const emptyBody = [{ children: [{text: ""}]}]
+const emptyBody = [{ children: [{ text: "" }] }]
 
-function LinkToConcept({uri, ...props}){
+function LinkToConcept({ uri, ...props }) {
   const id = conceptIdFromUri(uri)
   const name = urlSafeIdToConceptName(id)
   const { path } = useContext(NoteContext)
@@ -61,7 +61,7 @@ function LinkToConcept({uri, ...props}){
   )
 }
 
-function LinksTo({name}){
+function LinksTo({ name }) {
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { concept } = useConcept(webId, workspaceSlug, name)
@@ -70,14 +70,14 @@ function LinksTo({name}){
     <ul>
       {conceptUris && conceptUris.map(uri => (
         <li key={uri}>
-          <LinkToConcept uri={uri}/>
+          <LinkToConcept uri={uri} />
         </li>
       ))}
     </ul>
   )
 }
 
-function LinksFrom({conceptUri}){
+function LinksFrom({ conceptUri }) {
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
   const { index } = useCombinedConceptIndex(webId, workspaceSlug)
@@ -86,39 +86,39 @@ function LinksFrom({conceptUri}){
     <ul>
       {conceptUrisThatReference(index, conceptUri).map((uri) => (
         <li key={uri}>
-          <LinkToConcept uri={uri}/>
+          <LinkToConcept uri={uri} />
         </li>
       ))}
     </ul>
   )
 }
 
-function createOrUpdateNote(note, value){
+function createOrUpdateNote(note, value) {
   let newNote = note || createNote()
   newNote = setStringNoLocale(newNote, US.noteBody, JSON.stringify(value))
   return newNote
 }
 
-function createConcept(prefix, name){
-  return createThing({url: `${prefix}${conceptNameToUrlSafeId(name)}`})
+function createConcept(prefix, name) {
+  return createThing({ url: `${prefix}${conceptNameToUrlSafeId(name)}` })
 }
 
-function createTag(prefix, name){
-  return createThing({url: `${prefix}${tagNameToUrlSafeId(name)}`})
+function createTag(prefix, name) {
+  return createThing({ url: `${prefix}${tagNameToUrlSafeId(name)}` })
 }
 
-function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames){
+function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames) {
   let concept = createConcept(conceptPrefix, name)
-  for (const conceptName of conceptNames){
+  for (const conceptName of conceptNames) {
     concept = addUrl(concept, US.refersTo, createConcept(conceptPrefix, conceptName))
   }
-  for (const tagName of tagNames){
+  for (const tagName of tagNames) {
     concept = addUrl(concept, US.tagged, createTag(tagPrefix, tagName))
   }
   return concept
 }
 
-function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name){
+function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name) {
   const conceptPrefix = getUrl(workspace, US.conceptPrefix)
   const tagPrefix = getUrl(workspace, US.tagPrefix)
   const storageUri = concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
@@ -135,7 +135,7 @@ function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, na
   return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
 
-function PrivacyControl({name, ...rest}){
+function PrivacyControl({ name, ...rest }) {
   const [saving, setSaving] = useState(false)
   const webId = useWebId()
   const { slug: workspaceSlug } = useWorkspaceContext()
@@ -149,22 +149,22 @@ function PrivacyControl({name, ...rest}){
   const { thing: publicNote, save: savePublic } = useThing(publicNoteResourceUrl)
 
   const privateNoteResourceUrl = privateStorage && name && `${getUrl(privateStorage, US.noteStorage)}${noteStorageFileAndThingName(name)}`
-  const { thing: privateNote, save: savePrivate  } = useThing(privateNoteResourceUrl)
+  const { thing: privateNote, save: savePrivate } = useThing(privateNoteResourceUrl)
 
-  async function makePrivateCallback(){
+  async function makePrivateCallback() {
     setSaving(true)
     await savePrivate(setStringNoLocale(privateNote || createNote(), US.noteBody, getStringNoLocale(publicNote, US.noteBody)))
     await savePrivateIndex(setThing(privateIndex || createSolidDataset(),
-                                    setUrl(concept, US.storedAt, privateNoteResourceUrl)))
+      setUrl(concept, US.storedAt, privateNoteResourceUrl)))
     await savePublicIndex(removeThing(publicIndex || createSolidDataset(), concept))
     await deleteResource(publicNoteResourceUrl)
     setSaving(false)
   }
-  async function makePublicCallback(){
+  async function makePublicCallback() {
     setSaving(true)
     await savePublic(setStringNoLocale(publicNote || createNote(), US.noteBody, getStringNoLocale(privateNote, US.noteBody)))
     await savePublicIndex(setThing(publicIndex || createSolidDataset(),
-                                   setUrl(concept, US.storedAt, publicNoteResourceUrl)))
+      setUrl(concept, US.storedAt, publicNoteResourceUrl)))
     await savePrivateIndex(removeThing(privateIndex || createSolidDataset(), concept))
     await deleteResource(privateNoteResourceUrl)
     setSaving(false)
@@ -182,10 +182,10 @@ function PrivacyControl({name, ...rest}){
       <span>bad storage url: {getUrl(concept, US.storedAt)}</span>
     )
     )
-  ) : (<Loader/>)
+  ) : (<Loader />)
 }
 
-function Backup({label, backup, restoreValue}){
+function Backup({ label, backup, restoreValue }) {
   const editor = useNewEditor()
   const bodyJSON = getStringNoLocale(backup, US.noteBody)
   const value = JSON.parse(bodyJSON)
@@ -204,26 +204,26 @@ function Backup({label, backup, restoreValue}){
   )
 }
 
-function Backups({name, restoreValue}){
-  const { oneMinuteBackup, fiveMinuteBackup, tenMinuteBackup, thirtyMinuteBackup} = useBackups(name)
+function Backups({ name, restoreValue }) {
+  const { oneMinuteBackup, fiveMinuteBackup, tenMinuteBackup, thirtyMinuteBackup } = useBackups(name)
   return (
     <div className="text-center">
       <h2 className="text-2xl">Backups</h2>
       <div className="flex flex-row">
-        {oneMinuteBackup && <Backup label="One Minute" backup={oneMinuteBackup} restoreValue={restoreValue}/>}
-        {fiveMinuteBackup && <Backup label="Five Minutes" backup={fiveMinuteBackup} restoreValue={restoreValue}/>}
-        {tenMinuteBackup && <Backup label="Ten Minutes" backup={tenMinuteBackup} restoreValue={restoreValue}/>}
-        {thirtyMinuteBackup && <Backup label="Thirty Minutes" backup={thirtyMinuteBackup} restoreValue={restoreValue}/>}
+        {oneMinuteBackup && <Backup label="One Minute" backup={oneMinuteBackup} restoreValue={restoreValue} />}
+        {fiveMinuteBackup && <Backup label="Five Minutes" backup={fiveMinuteBackup} restoreValue={restoreValue} />}
+        {tenMinuteBackup && <Backup label="Ten Minutes" backup={tenMinuteBackup} restoreValue={restoreValue} />}
+        {thirtyMinuteBackup && <Backup label="Thirty Minutes" backup={thirtyMinuteBackup} restoreValue={restoreValue} />}
       </div>
     </div>
   )
 }
 
-export default function NotePage({encodedName, webId, path="/notes", readOnly=false}){
+export default function NotePage({ encodedName, webId, path = "/notes", readOnly = false }) {
   const name = encodedName && urlSafeIdToConceptName(encodedName)
   const myWebId = useWebId()
   const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
-  const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex} = useConcept(webId, workspaceSlug, name)
+  const { conceptUri, concept, index: conceptIndex, saveIndex: saveConceptIndex } = useConcept(webId, workspaceSlug, name)
 
   const noteStorageUri = concept && getUrl(concept, US.storedAt)
 
@@ -239,15 +239,15 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const saved = ((value === undefined) || (bodyJSON === JSON.stringify(value)))
 
   const editor = useNewEditor()
-  useEffect(function resetSelectionOnNameChange(){
+  useEffect(function resetSelectionOnNameChange() {
     editor.selection = null
   }, [name])
 
-  useEffect(function setValueFromNote(){
+  useEffect(function setValueFromNote() {
     if (bodyJSON) {
       const v = JSON.parse(bodyJSON)
       setValue(v)
-    } else if (errorStatus == 404){
+    } else if (errorStatus == 404) {
       setValue(emptyBody)
     }
   }, [bodyJSON, errorStatus])
@@ -256,7 +256,7 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
   const { profile: authorProfile } = useProfile(webId)
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
-  const saveCallback = async function saveNote(){
+  const saveCallback = async function saveNote() {
     const newNote = createOrUpdateNote(note, value)
     const newConceptIndex = createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name)
     setSaving(true)
@@ -269,12 +269,12 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
       setSaving(false)
     }
   }
-  useEffect(function saveAfterDebounce(){
-    if (debouncedValue){
+  useEffect(function saveAfterDebounce() {
+    if (debouncedValue) {
       const isInitialNoteState = (
         (debouncedValue === emptyBody) && (bodyJSON === undefined)
       )
-      if ((JSON.stringify(debouncedValue) !== bodyJSON) && !isInitialNoteState){
+      if ((JSON.stringify(debouncedValue) !== bodyJSON) && !isInitialNoteState) {
         saveCallback()
       }
     }
@@ -284,8 +284,8 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
 
   const { fetch } = useAuthentication()
   const router = useRouter()
-  async function deleteCallback(){
-    if (confirm(`Are you sure you want to delete ${name} ?`)){
+  async function deleteCallback() {
+    if (confirm(`Are you sure you want to delete ${name} ?`)) {
       await Promise.all([
         fetch(noteStorageUri, { method: 'DELETE' }),
         concept && saveConceptIndex(removeThing(conceptIndex, concept))
@@ -316,142 +316,142 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
     }
   }, [editor, popoverTarget])
 
-  const onChange = useCallback(function onChange(newValue){
+  const onChange = useCallback(function onChange(newValue) {
     setValue(newValue)
     conceptAutocompleteOnChange && conceptAutocompleteOnChange(editor)
   }, [editor, conceptAutocompleteOnChange])
 
 
   return (
-      <NoteContext.Provider value={noteContext}>
-        <div className="flex flex-col page">
-          <WebMonetization webId={webId} />
-          <Nav />
-          <div className="relative overflow-y-hidden flex-none h-56">
-            {coverImage && <img className="w-full" src={coverImage}/>}
-            <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
-              <div className="flex flex-row justify-between h-44 overflow-y-hidden">
-                <div className="flex flex-col">
-                  <h1 className="text-5xl font-bold text-gray-800">
-                    {name}
-                  </h1>
-                  {authorName && (
-                    <div className="text-lg text-gray-800">
-                      by&nbsp;
-                      <Link href={profilePath(webId) || ""}>
-                        <a>
-                          {authorName}
-                        </a>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-                {name && (readOnly ? (
-                  (myWebId === webId) && (
-                    <Link href={privateNotePath(workspaceSlug, name) || ""}>
+    <NoteContext.Provider value={noteContext}>
+      <div className="flex flex-col page">
+        <WebMonetization webId={webId} />
+        <Nav />
+        <div className="relative overflow-y-hidden flex-none h-56">
+          {coverImage && <img className="w-full" src={coverImage} />}
+          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
+            <div className="flex flex-row justify-between h-44 overflow-y-hidden">
+              <div className="flex flex-col">
+                <h1 className="text-5xl font-bold text-gray-800">
+                  {name}
+                </h1>
+                {authorName && (
+                  <div className="text-lg text-gray-800">
+                    by&nbsp;
+                    <Link href={profilePath(webId) || ""}>
                       <a>
-                        edit
+                        {authorName}
                       </a>
                     </Link>
-                  )
-                ) : (
-                  <Link href={publicNotePath(webId, workspaceSlug, name) || ""}>
-                    <a>
-                      sharable link
-                    </a>
-                  </Link>
-                ))}
-                <a href={noteStorageUri} target="_blank" rel="noopener">
-                  source
-                </a>
-                {!readOnly && (
-                  <div className="flex flex-col">
-                    <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
-                      {showPrivacy ? 'hide' : 'show'} privacy control
-                    </button>
-                    <button className="btn" onClick={deleteCallback}>
-                      delete
-                    </button>
-                    <button className="btn" onClick={() => setShowBackups(!showBackups)}>
-                      {showBackups ? 'hide' : 'show'} backups
-                    </button>
                   </div>
                 )}
               </div>
+              {name && (readOnly ? (
+                (myWebId === webId) && (
+                  <Link href={privateNotePath(workspaceSlug, name) || ""}>
+                    <a>
+                      edit
+                      </a>
+                  </Link>
+                )
+              ) : (
+                <Link href={publicNotePath(webId, workspaceSlug, name) || ""}>
+                  <a>
+                    sharable link
+                    </a>
+                </Link>
+              ))}
+              <a href={noteStorageUri} target="_blank" rel="noopener">
+                source
+                </a>
+              {!readOnly && (
+                <div className="flex flex-col">
+                  <button className="btn" onClick={() => setShowPrivacy(!showPrivacy)}>
+                    {showPrivacy ? 'hide' : 'show'} privacy control
+                    </button>
+                  <button className="btn" onClick={deleteCallback}>
+                    delete
+                    </button>
+                  <button className="btn" onClick={() => setShowBackups(!showBackups)}>
+                    {showBackups ? 'hide' : 'show'} backups
+                    </button>
+                </div>
+              )}
             </div>
           </div>
-          { showBackups && <Backups name={name} restoreValue={setValue}/> }
-          { showPrivacy && <PrivacyControl name={name} />}
-          <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
-            <div className="w-full flex flex-col flex-grow">
-              {(value !== undefined) && (
-                <Slate
-                  editor={editor}
-                  value={value}
-                  onChange={onChange}
-                >
-                  {!readOnly && (
-                    <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                                   className="sticky top-0 z-20"/>
-                  )}
-                  <div className="flex-grow flex flex-row mt-3">
-                    <Editable readOnly={readOnly}
-                              onKeyDown={onKeyDown}
-                              editor={editor}
-                              className="flex-grow text-gray-900" />
-                    <div className="relative">
-                      <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                              className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
-                        {sidebarOpen ? ">>" : "<<"}
-                      </button>
-                      <Transition
-                        show={sidebarOpen}
-                        enter="transform transition ease-in-out duration-500 sm:duration-700"
-                        enterFrom="translate-x-full"
-                        enterTo="translate-x-0"
-                        leave="transform transition ease-in-out duration-500 sm:duration-700"
-                        leaveFrom="translate-x-0"
-                        leaveTo="translate-x-full">
-                        {
-                          (ref) => (
-                            <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                              <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                                <div className="px-6 sm:px-6">
-                                  <div className="flex items-start justify-between">
-                                    <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                                      Links
+        </div>
+        {showBackups && <Backups name={name} restoreValue={setValue} />}
+        {showPrivacy && <PrivacyControl name={name} />}
+        <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
+          <div className="w-full flex flex-col flex-grow">
+            {(value !== undefined) && (
+              <Slate
+                editor={editor}
+                value={value}
+                onChange={onChange}
+              >
+                {!readOnly && (
+                  <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                    className="sticky top-0 z-20" />
+                )}
+                <div className="flex-grow flex flex-row mt-3">
+                  <Editable readOnly={readOnly}
+                    onKeyDown={onKeyDown}
+                    editor={editor}
+                    className="flex-grow text-gray-900" />
+                  <div className="relative">
+                    <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                      className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
+                      {sidebarOpen ? ">>" : "<<"}
+                    </button>
+                    <Transition
+                      show={sidebarOpen}
+                      enter="transform transition ease-in-out duration-500 sm:duration-700"
+                      enterFrom="translate-x-full"
+                      enterTo="translate-x-0"
+                      leave="transform transition ease-in-out duration-500 sm:duration-700"
+                      leaveFrom="translate-x-0"
+                      leaveTo="translate-x-full">
+                      {
+                        (ref) => (
+                          <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                            <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                              <div className="px-6 sm:px-6">
+                                <div className="flex items-start justify-between">
+                                  <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                    Links
                                     </h2>
-                                  </div>
-                                </div>
-                                <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                                  <div>
-                                    <h3>Links to</h3>
-                                    {concept && (
-                                      <LinksTo name={name}/>
-                                    )}
-                                  </div>
-                                  <div>
-                                    <h3>Linked from</h3>
-                                    {conceptIndex && (
-                                      <LinksFrom conceptUri={conceptUri}/>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="px-6 mt-6">
-                                  <h2 className="text-xl">
-                                    Actions
-                                  </h2>
                                 </div>
                               </div>
+                              <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                                <div>
+                                  <h3>Links to</h3>
+                                  {concept && (
+                                    <LinksTo name={name} />
+                                  )}
+                                </div>
+                                <div>
+                                  <h3>Linked from</h3>
+                                  {conceptIndex && (
+                                    <LinksFrom conceptUri={conceptUri} />
+                                  )}
+                                </div>
+                              </div>
+                              <div className="px-6 mt-6">
+                                <h2 className="text-xl">
+                                  Actions
+                                  </h2>
+                              </div>
                             </div>
-                          )
-                        }
-                      </Transition>
-                    </div>
+                          </div>
+                        )
+                      }
+                    </Transition>
                   </div>
-                </Slate>
-              )}
-              {/*
+                </div>
+              </Slate>
+            )}
+            {/*
                  <div>
                  <pre>
                  {JSON.stringify(editor.selection, null, 2)}
@@ -459,27 +459,27 @@ export default function NotePage({encodedName, webId, path="/notes", readOnly=fa
                  </pre>
                  </div>
                */}
+          </div>
+        </section>
+        {showPopover && (
+          <Portal>
+            <div ref={popoverRef}
+              className="bg-white p-1 border-2"
+              style={{
+                top: '-9999px',
+                left: '-9999px',
+                position: 'absolute',
+                zIndex: 1,
+              }}>
+              {matchingConceptNames && matchingConceptNames.map((name, i) => (
+                <div key={name} className={`${(i === popoverSelectionIndex) ? 'bg-purple-300' : 'bg-white'}`}>
+                  {name}
+                </div>
+              ))}
             </div>
-          </section>
-          {showPopover && (
-            <Portal>
-              <div ref={popoverRef}
-                   className="bg-white p-1 border-2"
-                   style={{
-                     top: '-9999px',
-                     left: '-9999px',
-                     position: 'absolute',
-                     zIndex: 1,
-                   }}>
-                {matchingConceptNames && matchingConceptNames.map((name, i) => (
-                  <div key={name} className={`${(i === popoverSelectionIndex) ? 'bg-purple-300' : 'bg-white'}`}>
-                    {name}
-                  </div>
-                ))}
-              </div>
-            </Portal>
-          )}
-        </div>
-      </NoteContext.Provider>
+          </Portal>
+        )}
+      </div>
+    </NoteContext.Provider>
   )
 }
