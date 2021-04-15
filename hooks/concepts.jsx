@@ -46,8 +46,7 @@ function maybeNewConcept(url, workspace, name) {
   return url && workspace && name && setUrl(createThing({ url }), US.storedAt, defaultNoteStorageUri(workspace, name))
 }
 
-export function useConcept(webId, workspaceSlug, name) {
-  const { workspace } = useWorkspace(webId, workspaceSlug)
+export function useConcept(webId, workspaceSlug, name, newConceptPrivacy='private') {
   const conceptPrefix = useConceptPrefix(webId, workspaceSlug)
   const conceptUri = conceptPrefix && name && `${conceptPrefix}${conceptNameToUrlSafeId(name)}`
 
@@ -55,6 +54,7 @@ export function useConcept(webId, workspaceSlug, name) {
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
   const publicConcept = publicIndex && getThing(publicIndex, conceptUri)
   const privateConcept = privateIndex && getThing(privateIndex, conceptUri)
+  const { workspace } = useWorkspace(webId, workspaceSlug, newConceptPrivacy)
   const thisConcept = publicConcept || privateConcept || maybeNewConcept(conceptUri, workspace, name)
   const concept = useMemoCompare(thisConcept, equal)
   if (conceptUri) {
@@ -72,7 +72,7 @@ export function useConcept(webId, workspaceSlug, name) {
         index: privateIndex,
         saveIndex: savePrivateIndex
       }
-    } else if (privateIndex && publicIndex && workspace) {
+    } else if (privateIndex && publicIndex) {
       return {
         conceptUri,
         concept,

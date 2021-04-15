@@ -66,7 +66,9 @@ export default function Nav() {
               />
             </a>
           </Link>
-          <NewNoteForm />
+          {loggedIn && (
+            <NewNoteForm />
+          )}
         </li>
         <li>
           <ul className="flex justify-between items-center space-x-4">
