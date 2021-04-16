@@ -40,7 +40,7 @@ export const US = {
   tagged: `${understoryRoot}tagged`,
   tagPrefix: `${understoryRoot}tagPrefix`,
   hasSettings: `${understoryRoot}hasSettings`,
-  devMode: `${understoryRoot}devMode`
-  hasGnomeType: `${understoryRoot}hasGnomeType`
+  devMode: `${understoryRoot}devMode`,
+  hasGnomeType: `${understoryRoot}hasGnomeType`,
   usesTemplate: `${understoryRoot}usesGateTemplate`
 }
