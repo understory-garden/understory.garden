@@ -33,10 +33,10 @@ Recommended links from Michiel on supporting non-public gnomes:
   - https://github.com/solid/solid-node-client
 */
 
-import { OcktoKit } from '@ocktokit/core'
 import * as base58 from 'micro-base58'
 import { getThing } from '@inrupt/solid-client'
-import US from '../vocab'
+import * as octokit from '@octokit/request'
+import US from '../../vocab'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
