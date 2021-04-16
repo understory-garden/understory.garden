@@ -34,9 +34,9 @@ Recommended links from Michiel on supporting non-public gnomes:
 */
 
 import * as base58 from 'micro-base58'
-import { getThing } from '@inrupt/solid-client'
+import { getThing, getSolidDataset, getStringNoLocale } from '@inrupt/solid-client'
 import * as octokit from '@octokit/request'
-import US from '../../vocab'
+import { US } from '../../vocab'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
@@ -54,11 +54,11 @@ function repoID(gnomeConfigURL) {
 
 async function readPublicGnomeConfig(url) {
   const gnomeConfigResource = await getSolidDataset(url)
-  const gnomeConfigThing = getThing(gnomeConfigResource, uri)
+  const gnomeConfigThing = getThing(gnomeConfigResource, url)
   const gnomeConfig = {
     url,
-    type: getStringNoLocale(gnomeConfigThing, UG.hasGnomeType),
-    template: getStringNoLocale(gnomeConfigThing, UG.usesGateTemplate),
+    type: getStringNoLocale(gnomeConfigThing, US.hasGnomeType),
+    template: getStringNoLocale(gnomeConfigThing, US.usesGateTemplate),
     repo: repoID(url)
   }
   if (gnomeConfig.type !== "gate") {
@@ -108,8 +108,8 @@ async function findOrCreateGnomesRepo(repo, template) {
 }
 
 async function setupPublicGnome(gnomeConfigURL) {
-  const { template , destinationRepo } = await readPublicGnomeConfig(gnomeConfigURL)
-  const gnomesRepo = await findOrCreateGnomesRepo(template, destinationRepo)
+  const { template , repo } = await readPublicGnomeConfig(gnomeConfigURL)
+  const gnomesRepo = await findOrCreateGnomesRepo(template, repo)
 }
 
 module.exports = async (req, res) => {
