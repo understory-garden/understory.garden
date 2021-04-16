@@ -115,8 +115,15 @@ async function setupPublicGnome(gnomeConfigURL) {
 module.exports = async (req, res) => {
   const { url } = req.body
   try {
-    setupPublicGnome(url)
+    const gnome = setupPublicGnome(url)
+    res.json({
+      url: url,
+      templateOrg: TemplateOrg,
+      gnomesOrg: GnomesOrg,
+      gnome: gnome
+    })
   } catch (e) {
     console.log(e.message)
+    res.status(500).send(`The Understory Gnome King could not understand your proposal: ${url}`)
   }
 };
