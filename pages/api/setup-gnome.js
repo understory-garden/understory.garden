@@ -1,4 +1,4 @@
-/* Update Gnomes- Gives your gnome new instructions for what to do.
+/* SetupGnome - Gives your gnome new instructions for what to do.
 
   This request handler will not be authenticated.
   That means it must not accept the data in the request as valid.
