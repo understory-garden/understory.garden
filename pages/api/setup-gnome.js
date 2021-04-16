@@ -68,11 +68,20 @@ async function readPublicGnomeConfig(url) {
 }
 
 async function findGnomesRepo(repo, template) {
-  const { data } = await octokit.request('GET /repos/{owner}/{repo}', {
-    headers: GithubAuthHeaders,
-    owner: GnomesOrg,
-    repo: repo
-  })
+  try {
+    const { data, status } = await octokit.request('GET /repos/{owner}/{repo}', {
+      headers: GithubAuthHeaders,
+      owner: GnomesOrg,
+      repo: repo
+    })
+  } catch (e) {
+    if (e.status === 404) {
+      // expected error if repo does not exist
+      return undefined
+    } else {
+      throw e
+    }
+  }
 
   if (data.description != templateID(template)) {
     throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
