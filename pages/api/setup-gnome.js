@@ -74,6 +74,10 @@ async function findGnomesRepo(repo, template) {
       owner: GnomesOrg,
       repo: repo
     })
+    if (data.description != templateID(template)) {
+      throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
+    }
+    return data
   } catch (e) {
     if (e.status === 404) {
       // expected error if repo does not exist
@@ -82,29 +86,31 @@ async function findGnomesRepo(repo, template) {
       throw e
     }
   }
-
-  if (data.description != templateID(template)) {
-    throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
-  }
-  return data
 }
 
 async function createGnomesRepo(repo, template) {
-  const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
-    headers: GithubAuthHeaders,
-    template_owner: TemplateOrg,
-    template_repo: template,
-    owner: GnomesOrg,
-    name: repo,
-    description: templateID(template), // this is used to check what template was used.
-    private: true,
-    mediaType: {
-      previews: [
-        'baptiste' // TODO: This is apparently an experimental github API feature. Probably shouldn't rely on it but it's the easist for now.
-      ]
-    }
-  })
-  return data
+  try {
+    console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${repo}, description: ${templateID(template)} }`)
+    const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
+      headers: GithubAuthHeaders,
+      template_owner: TemplateOrg,
+      template_repo: template,
+      owner: GnomesOrg,
+      name: repo,
+      description: templateID(template), // this is used to check what template was used.
+      private: true,
+      mediaType: {
+        previews: [
+          'baptiste' // TODO: This is apparently an experimental github API feature. Probably shouldn't rely on it but it's the easist for now.
+        ]
+      }
+    })
+    return data
+  }
+  catch (e) {
+    console.log(e)
+    return undefined
+  }
 }
 
 async function findOrCreateGnomesRepo(repo, template) {
@@ -118,7 +124,7 @@ async function findOrCreateGnomesRepo(repo, template) {
 
 async function setupPublicGnome(gnomeConfigURL) {
   const { template , repo } = await readPublicGnomeConfig(gnomeConfigURL)
-  const gnomesRepo = await findOrCreateGnomesRepo(template, repo)
+  const gnomesRepo = await findOrCreateGnomesRepo(repo, template)
 }
 
 module.exports = async (req, res) => {
