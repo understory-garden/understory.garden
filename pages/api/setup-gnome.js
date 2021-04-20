@@ -67,7 +67,8 @@ async function readPublicGnomeConfig(url) {
   return gnomeConfig
 }
 
-async function findGnomesRepo(repo, template) {
+async function findGnomesRepo(config) {
+  const { repo, template } = config
   try {
     const { data, status } = await octokit.request('GET /repos/{owner}/{repo}', {
       headers: GithubAuthHeaders,
@@ -88,7 +89,8 @@ async function findGnomesRepo(repo, template) {
   }
 }
 
-async function createGnomesRepo(repo, template) {
+async function createGnomesRepo(config) {
+  const { repo, template } = config
   try {
     console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${repo}, description: ${templateID(template)} }`)
     const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
@@ -113,18 +115,21 @@ async function createGnomesRepo(repo, template) {
   }
 }
 
-async function findOrCreateGnomesRepo(repo, template) {
-  const exists = await findGnomesRepo(repo, template)
+async function findOrCreateGnomesRepo(config) {
+  const { repo, url } = config
+  const exists = await findGnomesRepo(config)
   if (exists) {
+    console.log(`Found repo ${config.repo} for url ${config.url}`)
     return exists
   } else {
-    return await createGnomesRepo(repo, template)
+    return await createGnomesRepo(config)
   }
 }
 
-async function setupPublicGnome(gnomeConfigURL) {
-  const { template , repo } = await readPublicGnomeConfig(gnomeConfigURL)
-  const gnomesRepo = await findOrCreateGnomesRepo(repo, template)
+async function setupPublicGnome(url) {
+  const config = await readPublicGnomeConfig(url)
+  const githubRepo = await findOrCreateGnomesRepo(config)
+  return githubRepo
 }
 
 module.exports = async (req, res) => {
