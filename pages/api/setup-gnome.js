@@ -68,6 +68,7 @@ async function readPublicGnomeConfig(url) {
 }
 
 async function findGnomesRepo(config) {
+  // returns 'org/reponame' of the github repo found
   const { repo, template } = config
   try {
     const { data, status } = await octokit.request('GET /repos/{owner}/{repo}', {
@@ -78,7 +79,7 @@ async function findGnomesRepo(config) {
     if (data.description != templateID(template)) {
       throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
     }
-    return data
+    return data.full_name
   } catch (e) {
     if (e.status === 404) {
       // expected error if repo does not exist
@@ -90,6 +91,7 @@ async function findGnomesRepo(config) {
 }
 
 async function createGnomesRepo(config) {
+  // returns 'org/reponame' of the created github repo
   const { repo, template } = config
   try {
     console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${repo}, description: ${templateID(template)} }`)
@@ -107,7 +109,7 @@ async function createGnomesRepo(config) {
         ]
       }
     })
-    return data
+    return data.full_name
   }
   catch (e) {
     console.log(e)
@@ -119,7 +121,7 @@ async function findOrCreateGnomesRepo(config) {
   const { repo, url } = config
   const exists = await findGnomesRepo(config)
   if (exists) {
-    console.log(`Found repo ${config.repo} for url ${config.url}`)
+    console.log(`Found repo ${exists} for url ${config.url}`)
     return exists
   } else {
     return await createGnomesRepo(config)
@@ -135,13 +137,7 @@ async function setupPublicGnome(url) {
 module.exports = async (req, res) => {
   const { url } = req.body
   try {
-    const gnome = setupPublicGnome(url)
-    res.json({
-      url: url,
-      templateOrg: TemplateOrg,
-      gnomesOrg: GnomesOrg,
-      gnome: gnome
-    })
+    res.json(await setupPublicGnome(url))
   } catch (e) {
     console.log(e.message)
     res.status(500).send(`The Understory Gnome King could not understand your proposal: ${url}`)
