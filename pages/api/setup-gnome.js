@@ -37,6 +37,8 @@ import * as base58 from 'micro-base58'
 import { getThing, getSolidDataset, getStringNoLocale } from '@inrupt/solid-client'
 import * as octokit from '@octokit/request'
 import { US } from '../../vocab'
+import fetch from 'node-fetch'
+import greg from 'greg'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
@@ -50,6 +52,16 @@ function templateID(template) {
 
 function repoID(gnomeConfigURL) {
   return base58.encode(gnomeConfigURL)
+}
+
+function fullRepoID(gnomeConfigURL) {
+  return `${GnomesOrg}/${repoID(gnomeConfigURL)}`
+}
+
+function randomID() {
+  // https://blog.asana.com/2011/09/6-sad-squid-snuggle-softly/
+  // should reimplement with our own list of adjectives, nouns, verbs, and adverbs at some point
+  return greg.sentence().replace(/\s+/g, '-').toLowerCase()
 }
 
 async function readPublicGnomeConfig(url) {
@@ -76,10 +88,7 @@ async function findGnomesRepo(config) {
       owner: GnomesOrg,
       repo: repo
     })
-    if (data.description != templateID(template)) {
-      throw new Error("Changing the repo template yourself is not yet supported. Please reach out to support@understory.coop and we can update your website manually.")
-    }
-    return data.full_name
+    return data.description
   } catch (e) {
     if (e.status === 404) {
       // expected error if repo does not exist
@@ -101,7 +110,7 @@ async function createGnomesRepo(config) {
       template_repo: template,
       owner: GnomesOrg,
       name: repo,
-      description: templateID(template), // this is used to check what template was used.
+      description: randomID(),
       private: true,
       mediaType: {
         previews: [
@@ -109,7 +118,7 @@ async function createGnomesRepo(config) {
         ]
       }
     })
-    return data.full_name
+    return data.description
   }
   catch (e) {
     console.log(e)
@@ -128,10 +137,65 @@ async function findOrCreateGnomesRepo(config) {
   }
 }
 
+async function findVercelProject(config) {
+  const response = await fetch(`https://api.vercel.com/v1/projects/${config.name}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${VercelToken}`
+    }
+  })
+  if (response.ok) {
+    const data = await response.json()
+    return data.name
+  } else {
+    if (response.status !== 404) {
+      throw new Error(`Unexpected status from findVercelProject for repo: ${config.name}`)
+    }
+    return undefined
+  }
+}
+
+async function createVercelProject(config) {
+  const body = {
+    name: config.name,
+    gitRepository: {
+      type: `github`,
+      repo: fullRepoID(config.url)
+    }
+  }
+
+  console.log(`Creating vercel project: ${config.name}`)
+  const response = await fetch('https://api.vercel.com/v6/projects/', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${VercelToken}`
+    }
+  })
+  console.log(response)
+  const data = await response.json()
+  console.log(data)
+
+  return data.name
+}
+
+async function findOrCreateVercelProject(config) {
+  const { repo, url } = config
+  const exists = await findVercelProject(config)
+  if (exists) {
+    console.log(`Found project ${exists} for url ${config.url}`)
+    return exists
+  } else {
+    return await createVercelProject(config)
+  }
+}
+
 async function setupPublicGnome(url) {
   const config = await readPublicGnomeConfig(url)
-  const githubRepo = await findOrCreateGnomesRepo(config)
-  return githubRepo
+  config.name = await findOrCreateGnomesRepo(config)
+  const _ = await findOrCreateVercelProject(config)
+  return config
 }
 
 module.exports = async (req, res) => {
