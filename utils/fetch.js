@@ -18,14 +18,14 @@ export async function postFormData(uri, body){
 
 }
 
-const SolidServerURI = "https://coop.itme.host"
+const SolidServerURI = "https://myunderstory.com"
 
 export async function sendMagicLink(username, email) {
   const magicLinkURI = SolidServerURI + "/magic-link/generate"
   console.log("Sending magic link to " + email)
   return postFormData(magicLinkURI, {
     username, email,
-    returnToUrl: `https://itme.online/login/${username}.coop.itme.host`
+    returnToUrl: `https://understory.garden/login/${username}.myunderstory.com`
   })
 }
 
