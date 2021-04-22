@@ -11,6 +11,7 @@ import {
   addUrl
 } from '@inrupt/solid-client'
 
+// TODO: remove old coop.itme.host references
 export default function Editor ({ body }){
   const editor = useNewEditor()
   const [value, setValue] = useState(body)
