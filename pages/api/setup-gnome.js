@@ -45,6 +45,7 @@ const GnomesOrg = process.env.GITHUB_GNOMES_ORG
 const GithubToken = process.env.GITHUB_TOKEN_UGK
 const GithubAuthHeaders = { authorization: `token ${GithubToken}` }
 const VercelToken = process.env.VERCEL_TOKEN_UGK
+const VercelTeam = process.env.VERCEL_TEAM_ID || 'team_Mb1ivhnQAH2uo2nNrPBbDwk4' // Understory's team
 
 function templateId(template) {
   return `${TemplateOrg}/${template}`
@@ -130,7 +131,7 @@ async function findOrCreateGnomesRepo(config) {
   const { repo, url } = config
   const exists = await findGnomesRepo(config)
   if (exists) {
-    console.log(`Found repo ${exists} for url ${config.url}`)
+    console.log(`Found repo ${repo} for url ${config.url}`)
     return exists
   } else {
     return await createGnomesRepo(config)
@@ -138,7 +139,7 @@ async function findOrCreateGnomesRepo(config) {
 }
 
 async function findVercelProject(config) {
-  const response = await fetch(`https://api.vercel.com/v1/projects/${config.name}`, {
+  const response = await fetch(`https://api.vercel.com/v1/projects/${config.name}?teamId=${VercelTeam}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${VercelToken}`
@@ -164,10 +165,11 @@ async function createVercelProject(config) {
     }
   }
 
-  console.log(`Creating vercel project: ${config.name}`)
-  const response = await fetch('https://api.vercel.com/v6/projects/', {
+  console.log(`Creating new Vercel project named ${config.name} in ${VercelTeam} team`)
+  const response = await fetch(`https://api.vercel.com/v6/projects/?teamId=${VercelTeam}`, {
     method: 'POST',
     body: JSON.stringify(body),
+
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${VercelToken}`
