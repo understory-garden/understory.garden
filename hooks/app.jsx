@@ -80,6 +80,11 @@ function useConceptPrefix(webId, workspaceSlug){
   return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/concepts#`
 }
 
+function useGnomesPrefix(webId, workspaceSlug){
+  const storageContainerUri = useStorageContainer(webId)
+  return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/gnomes#`
+}
+
 function useTagPrefix(webId, workspaceSlug){
   const storageContainerUri = useStorageContainer(webId)
   return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/tags#`

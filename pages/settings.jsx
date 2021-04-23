@@ -62,6 +62,8 @@ export default function Profile(){
           />
         )}
       </div>
+      <h2 className="text-5xl text-center mb-12">Gnomes</h2>
+      <h3 className="text-5xl text-center mb-12">Gates</h3>
     </div>
   )
 }
