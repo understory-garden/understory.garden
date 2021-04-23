@@ -39,6 +39,7 @@ import * as octokit from '@octokit/request'
 import { US } from '../../vocab'
 import fetch from 'node-fetch'
 import greg from 'greg'
+import emptyGitHubCommit from 'make-empty-github-commit'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
@@ -208,6 +209,14 @@ async function setupPublicGnome(url) {
   const config = await readPublicGnomeConfig(url)
   config.name = await findOrCreateGnomesRepo(config)
   config.vercelProjectId = await findOrCreateVercelProject(config)
+  const { sha } = await emptyGitHubCommit({
+    owner: GnomesOrg,
+    repo: config.repo,
+    token: GithubToken,
+    message: 'I am Greg',
+    branch: 'main'
+  })
+  config.sha = sha
   return config
 }
 
