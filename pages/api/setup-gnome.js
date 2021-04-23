@@ -45,6 +45,7 @@ const GnomesOrg = process.env.GITHUB_GNOMES_ORG
 const GithubToken = process.env.GITHUB_TOKEN_UGK
 const GithubAuthHeaders = { authorization: `token ${GithubToken}` }
 const VercelToken = process.env.VERCEL_TOKEN_UGK
+const VercelHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${VercelToken}` }
 const VercelTeam = process.env.VERCEL_TEAM_ID || 'team_Mb1ivhnQAH2uo2nNrPBbDwk4' // Understory's team
 
 function templateId(template) {
@@ -140,10 +141,7 @@ async function findOrCreateGnomesRepo(config) {
 
 async function findVercelProject(config) {
   const response = await fetch(`https://api.vercel.com/v1/projects/${config.name}?teamId=${VercelTeam}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${VercelToken}`
-    }
+    headers: VercelHeaders
   })
   if (response.ok) {
     const data = await response.json()
@@ -156,7 +154,8 @@ async function findVercelProject(config) {
   }
 }
 
-async function createVercelProject(config) {
+async function createAndConfigureVercelProject(config) {
+  console.log(`Creating new Vercel project named ${config.name} in ${VercelTeam}`)
   const body = {
     name: config.name,
     gitRepository: {
@@ -164,22 +163,34 @@ async function createVercelProject(config) {
       repo: fullRepoId(config.url)
     }
   }
-
-  console.log(`Creating new Vercel project named ${config.name} in ${VercelTeam} team`)
   const response = await fetch(`https://api.vercel.com/v6/projects/?teamId=${VercelTeam}`, {
     method: 'POST',
     body: JSON.stringify(body),
-
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${VercelToken}`
-    }
+    headers: VercelHeaders
   })
-  console.log(response)
-  const data = await response.json()
-  console.log(data)
+  const project = await response.json()
 
-  return data.name
+  console.log(`Configuring new Vercel project with id ${project.id} in ${VercelTeam}`)
+  const envVarBody = {
+    type: 'plain',
+    key: 'GNOME_CONFIG_URL',
+    value: `${config.url}`,
+    target: [
+      'development',
+      'production',
+      'preview'
+    ]
+  }
+  const envVarResponse = await fetch(`https://api.vercel.com/v7/projects/${project.id}/env?teamId=${VercelTeam}`, {
+    method: 'POST',
+    body: JSON.stringify(envVarBody),
+    headers: VercelHeaders
+  })
+  console.log(envVarResponse)
+  const evData = await envVarResponse.json()
+  console.log(evData)
+
+  return project.id
 }
 
 async function findOrCreateVercelProject(config) {
@@ -189,14 +200,14 @@ async function findOrCreateVercelProject(config) {
     console.log(`Found project ${exists} for url ${config.url}`)
     return exists
   } else {
-    return await createVercelProject(config)
+    return await createAndConfigureVercelProject(config)
   }
 }
 
 async function setupPublicGnome(url) {
   const config = await readPublicGnomeConfig(url)
   config.name = await findOrCreateGnomesRepo(config)
-  const _ = await findOrCreateVercelProject(config)
+  config.vercelProjectId = await findOrCreateVercelProject(config)
   return config
 }
 
