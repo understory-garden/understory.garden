@@ -76,10 +76,10 @@ const LinkElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   return (
     <>
-      <a {...attributes} className={`underline text-blue-500 ${selected && "bg-blue-100"}`} href={element.url} >
+      <a {...attributes} className={`underline text-blue-500 ${selected && "bg-blue-100"}`} href={element.url} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
-      <a href={element.url} contentEditable={false}>
+      <a href={element.url} contentEditable={false} target="_blank" rel="noopener noreferrer">
         <ExternalLinkIcon className="inline" />
       </a>
     </>
