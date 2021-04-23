@@ -46,19 +46,19 @@ const GithubToken = process.env.GITHUB_TOKEN_UGK
 const GithubAuthHeaders = { authorization: `token ${GithubToken}` }
 const VercelToken = process.env.VERCEL_TOKEN_UGK
 
-function templateID(template) {
+function templateId(template) {
   return `${TemplateOrg}/${template}`
 }
 
-function repoID(gnomeConfigURL) {
+function repoId(gnomeConfigURL) {
   return base58.encode(gnomeConfigURL)
 }
 
-function fullRepoID(gnomeConfigURL) {
-  return `${GnomesOrg}/${repoID(gnomeConfigURL)}`
+function fullRepoId(gnomeConfigURL) {
+  return `${GnomesOrg}/${repoId(gnomeConfigURL)}`
 }
 
-function randomID() {
+function randomId() {
   // https://blog.asana.com/2011/09/6-sad-squid-snuggle-softly/
   // should reimplement with our own list of adjectives, nouns, verbs, and adverbs at some point
   return greg.sentence().replace(/\s+/g, '-').toLowerCase()
@@ -71,7 +71,7 @@ async function readPublicGnomeConfig(url) {
     url,
     type: getStringNoLocale(gnomeConfigThing, US.hasGnomeType),
     template: getStringNoLocale(gnomeConfigThing, US.usesGateTemplate),
-    repo: repoID(url)
+    repo: repoId(url)
   }
   if (gnomeConfig.type !== "gate") {
     throw new Error(`Only gnomes of type Gate are currently supported.`)
@@ -103,14 +103,14 @@ async function createGnomesRepo(config) {
   // returns 'org/reponame' of the created github repo
   const { repo, template } = config
   try {
-    console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${repo}, description: ${templateID(template)} }`)
+    console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${repo}, description: ${templateId(template)} }`)
     const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
       headers: GithubAuthHeaders,
       template_owner: TemplateOrg,
       template_repo: template,
       owner: GnomesOrg,
       name: repo,
-      description: randomID(),
+      description: randomId(),
       private: true,
       mediaType: {
         previews: [
@@ -160,7 +160,7 @@ async function createVercelProject(config) {
     name: config.name,
     gitRepository: {
       type: `github`,
-      repo: fullRepoID(config.url)
+      repo: fullRepoId(config.url)
     }
   }
 
