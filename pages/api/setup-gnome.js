@@ -157,41 +157,48 @@ async function findVercelProject(config) {
 
 async function createAndConfigureVercelProject(config) {
   console.log(`Creating new Vercel project named ${config.name} in ${VercelTeam}`)
-  const body = {
-    name: config.name,
-    gitRepository: {
-      type: `github`,
-      repo: fullRepoId(config.url)
-    }
-  }
   const response = await fetch(`https://api.vercel.com/v6/projects/?teamId=${VercelTeam}`, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+        name: config.name,
+        gitRepository: {
+          type: `github`,
+          repo: fullRepoId(config.url)
+        }
+      }),
     headers: VercelHeaders
   })
   const project = await response.json()
 
-  console.log(`Configuring new Vercel project with id ${project.id} in ${VercelTeam}`)
-  const envVarBody = {
-    type: 'plain',
-    key: 'GNOME_CONFIG_URL',
-    value: `${config.url}`,
-    target: [
-      'development',
-      'production',
-      'preview'
-    ]
-  }
-  const envVarResponse = await fetch(`https://api.vercel.com/v7/projects/${project.id}/env?teamId=${VercelTeam}`, {
+  console.log(`Configuring GNOME_CONFIG_URL on new Vercel project with id ${project.id} in ${VercelTeam}`)
+  const envVarResponse = await fetch(`https://api.vercel.com/v2/projects/${project.id}/env?teamId=${VercelTeam}`, {
     method: 'POST',
-    body: JSON.stringify(envVarBody),
+    body: JSON.stringify({
+      type: 'plain',
+      key: 'GNOME_CONFIG_URL',
+      value: `${config.url}`,
+      target: [
+        'development',
+        'production',
+        'preview'
+      ]
+    }),
     headers: VercelHeaders
   })
-  console.log(envVarResponse)
   const evData = await envVarResponse.json()
-  console.log(evData)
 
-  return project.id
+  console.log(`Configuring framework on new Vercel project with id ${project.id} in ${VercelTeam}`)
+  const newProjectResponse = await fetch(`https://api.vercel.com/v2/projects/${project.id}?teamId=${VercelTeam}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      framework: 'nextjs',
+      publicSource: false,
+    }),
+    headers: VercelHeaders
+  })
+  const newProject = await newProjectResponse.json()
+
+  return newProject.id
 }
 
 async function findOrCreateVercelProject(config) {
