@@ -43,6 +43,14 @@ function SettingToggle({settings, predicate, onChange, label, description}){
   )
 }
 
+function ResourceEditor({resource}) {
+
+}
+
+function ThingEditor({thing}) {
+
+}
+
 export default function Profile(){
   const webId = useWebId()
   const { settings, save } = useAppSettings(webId)
@@ -62,8 +70,11 @@ export default function Profile(){
           />
         )}
       </div>
-      <h2 className="text-5xl text-center mb-12">Gnomes</h2>
-      <h3 className="text-5xl text-center mb-12">Gates</h3>
+      <h2 className="text-3xl text-center mb-12">Gnomes</h2>
+      <h3 className="text-xl text-center mb-12">Gates</h3>
+        <p>Gates are customizable websites that serve as gateways to your garden. Custom domains are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
+      <h3 className="text-xl text-center mb-12">Zines</h3>
+        <p>Zines are rich, interactive html newsletters sent to your subscribers. Zines are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
     </div>
   )
 }

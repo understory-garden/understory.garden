@@ -64,6 +64,14 @@ export function useApp(webId){
   return {app, initApp, saveResource: saveAppResource, ...rest}
 }
 
+export function useGnomeConfigResource(webId) {
+  // check 404  do find or create on it
+  // use   const concepts = index && getThingAll(index) to get all the gnome things from a resource
+  // to save, use resource will give me a save function, need to pass save the updated resource
+  // will have a new value for a particular predicate, will need to use setThing on the resource and then save the resource
+  const appContainerUri = useUnderstoryContainerUri(webId)
+  return useResource(appContainerUri && `${appContainerUri}gnomes.ttl`)
+}
 
 export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
   const { app } = useApp(webId)
@@ -78,11 +86,6 @@ export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
 function useConceptPrefix(webId, workspaceSlug){
   const storageContainerUri = useStorageContainer(webId)
   return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/concepts#`
-}
-
-function useGnomesPrefix(webId, workspaceSlug){
-  const storageContainerUri = useStorageContainer(webId)
-  return storageContainerUri && `${storageContainerUri}${appPrefix}/${workspaceSlug}/gnomes#`
 }
 
 function useTagPrefix(webId, workspaceSlug){
