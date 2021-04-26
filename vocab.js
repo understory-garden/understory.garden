@@ -42,5 +42,6 @@ export const US = {
   hasSettings: `${understoryRoot}hasSettings`,
   devMode: `${understoryRoot}devMode`,
   hasGnomeType: `${understoryRoot}hasGnomeType`,
-  usesGateTemplate: `${understoryRoot}usesGateTemplate`
+  usesGateTemplate: `${understoryRoot}usesGateTemplate`,
+  noteUrl: `${understoryRoot}noteUrl`
 }

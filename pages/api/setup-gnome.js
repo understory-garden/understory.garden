@@ -67,7 +67,7 @@ function randomId() {
   return greg.sentence().replace(/\s+/g, '-').toLowerCase()
 }
 
-async function readPublicGnomeConfig(url) {
+async function loadPublicGnomeConfig(url) {
   const gnomeConfigResource = await getSolidDataset(url)
   const gnomeConfigThing = getThing(gnomeConfigResource, url)
   const gnomeConfig = {
@@ -206,7 +206,7 @@ async function findOrCreateVercelProject(config) {
 }
 
 async function setupPublicGnome(url) {
-  const config = await readPublicGnomeConfig(url)
+  const config = await loadPublicGnomeConfig(url)
   config.name = await findOrCreateGnomesRepo(config)
   config.vercelProjectId = await findOrCreateVercelProject(config)
   const { sha } = await emptyGitHubCommit({
