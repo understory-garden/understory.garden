@@ -13,7 +13,8 @@ import WebMonetization from '../components/WebMonetization'
 import { profilePath } from '../utils/uris'
 import { useImageUploadUri } from '../hooks/uris'
 import { EditIcon } from '../components/icons'
-import { ImageUploadAndEditor } from '../components/ImageUploader';
+import { ImageUploadAndEditor } from '../components/ImageUploader'
+import { getPaymentPointer, setPaymentPointer } from '../model/profile'
 
 function Name({name, save, ...props}){
   const [newName, setNewName] = useState()
@@ -51,7 +52,7 @@ function Name({name, save, ...props}){
 }
 
 function WebMonetizationPointer({profile, save, ...props}){
-  const paymentPointer = profile && getStringNoLocale(profile, US.paymentPointer)
+  const paymentPointer = getPaymentPointer(profile)
   const [newPaymentPointer, setNewPaymentPointer] = useState()
   const [editingPaymentPointer, setEditingPaymentPointer] = useState(false)
   function savePaymentPointer(){
@@ -133,7 +134,7 @@ export default function Profile(){
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
   }
   async function onSavePaymentPointer(newPaymentPointer){
-    return await saveProfile(setStringNoLocale(profile, US.paymentPointer, newPaymentPointer))
+    return await saveProfile(setPaymentPointer(profile, newPaymentPointer))
   }
   async function onSaveProfileImage(newProfileImage){
     return await saveProfile(setUrl(profile, FOAF.img, newProfileImage))
