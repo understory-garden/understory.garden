@@ -24,6 +24,10 @@ export const ITME = {
   conceptPrefix: `${itmeRoot}conceptPrefix`
 }
 
+export const PP = {
+  paymentPointer: "http://paymentpointers.org/ns#PaymentPointer"
+}
+
 const understoryRoot = "https://understory.coop/vocab/garden#"
 export const US = {
   noteBody: `${understoryRoot}noteBody`,
