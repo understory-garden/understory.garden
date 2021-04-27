@@ -1,7 +1,7 @@
 const iconFromPath = (path) => ({className, ...props}) => (
   <svg xmlns="http://www.w3.org/2000/svg"
        viewBox="0 0 20 20" fill="currentColor"
-       className={`w-4 ${className || ''}`} {...props}>
+       className={`h-5 w-5 ${className || ''}`} {...props}>
     {path}
   </svg>
 )
@@ -57,19 +57,25 @@ export const ExternalLinkIcon = iconFromPath(
 )
 
 export const FormatBold = ({className, ...props}) => (
-  <div className={`w-4 font-bold ${className || ''}`} {...props}>
+  <div className={`w-5 h-5 leading-tight font-bold ${className || ''}`} {...props}>
     b
   </div>
 )
 
 export const FormatItalic = ({className, ...props}) => (
-  <div className={`w-4 italic ${className || ''}`} {...props}>
+  <div className={`w-5 h-5 leading-tight italic ${className || ''}`} {...props}>
     i
   </div>
 )
 
 export const FormatUnderlined = ({className, ...props}) => (
-  <div className={`w-4 underline ${className || ''}`} {...props}>
+  <div className={`w-5 h-5 leading-none underline ${className || ''}`} {...props}>
     u
+  </div>
+)
+
+export const ConceptIcon = ({className, ...props}) => (
+  <div className={`w-5 h-5 leading-none ${className || ''}`} {...props}>
+    [[
   </div>
 )
