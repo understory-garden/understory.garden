@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useWebId } from 'swrlit'
 import {
-  getBoolean, setBoolean, getThingAll, thingAsMardown
+  getBoolean, setBoolean, getThingAll, thingAsMarkdown
 } from '@inrupt/solid-client'
 
 import Nav from '../components/nav'
@@ -9,6 +9,7 @@ import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
 import { useAppSettings } from '../hooks/app'
 import { useGnomesResource } from '../hooks/gnomes'
+import NewNoteForm from '../components/NewNoteForm'
 
 function SettingToggle({settings, predicate, onChange, label, description}){
   const [value, setValue] = useState()
@@ -44,42 +45,76 @@ function SettingToggle({settings, predicate, onChange, label, description}){
   )
 }
 
-function ThingEditor({thing, updateThing}) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="flex-grow flex flex-col" id="availability-label">
-        <span className="text-sm font-medium text-gray-900">
-          {thingAsMarkdown(thing)}
-        </span>
-      </span>
+const GateGnomeType = "gate"
+const SinglePageGateTemplateId = "single-page-gate"
 
-      <button className="btn">
-        Edit
-      </button>
-    </div>
+function GnomeThingEntry({thing}) {
+  return (
+    <div>{thing && thingAsMarkdown(thing)}</div>
   )
 }
 
-function ThingsEditor({things, updateThing}) {
-  if (things.length) {
-    things.map(things => {
-      <ThingEditor key={asUrl(gnomeThing)} thing={thing} updateThing={updateThing}/>
-    })
-  } else {
-    <button className="btn">Create a New Gate</button>
+function GnomeThingEditor({thing, updateThing}) {
+  // Users are currently able to edit the following Gate Config values (we only support Gate type gnomes for now)
+  // Concept picker / new note picker to set concept for single-page-gate
+  //    onSubmit returns concept name
+  //    hooks/concepts useConcept(webId, workspace, name) to turn that name into an id.
+  // hooks/app useConceptPrefix to get the prefix
+  // assume defualt workspace
+  const [chosenConcept, setChoseConcept] = useState()
+  const [editing, setEditing] = useState(!thing)
+  // const useConcept(webId, 'default', noteName)
+
+  async function onSubmit(selectedNoteName) {
+    setConceptName(selectedNoteName)
   }
+  return (
+    <>
+      { editing ? (
+        <>
+          <NewNoteForm onSubmit={onSubmit}/>
+          <button className="btn">Save Gate</button>
+        </>
+        ) : (
+        <>
+          <GnomeThingEntry thing={thing}/>
+          <button className="btn">Edit Gate</button>
+        </>
+      )}
+    </>)
+}
+
+function GnomesResourceEditor({webId}) {
+  const { resource, save } = useGnomesResource(webId)
+  const [addingNewGnome, setAddingNewGnome] = useState()
+  const gnomeThings = resource && getThingAll(resource)
+  async function updateThing(newThing) {
+    // updateResource with setThing
+    // await save(resource)
+    // do something
+  }
+  async function addThing(newThing) {
+    setAddingNewGnome(false)
+    updateThing(newThing)
+  }
+  return (
+    <>
+    { gnomeThings && gnomeThings.map(thing => (
+      <GnomeThingEditor thing={thing} updateThing={updateThing}/>
+    ))
+    }
+    { addingNewGnome ?
+      (<GnomeThingEditor updateThing={updateThing}/>) :
+      (<button className="btn" onSubmit={() => setAddingNewGnome(true)}>Create a New Gate</button>)
+    }
+    </>
+  )
 }
 
 export default function Profile(){
   const webId = useWebId()
   const { settings, save } = useAppSettings(webId)
-  const { gnomesResource, save: saveGnomesResource } = useGnomesResource(webId)
-  const gnomeThings = gnomesResource && getThingAll(gnomesResource)
-  function updateGnomeThing(newGnomeThing) {
-    // call setup-gnome
-    // saveGnomesResource
-  }
-  function onChange(newSettings){
+  function onChange(newSettings) {
     save(newSettings)
   }
   return (
@@ -98,7 +133,7 @@ export default function Profile(){
       <h2 className="text-3xl text-center mb-12">Gnomes</h2>
       <h3 className="text-xl text-center mb-12">Gates</h3>
         <p>Gates are customizable websites that serve as gateways to your garden. Custom domains are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
-        <ThingsEditor things={gnomeThings} updateThing={updateGnomeThing}>
+        <GnomesResourceEditor webId={webId}/>
       <h3 className="text-xl text-center mb-12">Zines</h3>
         <p>Zines are rich, interactive html newsletters sent to your subscribers. Zines are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
     </div>

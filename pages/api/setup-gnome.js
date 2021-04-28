@@ -95,7 +95,7 @@ async function findGnomesRepo(config) {
   } catch (e) {
     if (e.status === 404) {
       // expected error if repo does not exist
-      return undefined
+      return null
     } else {
       throw e
     }
@@ -125,7 +125,7 @@ async function createGnomesRepo(config) {
   }
   catch (e) {
     console.log(e)
-    return undefined
+    return null
   }
 }
 
@@ -151,7 +151,7 @@ async function findVercelProject(config) {
     if (response.status !== 404) {
       throw new Error(`Unexpected status from findVercelProject for repo: ${config.name}`)
     }
-    return undefined
+    return null
   }
 }
 
