@@ -6,7 +6,7 @@ import {
 } from '@inrupt/solid-client'
 import { useWebId, useResource, useAuthentication, useThing, useMyProfile } from 'swrlit'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
-import { FB, ITME, US } from '../vocab'
+import { FB, ITME, PP, US } from '../vocab'
 
 import { useStorageContainer } from '../hooks/uris'
 import { useConceptInCurrentWorkspace, useConceptIndex, useConceptPrefix } from '../hooks/concepts'
@@ -75,8 +75,8 @@ export function ItmeOnlineMigrator(){
   async function migrate(){
     console.log(concepts.map(concept => asUrl(concept) ))
     // typo in original vocab means we need to a "triple slash" version of the itme payment pointer predicate
-    const paymentPointerPredicate = "https:///itme.online/vocab#paymentPointer"
-    let updatedProfile = setStringNoLocale(profile, US.paymentPointer, getStringNoLocale(profile, paymentPointerPredicate))
+    const paymentPointerPredicate = ITME.paymentPointer
+    let updatedProfile = setStringNoLocale(profile, PP.PaymentPointer, getStringNoLocale(profile, paymentPointerPredicate))
     console.log("updated profile", updatedProfile)
     await saveProfile(updatedProfile)
     setPaymentPointerMigrated(true)

@@ -6,7 +6,7 @@ import {
   getDatetime
 } from '@inrupt/solid-client'
 import { FOAF } from '@inrupt/vocab-common-rdf'
-import { US } from "../vocab"
+import { PP } from "../vocab"
 
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
@@ -51,7 +51,7 @@ function Name({name, save, ...props}){
 }
 
 function WebMonetizationPointer({profile, save, ...props}){
-  const paymentPointer = profile && getStringNoLocale(profile, US.paymentPointer)
+  const paymentPointer = profile && getStringNoLocale(profile, PP.paymentPointer)
   const [newPaymentPointer, setNewPaymentPointer] = useState()
   const [editingPaymentPointer, setEditingPaymentPointer] = useState(false)
   function savePaymentPointer(){
@@ -133,7 +133,7 @@ export default function Profile(){
     return await saveProfile(setStringNoLocale(profile, FOAF.name, newName))
   }
   async function onSavePaymentPointer(newPaymentPointer){
-    return await saveProfile(setStringNoLocale(profile, US.paymentPointer, newPaymentPointer))
+    return await saveProfile(setStringNoLocale(profile, PP.paymentPointer, newPaymentPointer))
   }
   async function onSaveProfileImage(newProfileImage){
     return await saveProfile(setUrl(profile, FOAF.img, newProfileImage))
