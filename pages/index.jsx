@@ -52,7 +52,7 @@ function LoginUI() {
     }
   }
   return (
-    <>
+    <div className="max-w-5xl mx-auto">
       {/*
       <Link href="/register">
         <a className="text-4xl block">create your account</a>
@@ -64,9 +64,22 @@ function LoginUI() {
       <h3 className="text-3xl my-6">OR</h3>
       <h3 className="text-3xl mb-3 text-gray-800">login with your handle</h3>
        */}
-      <h3 className="text-3xl mb-3 text-gray-700">Welcome to understory.garden (formerly itme.online)! 👋</h3>
-      <h3 className="text-lg mb-3 text-gray-600">We're hard at work laying the foundations for you to build your new <a href="https://itme.company/">Home on the Web</a>.</h3>
-      <h3 className="text-lg mb-3 text-gray-600">If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname as your "handle" below. If you don't have a Pod, you can get one from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web, but please be warned that the user experience is currently pretty rough! We're working on it 😉</h3>
+      <h3 className="text-3xl mb-3 text-gray-700">🌻🌿🌱 Welcome to Understory Garden! 🌱🌿🌻 </h3>
+      <h3 className="text-lg mb-3 text-gray-600">
+        We're hard at work laying the foundations for you to build your
+        new <a href="https://understory.coop/">Home on the Web</a>.
+      </h3>
+      <h3 className="text-lg mb-3 text-gray-600">
+        If you already have a <a href="https://solidproject.org/">Solid Pod</a> you can use its hostname
+        as your "username" below. If you don't have a Pod, you can get one
+        from a <a href="https://solidproject.org/users/get-a-pod">number of providers</a> around the Web,
+        but please be warned that the user experience is currently pretty rough! We're working on it 😉
+      </h3>
+      <h3 className="text-lg mb-3 text-gray-600">
+        Unfortunately we are not currently compatible with Inrupt Pod Spaces but plan to support Pods
+        from this service in the future. If you would like to host your Pod with Inrupt, please
+        use <a href="https://inrupt.net">inrupt.net</a>
+      </h3>
       <h3 className="text-lg mb-12 text-gray-600">Please note that we can't provide any guarantees as to the safety or security of your Pod data at this point - there may be bugs that delete all of your data or expose it to the open Web, so for now please just treat this like a sandbox.</h3>
       <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
         placeholder="what's your username?"
@@ -84,7 +97,7 @@ function LoginUI() {
           </button>
         )}
       <p className="mt-3 text-gray-500">By logging in you agree to be bound by our <a href="/tos">Terms of Service</a></p>
-    </>
+    </div>
   )
 }
 
