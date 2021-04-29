@@ -13,7 +13,6 @@ const itmeRoot = "https://itme.online/vocab#"
 export const ITME = {
   noteBody: `${itmeRoot}noteBody`,
   refs: `${itmeRoot}refs`,
-  paymentPointer: `${itmeRoot}paymentPointer`,
   storedAt: `${itmeRoot}storedAt`,
   noteStorage: `${itmeRoot}noteStorage`,
   publicPrefs: `${itmeRoot}publicPrefs`,
@@ -22,6 +21,11 @@ export const ITME = {
   hasWorkspace: `${itmeRoot}hasWorkspace`,
   conceptIndex: `${itmeRoot}conceptIndex`,
   conceptPrefix: `${itmeRoot}conceptPrefix`
+}
+
+const ppRoot = "http://paymentpointers.org/ns#"
+export const PP = {
+  paymentPointer: `${ppRoot}PaymentPointer`,
 }
 
 const understoryRoot = "https://understory.coop/vocab/garden#"
