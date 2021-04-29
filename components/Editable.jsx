@@ -27,7 +27,7 @@ const HOTKEYS = {
 }
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
-    children = <strong>{children}</strong>
+    children = <strong className="font-bold">{children}</strong>
   }
 
   if (leaf.code) {

@@ -22,6 +22,7 @@ export default function CheckListItemElement({ attributes, children, element }) 
           )
         }} />
       <span
+        className={checked ? `line-through` : ``}
         contentEditable={!readOnly}
         suppressContentEditableWarning
       >

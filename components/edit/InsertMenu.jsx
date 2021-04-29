@@ -84,9 +84,11 @@ const InsertMenu = ({ element, onClose, className, ...props }) => {
           <InsertItem element={element} onClick={() => setImagePickerOpen(true)} onClose={onClose} icon="img">
             image
           </InsertItem>
+          {/*
           <InsertItem element={element} format="table" onClose={onClose} icon="⿳">
             table
           </InsertItem>
+          */}
           <InsertItem element={element} format="video" onClose={onClose} icon="🎞">
             video
           </InsertItem>
