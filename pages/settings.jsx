@@ -45,6 +45,21 @@ function SettingToggle({settings, predicate, onChange, label, description}){
   )
 }
 
+function SectionHeader({title, description}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="flex-grow flex flex-col" id="availability-label">
+        <span className="text-lg font-large text-gray-900">
+          {title}
+        </span>
+        <span className="text-sm text-gray-500">
+          {description}
+        </span>
+      </span>
+    </div>
+  )
+}
+
 const GateGnomeType = "gate"
 const SinglePageGateTemplateId = "single-page-gate"
 
@@ -69,11 +84,11 @@ function GnomeThingEditor({thing, updateThing}) {
     setConceptName(selectedNoteName)
   }
   return (
-    <>
+    <div className="flex items-center justify-between">
       { editing ? (
         <>
-          <NewNoteForm onSubmit={onSubmit}/>
-          <button className="btn">Save Gate</button>
+          What note would you like to use for your Gate?
+          <NewNoteForm onSubmit={onSubmit} submitTitle="choose"/>
         </>
         ) : (
         <>
@@ -81,12 +96,13 @@ function GnomeThingEditor({thing, updateThing}) {
           <button className="btn">Edit Gate</button>
         </>
       )}
-    </>)
+    </div>
+  )
 }
 
 function GnomesResourceEditor({webId}) {
   const { resource, save } = useGnomesResource(webId)
-  const [addingNewGnome, setAddingNewGnome] = useState()
+  const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
   async function updateThing(newThing) {
     // updateResource with setThing
@@ -98,16 +114,15 @@ function GnomesResourceEditor({webId}) {
     updateThing(newThing)
   }
   return (
-    <>
-    { gnomeThings && gnomeThings.map(thing => (
-      <GnomeThingEditor thing={thing} updateThing={updateThing}/>
-    ))
-    }
-    { addingNewGnome ?
-      (<GnomeThingEditor updateThing={updateThing}/>) :
-      (<button className="btn" onSubmit={() => setAddingNewGnome(true)}>Create a New Gate</button>)
-    }
-    </>
+    <div className="flex items-center justify-between">
+      { gnomeThings && gnomeThings.map(thing => (
+        <GnomeThingEditor thing={thing} updateThing={updateThing}/>
+      ))}
+      { addingNewGnome ?
+          (<GnomeThingEditor updateThing={updateThing}/>) :
+          (<button className="btn" onClick={() => setAddingNewGnome(true)}>Create a New Gate</button>)
+      }
+    </div>
   )
 }
 
@@ -129,13 +144,10 @@ export default function Profile(){
                          description="Seatbelts off, maximum information."
           />
         )}
-      </div>
-      <h2 className="text-3xl text-center mb-12">Gnomes</h2>
-      <h3 className="text-xl text-center mb-12">Gates</h3>
-        <p>Gates are customizable websites that serve as gateways to your garden. Custom domains are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
+        <SectionHeader title="Gates" description="Gates are customizable websites that serve as gateways to your garden. Right now we only support deploying a single note to a simple one page website, but expect richer templates soon. Custom domains are availible to paid members only. Reach out at hello@understory.coop to purchase a plan."/>
         <GnomesResourceEditor webId={webId}/>
-      <h3 className="text-xl text-center mb-12">Zines</h3>
-        <p>Zines are rich, interactive html newsletters sent to your subscribers. Zines are availible to paid members only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.</p>
+        <SectionHeader title="Zines" description="Zines are rich, interactive html newsletters sent to your subscribers. Zines are availible to paid members only. Reach out at hello@understory.coop to purchase a plan."/>
+      </div>
     </div>
   )
 }

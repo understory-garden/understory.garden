@@ -69,7 +69,7 @@ export default function NewNoteForm({onSubmit, submitTitle}) {
         <button className="btn"
           onClick={onClick}
           disabled={displayedName === ""}>
-          {(selectionIndex === 0) ? 'create' : 'goto'} {selectedNote}
+          {submitTitle || ((selectionIndex === 0) ? 'create' : 'goto')} {selectedNote}
         </button>
       )}
     </div>
