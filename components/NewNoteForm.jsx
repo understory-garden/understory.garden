@@ -5,9 +5,9 @@ import { useRouter } from 'next/router'
 import { useConceptNamesMatching } from '../hooks/concepts'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 
-export default function NewNoteForm({onSubmit, submitTitle}) {
+export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=""}) {
   const router = useRouter()
-  const [displayedName, setDisplayedName] = useState("")
+  const [displayedName, setDisplayedName] = useState(initialSelectedName)
   const gotoNote = useCallback((noteName) => {
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
     setDisplayedName("")

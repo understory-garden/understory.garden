@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useWebId } from 'swrlit'
 import {
-  getBoolean, setBoolean, getThingAll, thingAsMarkdown
+  getBoolean, setBoolean, getThingAll, thingAsMarkdown, getUrl
 } from '@inrupt/solid-client'
 
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
 import { useAppSettings } from '../hooks/app'
+import { useConceptPrefix, useConcept } from '../hooks/concepts'
 import { useGnomesResource } from '../hooks/gnomes'
+import { newSinglePageGateThing } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
 
 function SettingToggle({settings, predicate, onChange, label, description}){
@@ -60,40 +62,63 @@ function SectionHeader({title, description}) {
   )
 }
 
-const GateGnomeType = "gate"
-const SinglePageGateTemplateId = "single-page-gate"
-
 function GnomeThingEntry({thing}) {
   return (
     <div>{thing && thingAsMarkdown(thing)}</div>
   )
 }
 
-function GnomeThingEditor({thing, updateThing}) {
+function GnomeThingEditor({webId, thing, updateThing}) {
   // Users are currently able to edit the following Gate Config values (we only support Gate type gnomes for now)
   // Concept picker / new note picker to set concept for single-page-gate
   //    onSubmit returns concept name
   //    hooks/concepts useConcept(webId, workspace, name) to turn that name into an id.
   // hooks/app useConceptPrefix to get the prefix
-  // assume defualt workspace
-  const [chosenConcept, setChoseConcept] = useState()
-  const [editing, setEditing] = useState(!thing)
-  // const useConcept(webId, 'default', noteName)
+  const isNewThing = !thing
+  const [chosenConceptName, setChoseConceptName] = useState()
+  const [editingNoteName, setEditingNoteName] = useState(!thing)
+  const [editingGate, setEditingGate] = useState(!thing)
 
+  const conceptPrefix = useConceptPrefix(webId, 'default')
+  const { concept } = useConcept(webId, 'default', chosenConceptName)
+
+  function setEditingAll(b) {
+    setEditingNoteName(b)
+    setEditingGate(b)
+  }
   async function onSubmit(selectedNoteName) {
-    setConceptName(selectedNoteName)
+    setChoseConceptName(selectedNoteName)
+    setEditingNoteName(false)
+  }
+  async function onSave() {
+    console.log(`onSave isNewThing ${isNewThing}`)
+    if (isNewThing) {
+      const newThing = newSinglePageGateThing(webId, conceptPrefix, getUrl(concept, US.storedAt))
+      await updateThing(newThing)
+    } else {
+      await updateThing(thing)
+    }
+    setEditingGate(false)
   }
   return (
     <div className="flex items-center justify-between">
-      { editing ? (
+      { editingGate ? (
         <>
           What note would you like to use for your Gate?
-          <NewNoteForm onSubmit={onSubmit} submitTitle="choose"/>
+          { editingNoteName ?
+              <NewNoteForm onSubmit={onSubmit} initialSelectedName={chosenConceptName} submitTitle="choose"/>
+              :
+              <>
+                <strong>{chosenConceptName}</strong>
+                <button className="btn" onClick={() => setEditingAll(true)}>Pick a different note</button>
+              </>
+          }
+          <button className="btn" disabled={!chosenConceptName} onSave={onSave}>Save and Deploy Gate</button>
         </>
         ) : (
         <>
           <GnomeThingEntry thing={thing}/>
-          <button className="btn">Edit Gate</button>
+          <button className="btn" onClick={() => setEditingAll(true)}>Edit Gate</button>
         </>
       )}
     </div>
@@ -116,10 +141,10 @@ function GnomesResourceEditor({webId}) {
   return (
     <div className="flex items-center justify-between">
       { gnomeThings && gnomeThings.map(thing => (
-        <GnomeThingEditor thing={thing} updateThing={updateThing}/>
+        <GnomeThingEditor webId={webId} updateThing={updateThing} thing={thing}/>
       ))}
       { addingNewGnome ?
-          (<GnomeThingEditor updateThing={updateThing}/>) :
+          (<GnomeThingEditor webId={webId} updateThing={updateThing}/>) :
           (<button className="btn" onClick={() => setAddingNewGnome(true)}>Create a New Gate</button>)
       }
     </div>

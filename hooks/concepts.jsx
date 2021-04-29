@@ -52,8 +52,8 @@ export function useConcept(webId, workspaceSlug, name, newConceptPrivacy='privat
 
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
-  const publicConcept = publicIndex && getThing(publicIndex, conceptUri)
-  const privateConcept = privateIndex && getThing(privateIndex, conceptUri)
+  const publicConcept = publicIndex && conceptUri && getThing(publicIndex, conceptUri)
+  const privateConcept = privateIndex && conceptUri && getThing(privateIndex, conceptUri)
   const { workspace } = useWorkspace(webId, workspaceSlug, newConceptPrivacy)
   const thisConcept = publicConcept || privateConcept || maybeNewConcept(conceptUri, workspace, name)
   const concept = useMemoCompare(thisConcept, equal)
