@@ -286,8 +286,10 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const router = useRouter()
   useEffect(() => {
     const handleRouteChange = (url) => {
-      setValue(undefined)
-      editor.selection = null
+      if (url !== window.location.pathname){
+        setValue(undefined)
+        editor.selection = null
+      }
     }
     router.events.on('routeChangeStart', handleRouteChange)
     return () => {
@@ -330,7 +332,6 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
     setValue(newValue)
     conceptAutocompleteOnChange && conceptAutocompleteOnChange(editor)
   }, [editor, conceptAutocompleteOnChange])
-
 
   return (
     <NoteContext.Provider value={noteContext}>

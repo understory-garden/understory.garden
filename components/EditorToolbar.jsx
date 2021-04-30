@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSlate } from 'slate-react';
 import { Transforms } from 'slate'
 import IconButton from './IconButton';
-import { FormatBold, FormatItalic, FormatUnderlined, LinkIcon } from './icons'
+import { FormatBold, FormatItalic, FormatUnderlined, LinkIcon, ConceptIcon } from './icons'
 import ReactModal from 'react-modal';
 
 import {
@@ -131,7 +131,7 @@ function ConceptLink(){
       active={isConceptActive(editor)}
       onClick={onUpdateConcept}
     >
-      [[
+      <ConceptIcon/>
     </IconButton>
   )
 }
@@ -140,7 +140,7 @@ function ConceptLink(){
 export default function EditorToolbar({className, saving, saved, save, ...props}){
   return (
     <div className={`flex justify-between ${className || ''}`} {...props}>
-      <div>
+      <div className="flex">
         <MarkButton title="Bold" format="bold"><FormatBold/></MarkButton>
         <MarkButton title="Italic" format="italic"><FormatItalic/></MarkButton>
         <MarkButton title="Underline" format="underline"> <FormatUnderlined/></MarkButton>
