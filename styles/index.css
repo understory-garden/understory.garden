@@ -22,6 +22,10 @@ body {
     @apply font-semibold;
 }
 
+b, strong {
+    @apply font-bold;
+}
+
 @font-face {
     font-family: Marisa;
     font-weight: 300;
