@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useWebId } from 'swrlit'
 import {
-  getBoolean, setBoolean, getThingAll, thingAsMarkdown, getUrl
+  getBoolean, setBoolean, getThingAll,
+  thingAsMarkdown, getUrl, setThing, asUrl,
+  getStringNoLocale
 } from '@inrupt/solid-client'
 
 import Nav from '../components/nav'
@@ -9,6 +11,7 @@ import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
 import { useAppSettings } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
+import { conceptUriToName } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
@@ -63,8 +66,13 @@ function SectionHeader({title, description}) {
 }
 
 function GnomeThingEntry({thing}) {
+  const type = thing && getStringNoLocale(thing, US.hasGnomeType)
+  const template = thing && getStringNoLocale(thing, US.usesGateTemplate)
+  const conceptPrefix = thing && getStringNoLocale(thing, US.conceptPrefix)
+  const conceptUrl = thing && getUrl(thing, US.usesConcept)
+  const conceptName = conceptUrl && conceptUriToName(conceptUrl)
   return (
-    <div>{thing && thingAsMarkdown(thing)}</div>
+    <div>{conceptName}</div>
   )
 }
 
@@ -86,14 +94,14 @@ function GnomeThingEditor({webId, thing, updateThing}) {
     setEditingNoteName(b)
     setEditingGate(b)
   }
-  async function onSubmit(selectedNoteName) {
+  function onSubmit(selectedNoteName) {
     setChoseConceptName(selectedNoteName)
     setEditingNoteName(false)
   }
   async function onSave() {
     console.log(`onSave isNewThing ${isNewThing}`)
     if (isNewThing) {
-      const newThing = newSinglePageGateThing(webId, conceptPrefix, getUrl(concept, US.storedAt))
+      const newThing = newSinglePageGateThing(webId, conceptPrefix, asUrl(concept))
       await updateThing(newThing)
     } else {
       await updateThing(thing)
@@ -113,7 +121,7 @@ function GnomeThingEditor({webId, thing, updateThing}) {
                 <button className="btn" onClick={() => setEditingAll(true)}>Pick a different note</button>
               </>
           }
-          <button className="btn" disabled={!chosenConceptName} onSave={onSave}>Save and Deploy Gate</button>
+          <button className="btn" disabled={!chosenConceptName} onClick={onSave}>Save and Deploy Gate</button>
         </>
         ) : (
         <>
@@ -130,13 +138,14 @@ function GnomesResourceEditor({webId}) {
   const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
   async function updateThing(newThing) {
-    // updateResource with setThing
-    // await save(resource)
-    // do something
+    console.log('GRE T', newThing)
+    const newResource = setThing(resource, newThing)
+    console.log('GRE R', newResource)
+    await save(newResource)
   }
   async function addThing(newThing) {
     setAddingNewGnome(false)
-    updateThing(newThing)
+    await updateThing(newThing)
   }
   return (
     <div className="flex items-center justify-between">

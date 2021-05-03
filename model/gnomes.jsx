@@ -9,12 +9,11 @@ export const GateTemplate = {
   SinglePageGate: "single-page-gate"
 }
 
-export function newSinglePageGateThing(webId, conceptPrefix, noteUrl) {
-  const thing = createThing()
-  console.log(`SPGT ${conceptPrefix}`)
-  setStringNoLocale(thing, US.hasGnomeType, GnomeType.Gate)
-  setStringNoLocale(thing, US.usesGateTemplate, GateTemplate.SinglePageGate)
-  setStringNoLocale(thing, US.conceptPrefix, conceptPrefix)
-  setUrl(thing, US.noteUrl, noteUrl)
+export function newSinglePageGateThing(webId, conceptPrefix, conceptUrl) {
+  let thing = createThing()
+  thing = setStringNoLocale(thing, US.hasGnomeType, GnomeType.Gate)
+  thing = setStringNoLocale(thing, US.usesGateTemplate, GateTemplate.SinglePageGate)
+  thing = setStringNoLocale(thing, US.conceptPrefix, conceptPrefix)
+  thing = setUrl(thing, US.usesConcept, conceptUrl)
   return thing
 }
