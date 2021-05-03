@@ -13,7 +13,7 @@ import { useAppSettings } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
 import { conceptUriToName } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
-import { newSinglePageGateThing, updateSinglePageGateThing } from '../model/gnomes'
+import { newSinglePageGateThing, updateSinglePageGateThing, setupGnomeThing } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
 
 function SettingToggle({ settings, predicate, onChange, label, description }) {
@@ -153,6 +153,8 @@ function GnomesResourceEditor({ webId }) {
   async function updateThing(newThing) {
     const newResource = setThing(resource, newThing)
     await save(newResource)
+    const resp = await setupGnomeThing(newThing)
+    console.log(resp)
     setAddingNewGnome(false)
   }
   function cancel() {

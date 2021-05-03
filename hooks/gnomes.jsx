@@ -2,17 +2,6 @@ import { useUnderstoryContainerUri } from './uris'
 import { useResource, useWebId } from 'swrlit'
 import { createSolidDataset, asUrl, getThingAll } from '@inrupt/solid-client'
 
-async function setupGnomeThing(thing) {
-  const response = await fetch(`https://understory.garden/api/setup-gnome`, {
-    method: 'POST',
-    body: JSON.stringify({
-      url: asUrl(thing)
-    }),
-    headers:{ 'Content-Type': 'application/json'}
-  })
-  return response.json()
-}
-
 export function useGnomesResource(webId) {
   // use   const concepts = index && getThingAll(index) to get all the gnome things from a resource
   // to save, use resource will give me a save function, need to pass save the updated resource
