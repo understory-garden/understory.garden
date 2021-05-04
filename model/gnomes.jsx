@@ -22,12 +22,10 @@ export function updateSinglePageGateThing(thing, concept){
   return setUrl(thing, US.usesConcept, asUrl(concept))
 }
 
-export async function setupGnomeThing(thing) {
+export async function setupGnome(body) {
   const response = await fetch(`/api/setup-gnome`, {
     method: 'POST',
-    body: JSON.stringify({
-      url: asUrl(thing)
-    }),
+    body: JSON.stringify(body),
     headers:{ 'Content-Type': 'application/json'}
   })
   return response.json()
