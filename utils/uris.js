@@ -27,6 +27,10 @@ export function profilePath(webId){
   return `/u/${webIdToHandle(webId)}`
 }
 
+export function understoryGardenConceptPrefix(webId, workspaceSlug){
+  return webId && workspaceSlug && `https://${window.location.hostname}${profilePath(webId)}/${workspaceSlug}/`
+}
+
 export function publicNotePath(webId, workspaceSlug, name){
   return webId && name && `${profilePath(webId)}/${workspaceSlug}/${conceptNameToUrlSafeId(name)}`
 }

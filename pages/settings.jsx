@@ -11,7 +11,7 @@ import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
 import { useAppSettings } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
-import { conceptUriToName } from '../utils/uris'
+import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnomeThing } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
@@ -92,8 +92,8 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
   const [editingNoteName, setEditingNoteName] = useState(!thing)
   const [editingGate, setEditingGate] = useState(!thing)
 
-  const conceptPrefix = useConceptPrefix(webId, 'default')
-  const { concept } = useConcept(webId, 'default', chosenConceptName)
+  const conceptPrefix = understoryGardenConceptPrefix(webId, 'default')
+  const { concept, index } = useConcept(webId, 'default', chosenConceptName)
 
   function setEditingAll(b) {
     setEditingNoteName(b)
@@ -105,10 +105,10 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
   }
   async function onSave() {
     if (isNewThing) {
-      const newThing = newSinglePageGateThing(webId, conceptPrefix, concept)
+      const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept)
       await updateThing(newThing)
     } else {
-      await updateThing(updateSinglePageGateThing(thing, concept))
+      await updateThing(updateSinglePageGateThing(thing, conceptPrefix, index, concept))
     }
     setEditingGate(false)
   }
