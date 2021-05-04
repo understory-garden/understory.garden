@@ -1,5 +1,7 @@
 import { createThing, setUrl, setStringNoLocale, asUrl, getSourceUrl } from '@inrupt/solid-client'
 import { US } from '../vocab'
+import greg from 'greg'
+import * as base58 from 'micro-base58'
 
 export const GnomeType = {
   Gate: "gate"
@@ -7,6 +9,21 @@ export const GnomeType = {
 
 export const GateTemplate = {
   SinglePageGate: "single-page-gate"
+}
+
+export const GnomeStatus = {
+  Deployed: 'deployed',
+  Requested: 'requested'
+}
+
+export function encodeGnomeUrl(gnomeConfigURL) {
+  return base58.encode(gnomeConfigURL)
+}
+
+export function randomReadableId() {
+  // https://blog.asana.com/2011/09/6-sad-squid-snuggle-softly/
+  // should reimplement with our own list of adjectives, nouns, verbs, and adverbs at some point, rather than relying on this greg lib
+  return greg.sentence().replace(/\s+/g, '-').toLowerCase()
 }
 
 export function newSinglePageGateThing(webId, conceptPrefix, index, concept) {

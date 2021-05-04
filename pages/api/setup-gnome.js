@@ -7,40 +7,24 @@
 
   For now, we only support one Gnome type: Gates
 
-    workspace/gnomes/gate.ttl
+    workspace/gnomes.ttl#some-gate-id
       type: gate
       template: single-page-gate // matches github.com/understory-garden/single-page-gate
 
 
   POST /api/setup-gnome
     data {
-      gnomeConfigUrl
+      url // correspondings to the url of a Gnome Thing to deploy
     }
-
-  -> grab gnomes.ttl file
-  -> parse data
-  -> setup github
-     -> clone template repo over github project, setup if necessary
-  -> setup vercel
-     -> call vercel api to setup project
-     -> call vercel project to set webid env variable
-      # add github ops user to vercel team
-
-Recommended links from Michiel on supporting non-public gnomes:
-  - https://github.com/solid/web-access-control-tests/blob/main/test/helpers/env.ts#L19
-  - https://github.com/solid/solid-auth-fetcher/blob/master/src/obtainAuthHeaders.ts#L57
-  - Talk with Jeff Zucker about node auth
-  - https://github.com/solid/solid-node-client
 */
 
-import * as base58 from 'micro-base58'
 import { getThing, getSolidDataset, getStringNoLocale } from '@inrupt/solid-client'
 import * as octokit from '@octokit/request'
 import { US } from '../../vocab'
 import fetch from 'node-fetch'
-import greg from 'greg'
 import emptyGitHubCommit from 'make-empty-github-commit'
 import { createClient } from '@supabase/supabase-js'
+import { encodeGnomeUrl, randomReadableId, GnomeStatus } from '../../model/gnomes.jsx'
 
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
@@ -56,21 +40,8 @@ const SupabaseUrl = process.env.SUPABASE_URL
 const supabase = createClient(SupabaseUrl, SupabaseServiceKey)
 
 function templateId(template) {
+  // TODO: move to model/gnomes?
   return `${TemplateOrg}/${template}`
-}
-
-function gnomeId(gnomeConfigURL) {
-  return base58.encode(gnomeConfigURL)
-}
-
-function gnomeIndexPath(gnomeId) {
-  return `/${gnomeId}.json`
-}
-
-function randomId() {
-  // https://blog.asana.com/2011/09/6-sad-squid-snuggle-softly/
-  // should reimplement with our own list of adjectives, nouns, verbs, and adverbs at some point, rather than relying on this greg lib
-  return greg.sentence().replace(/\s+/g, '-').toLowerCase()
 }
 
 async function loadPublicGnomeConfig(url) {
@@ -80,7 +51,10 @@ async function loadPublicGnomeConfig(url) {
     url,
     type: getStringNoLocale(gnomeConfigThing, US.hasGnomeType),
     template: getStringNoLocale(gnomeConfigThing, US.usesGateTemplate),
-    gnomeId: gnomeId(url),
+    // TODO I don't think this is used any longer, but keepig in for now for good measure.
+    // can remove fully after soft launch
+    gnomeId: encodeGnomeUrl(url),
+    status: GnomeStatus.Requested,
   }
   if (gnomeConfig.type !== "gate") {
     throw new Error(`Only gnomes of type Gate are currently supported.`)
@@ -89,14 +63,18 @@ async function loadPublicGnomeConfig(url) {
 }
 
 async function findInIndex(config) {
-  const { gnomeId } = config
   try {
   let { data, error } = await supabase
     .from('index')
     .select('*')
     .eq('url', config.url)
-    console.log('supa find', data)
-    return data[0] && data[0].config
+    const foundConfig = data[0] && data[0].config
+    if (foundConfig) {
+      console.log('found persistent config ', foundConfig)
+    } else {
+      console.log('No persisten config found for gnome', config.url)
+    }
+    return foundConfig
   } catch (e) {
     if (e.status === 404) {
       // expected error if gnome does not exist
@@ -108,7 +86,6 @@ async function findInIndex(config) {
 }
 
 async function updateIndex(config) {
-  const { gnomeId } = config
   try {
   const { data, error } = await supabase
     .from('index')
@@ -118,8 +95,9 @@ async function updateIndex(config) {
         config: config
       },
     ], { upsert: 'true' })
-    console.log('supa update ', data)
-    return data[0] && data[0].config
+    const updatedConfig = data[0] && data[0].config
+    console.log('updated persistent config ', updatedConfig)
+    return updatedConfig
   } catch (e) {
     console.log(e)
     return null
@@ -127,8 +105,8 @@ async function updateIndex(config) {
 }
 
 async function createGnomesRepo(config) {
-  const { gnomeId, template } = config
-  const newProjectName = randomId()
+  const { template } = config
+  const newProjectName = randomReadableId()
   try {
     console.log(`Creating repo: { template_owner: ${TemplateOrg}, template_repo: ${template}, owner: ${GnomesOrg}, name: ${newProjectName}, description: ${templateId(template)} }`)
     const { data } = await octokit.request('POST /repos/{template_owner}/{template_repo}/generate', {
@@ -155,10 +133,9 @@ async function createGnomesRepo(config) {
 }
 
 async function findOrCreateGnomesRepo(config) {
-  const { gnomeId, url } = config
+  const {  url } = config
   const exists = await findInIndex(config)
   if (exists) {
-    console.log(`Found index entry ${exists.gnomeId} for url ${config.url}`)
     return exists
   } else {
     return await createGnomesRepo(config)
@@ -171,7 +148,10 @@ async function findVercelProject(config) {
   })
   if (response.ok) {
     const data = await response.json()
-    return data.name
+    config.vercelProjectId = data.id
+    config.pageUrl = data.alias && data.alias[0] && data.alias[0].domain
+    console.log(`Found project ${config.vercelProjectId} for url ${config.url}`)
+    return config
   } else {
     if (response.status !== 404) {
       throw new Error(`Unexpected status from findVercelProject for project: ${config.projectName}`)
@@ -193,11 +173,14 @@ async function createAndConfigureVercelProject(config) {
       }),
     headers: VercelHeaders
   })
-  const project = await response.json()
-  console.log(project)
 
-  console.log(`Configuring GNOME_CONFIG_URL on new Vercel project with id ${project.id} in ${VercelTeam}`)
-  const envVarResponse = await fetch(`https://api.vercel.com/v2/projects/${project.id}/env?teamId=${VercelTeam}`, {
+  const data = await response.json()
+  console.log(data)
+  config.vercelProjectId = data.id
+  config.pageUrl = data.alias && data.alias[0] && data.alias[0].domain
+
+  console.log(`Configuring GNOME_CONFIG_URL on new Vercel project with id ${data.id} in ${VercelTeam}`)
+  const envVarResponse = await fetch(`https://api.vercel.com/v2/projects/${data.id}/env?teamId=${VercelTeam}`, {
     method: 'POST',
     body: JSON.stringify({
       type: 'plain',
@@ -213,8 +196,8 @@ async function createAndConfigureVercelProject(config) {
   })
   const evData = await envVarResponse.json()
 
-  console.log(`Configuring framework on new Vercel project with id ${project.id} in ${VercelTeam}`)
-  const newProjectResponse = await fetch(`https://api.vercel.com/v2/projects/${project.id}?teamId=${VercelTeam}`, {
+  console.log(`Configuring framework on new Vercel project with id ${data.id} in ${VercelTeam}`)
+  const newProjectResponse = await fetch(`https://api.vercel.com/v2/projects/${data.id}?teamId=${VercelTeam}`, {
     method: 'PATCH',
     body: JSON.stringify({
       framework: 'nextjs',
@@ -224,13 +207,20 @@ async function createAndConfigureVercelProject(config) {
   })
   const newProject = await newProjectResponse.json()
 
-  return newProject.id
+  console.log(`Triggering deployment of new Vercel project with id ${data.id} in ${VercelTeam}`)
+  const { sha } = await emptyGitHubCommit({
+    owner: GnomesOrg,
+    repo: config.projectName,
+    token: GithubToken,
+    message: 'Empty Commit to Trigger Vercel Deploy',
+    branch: 'main'
+  })
+  return config
 }
 
 async function findOrCreateVercelProject(config) {
   const exists = await findVercelProject(config)
   if (exists) {
-    console.log(`Found project ${exists} for url ${config.url}`)
     return exists
   } else {
     return await createAndConfigureVercelProject(config)
@@ -238,18 +228,11 @@ async function findOrCreateVercelProject(config) {
 }
 
 async function setupPublicGnome(url) {
-  const config = await loadPublicGnomeConfig(url)
-  config.name = await findOrCreateGnomesRepo(config)
-  config.vercelProjectId = await findOrCreateVercelProject(config)
-  const { sha } = await emptyGitHubCommit({
-    owner: GnomesOrg,
-    repo: config.projectName,
-    token: GithubToken,
-    message: 'I am Greg',
-    branch: 'main'
-  })
-  config.sha = sha
-  return config
+  let config = await loadPublicGnomeConfig(url)
+  config = await findOrCreateGnomesRepo(config)
+  config = await findOrCreateVercelProject(config)
+  config.status = GnomeStatus.Deployed
+  return await updateIndex(config)
 }
 
 module.exports = async (req, res) => {
