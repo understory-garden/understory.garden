@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useWebId } from 'swrlit'
 import {
   getBoolean, setBoolean, getThingAll,
-  thingAsMarkdown, getUrl, setThing, asUrl,
-  getStringNoLocale
+  thingAsMarkdown, getUrl, setThing, getThing,
+  asUrl, getStringNoLocale, getSourceUrl
 } from '@inrupt/solid-client'
 
 import Nav from '../components/nav'
@@ -13,7 +13,7 @@ import { useAppSettings } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
 import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
-import { newSinglePageGateThing, updateSinglePageGateThing, setupGnomeThing } from '../model/gnomes'
+import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
 
 function SettingToggle({ settings, predicate, onChange, label, description }) {
@@ -153,7 +153,10 @@ function GnomesResourceEditor({ webId }) {
   async function updateThing(newThing) {
     const newResource = setThing(resource, newThing)
     await save(newResource)
-    const resp = await setupGnomeThing(newThing)
+    const resourceUrl = getSourceUrl(newResource)
+    const thingUrl = asUrl(newThing, resourceUrl)
+    console.log(`Setting up gnome at url: ${thingUrl}`)
+    const resp = await setupGnome({ url: thingUrl })
     console.log(resp)
     setAddingNewGnome(false)
   }
