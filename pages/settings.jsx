@@ -105,7 +105,6 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
   const { concept, index } = useConcept(webId, 'default', chosenConceptName)
 
   async function save({css}) {
-    console.log("saving with CSS", css)
     if (isNewThing) {
       const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept, css)
       await updateThing(newThing)
@@ -187,13 +186,13 @@ function GnomesResourceEditor({ webId }) {
     await save(newResource)
     const resourceUrl = getSourceUrl(newResource)
     const thingUrl = asUrl(newThing, resourceUrl)
-   /* console.log(`Requesting setup for gnome at url: ${thingUrl}`)
+   console.log(`Requesting setup for gnome at url: ${thingUrl}`)
     const gnomeConfig = await setupGnome({ url: thingUrl })
     let deployedThing = getThing(newResource, thingUrl)
     deployedThing = updateDeploymentStatus(deployedThing, gnomeConfig)
     const deployedResource = setThing(newResource, deployedThing)
     await save(deployedResource)
-    console.log(`Finished setting up gnome at url: ${thingUrl}`)*/
+    console.log(`Finished setting up gnome at url: ${thingUrl}`)
   }
   function cancel() {
     setAddingNewGnome(false)
