@@ -43,6 +43,12 @@ export function updateSinglePageGateThing(thing, conceptPrefix, index, concept){
   return updatedThing
 }
 
+export function updateDeploymentStatus(thing, gnomeConfig) {
+  let updatedThing = setUrl(thing, US.deployedAt, gnomeConfig.pageUrl)
+  updatedThing = setStringNoLocale(updatedThing, US.hasGnomeStatus, gnomeConfig.status)
+  return updatedThing
+}
+
 export async function setupGnome(body) {
   const response = await fetch(`/api/setup-gnome`, {
     method: 'POST',
