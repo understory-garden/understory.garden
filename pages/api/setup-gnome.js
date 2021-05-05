@@ -123,9 +123,9 @@ async function createGnomesRepo(config) {
       }
     })
     const updatedConfig = {
+      ...config,
       projectName: newProjectName,
-      githubProjectName: data.full_name,
-      ...config
+      githubProjectName: data.full_name
     }
     return await updateIndex(updatedConfig)
   }
@@ -184,7 +184,7 @@ async function createAndConfigureVercelProject(config) {
   console.log(data)
   const updatedConfig = {
     ...config,
-    vercelProjectId: project.id
+    vercelProjectId: project.id,
     pageUrl: data.alias && data.alias[0] && data.alias[0].domain
   }
 
