@@ -157,7 +157,7 @@ async function findVercelProject(config) {
       pageUrl: data.alias && data.alias[0] && data.alias[0].domain
     }
     console.log(`Found project ${updatedConfig.vercelProjectId} for url ${updatedConfig.url}`)
-    return configToPersist
+    return updatedConfig
   } else {
     if (response.status !== 404) {
       throw new Error(`Unexpected status from findVercelProject for project: ${config.projectName}`)
@@ -243,7 +243,7 @@ async function setupPublicGnome(url) {
   config = await findOrCreateVercelProject(config)
   config =   {
     ...config,
-    status: GnomesStatus.Deployed
+    status: GnomeStatus.Deployed
   }
   config = await (updateIndex(config))
   return config
