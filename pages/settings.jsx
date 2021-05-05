@@ -77,8 +77,8 @@ function GnomeThingEntry({ thing }) {
       <h5 className="font-bold">{template}</h5>
         template and
       <h5 className="font-bold">{conceptName}</h5>
-       to
-       <h5 className="font-bold"><a href={deployedAt}>{deployedAt}</a></h5>
+        to
+      <h5 className="font-bold"><a href={deployedAt} target='_blank' rel='noopener noreferrer'>{deployedAt}</a></h5>
     </div>
   )
 }
