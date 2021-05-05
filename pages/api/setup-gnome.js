@@ -186,7 +186,7 @@ async function createAndConfigureVercelProject(config) {
   const pageDomain = data.alias && data.alias[0] && data.alias[0].domain
   const updatedConfig = {
     ...config,
-    vercelProjectId: project.id,
+    vercelProjectId: data.id,
     pageUrl: pageDomain && `https://${pageDomain}`
   }
 
