@@ -5,6 +5,8 @@ import {
   thingAsMarkdown, getUrl, setThing, getThing,
   asUrl, getStringNoLocale, getSourceUrl
 } from '@inrupt/solid-client'
+import { Formik, Field, Form } from 'formik';
+import * as Yup from 'yup';
 
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
@@ -15,6 +17,10 @@ import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
+
+const SinglePageGateSchema = Yup.object().shape({
+  css: Yup.string()
+});
 
 function SettingToggle({ settings, predicate, onChange, label, description }) {
   const [value, setValue] = useState()
@@ -83,7 +89,7 @@ function GnomeThingEntry({ thing }) {
   )
 }
 
-function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
+function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
   // Users are currently able to edit the following Gate Config values (we only support Gate type gnomes for now)
   // Concept picker / new note picker to set concept for single-page-gate
   //    onSubmit returns concept name
@@ -91,54 +97,76 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
   // hooks/app useConceptPrefix to get the prefix
   const isNewThing = !thing
   const currentConceptName = thing && conceptUriToName(getUrl(thing, US.usesConcept))
-  const [chosenConceptName, setChoseConceptName] = useState(currentConceptName)
+  const [chosenConceptName, setChosenConceptName] = useState(currentConceptName)
   const [editingNoteName, setEditingNoteName] = useState(!thing)
   const [editingGate, setEditingGate] = useState(!thing)
 
   const conceptPrefix = understoryGardenConceptPrefix(webId, 'default')
   const { concept, index } = useConcept(webId, 'default', chosenConceptName)
 
-  function setEditingAll(b) {
-    setEditingNoteName(b)
-    setEditingGate(b)
-  }
-  function onSubmit(selectedNoteName) {
-    setChoseConceptName(selectedNoteName)
-    setEditingNoteName(false)
-  }
-  async function onSave() {
+  async function save({css}) {
+    console.log("saving with CSS", css)
     if (isNewThing) {
-      const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept)
+      const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept, css)
       await updateThing(newThing)
     } else {
-      await updateThing(updateSinglePageGateThing(thing, conceptPrefix, index, concept))
+      await updateThing(updateSinglePageGateThing(thing, webId, conceptPrefix, index, concept, css))
     }
     setEditingGate(false)
   }
+
   function cancelEdit() {
     setEditingGate(false)
     cancelAdd && cancelAdd()
   }
   return (
-    <div className="mb-6">
+    <div className="mb-12">
       { editingGate ? (
-        <>
-          <h3 className="mb-3">What note would you like to use for your Gate?</h3>
-          <div className="w-full">
-            {editingNoteName ? (
-              <NewNoteForm onSubmit={onSubmit} initialSelectedName={chosenConceptName} submitTitle="choose" />
-            ) : (
-              <div className="flex justify-between">
-                <h5 className="font-bold">{chosenConceptName}</h5>
-                <button className="btn" onClick={() => setEditingNoteName(true)}>Pick a different note</button>
+        <Formik
+          initialValues={{
+            conceptName: chosenConceptName,
+            css: ''
+          }}
+          validationSchema={SinglePageGateSchema}
+          onSubmit={save}
+        >
+          {({ errors, touched, setFieldValue, values: {conceptName} }) => (
+
+            <Form>
+              <div className="flex flex-col">
+                <div>
+                  <h3 className="mb-3">What note would you like to use for your Gate?</h3>
+
+                  {editingNoteName ? (
+                    <NewNoteForm onSubmit={(newConceptName) => {
+                      setFieldValue('conceptName', newConceptName)
+                      // we need to set this here so that the concept loader above will
+                      // load the concept
+                      setChosenConceptName(newConceptName)
+                      setEditingNoteName(false)
+                    }}
+                      initialSelectedName={conceptName} submitTitle="choose" />
+                  ) : (
+                    <div className="flex justify-between">
+                      <h5 className="font-bold">{conceptName}</h5>
+                      <button className="btn" onClick={() => setEditingNoteName(true)}>Pick a different note</button>
+                    </div>
+                  )}
+                </div>
+                <Field id="css" name="css"
+                  as="textarea"
+                  className="my-3"
+                  placeholder="add custom css" />
+                {errors.css && touched.css ? <div className="text-red-500">{errors.css}</div> : null}
+
+                <div className="flex mt-1">
+                  <button className="btn" disabled={!conceptName} type="submit">Save and Deploy Gate</button>
+                  <button className="btn" onClick={cancelEdit}>Cancel</button>
+                </div>
               </div>
-            )}
-          </div>
-          <div className="flex">
-            <button className="btn mt-3" disabled={!chosenConceptName} onClick={onSave}>Save and Deploy Gate</button>
-            <button className="btn" onClick={cancelEdit}>Cancel</button>
-          </div>
-        </>
+            </Form>
+          )}
+        </Formik>
       ) : (
         <div className="flex justify-between mt-3">
           <GnomeThingEntry thing={thing} />
@@ -159,13 +187,13 @@ function GnomesResourceEditor({ webId }) {
     await save(newResource)
     const resourceUrl = getSourceUrl(newResource)
     const thingUrl = asUrl(newThing, resourceUrl)
-    console.log(`Requesting setup for gnome at url: ${thingUrl}`)
+   /* console.log(`Requesting setup for gnome at url: ${thingUrl}`)
     const gnomeConfig = await setupGnome({ url: thingUrl })
     let deployedThing = getThing(newResource, thingUrl)
     deployedThing = updateDeploymentStatus(deployedThing, gnomeConfig)
     const deployedResource = setThing(newResource, deployedThing)
     await save(deployedResource)
-    console.log(`Finished setting up gnome at url: ${thingUrl}`)
+    console.log(`Finished setting up gnome at url: ${thingUrl}`)*/
   }
   function cancel() {
     setAddingNewGnome(false)
@@ -176,7 +204,7 @@ function GnomesResourceEditor({ webId }) {
         <GnomeThingEditor key={i}
           webId={webId}
           thing={thing}
-          updateThing={updateThing}/>
+          updateThing={updateThing} />
       ))}
       { addingNewGnome ?
         (<GnomeThingEditor webId={webId} updateThing={updateThing} cancelAdd={cancel} />) :
