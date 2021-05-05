@@ -122,9 +122,12 @@ async function createGnomesRepo(config) {
         ]
       }
     })
-    config.projectName = newProjectName
-    config.githubProjectName = data.full_name
-    return await updateIndex(config)
+    const updatedConfig = {
+      projectName: newProjectName,
+      githubProjectName: data.full_name,
+      ...config
+    }
+    return await updateIndex(updatedConfig)
   }
   catch (e) {
     console.log(e)
@@ -148,10 +151,13 @@ async function findVercelProject(config) {
   })
   if (response.ok) {
     const data = await response.json()
-    config.vercelProjectId = data.id
-    config.pageUrl = data.alias && data.alias[0] && data.alias[0].domain
-    console.log(`Found project ${config.vercelProjectId} for url ${config.url}`)
-    return config
+    const updatedConfig = {
+      ...config,
+      vercelProjectId: data.id,
+      pageUrl: data.alias && data.alias[0] && data.alias[0].domain
+    }
+    console.log(`Found project ${updatedConfig.vercelProjectId} for url ${updatedConfig.url}`)
+    return configToPersist
   } else {
     if (response.status !== 404) {
       throw new Error(`Unexpected status from findVercelProject for project: ${config.projectName}`)
@@ -176,8 +182,11 @@ async function createAndConfigureVercelProject(config) {
 
   const data = await response.json()
   console.log(data)
-  config.vercelProjectId = data.id
-  config.pageUrl = data.alias && data.alias[0] && data.alias[0].domain
+  const updatedConfig = {
+    ...config,
+    vercelProjectId: project.id
+    pageUrl: data.alias && data.alias[0] && data.alias[0].domain
+  }
 
   console.log(`Configuring GNOME_CONFIG_URL on new Vercel project with id ${data.id} in ${VercelTeam}`)
   const envVarResponse = await fetch(`https://api.vercel.com/v2/projects/${data.id}/env?teamId=${VercelTeam}`, {
@@ -215,7 +224,8 @@ async function createAndConfigureVercelProject(config) {
     message: 'Empty Commit to Trigger Vercel Deploy',
     branch: 'main'
   })
-  return config
+
+  return updatedConfig
 }
 
 async function findOrCreateVercelProject(config) {
@@ -231,8 +241,12 @@ async function setupPublicGnome(url) {
   let config = await loadPublicGnomeConfig(url)
   config = await findOrCreateGnomesRepo(config)
   config = await findOrCreateVercelProject(config)
-  config.status = GnomeStatus.Deployed
-  return await updateIndex(config)
+  config =   {
+    ...config,
+    status: GnomesStatus.Deployed
+  }
+  config = await (updateIndex(config))
+  return config
 }
 
 module.exports = async (req, res) => {
