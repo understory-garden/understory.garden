@@ -26,19 +26,23 @@ export function randomReadableId() {
   return greg.sentence().replace(/\s+/g, '-').toLowerCase()
 }
 
-export function newSinglePageGateThing(webId, conceptPrefix, index, concept) {
+export function newSinglePageGateThing(webId, conceptPrefix, index, concept, css) {
   let thing = createThing()
   thing = setStringNoLocale(thing, US.hasGnomeType, GnomeType.Gate)
   thing = setStringNoLocale(thing, US.usesGateTemplate, GateTemplate.SinglePageGate)
   thing = setStringNoLocale(thing, US.conceptPrefix, conceptPrefix)
+  thing = setStringNoLocale(thing, US.usesCSS, css)
+  thing = setUrl(thing, US.monetizedFor, webId)
   thing = setUrl(thing, US.usesConcept, asUrl(concept))
   thing = setUrl(thing, US.usesConceptIndex, getSourceUrl(index))
   return thing
 }
 
-export function updateSinglePageGateThing(thing, conceptPrefix, index, concept){
+export function updateSinglePageGateThing(thing, webId, conceptPrefix, index, concept, css){
   let updatedThing = setUrl(thing, US.usesConcept, asUrl(concept));
   updatedThing = setStringNoLocale(updatedThing, US.conceptPrefix, conceptPrefix)
+  updatedThing = setStringNoLocale(updatedThing, US.usesCSS, css)
+  updatedThing = setUrl(updatedThing, US.monetizedFor, webId)
   updatedThing = setUrl(updatedThing, US.usesConceptIndex, getSourceUrl(index));
   return updatedThing
 }

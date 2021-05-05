@@ -51,5 +51,6 @@ export const US = {
   usesConceptIndex: `${understoryRoot}usesConceptIndex`,
   deployedAt: `${understoryRoot}deployedAt`,
   hasGnomeStatus: `${understoryRoot}hasGnomeStatus`,
-
+  monetizedFor: `${understoryRoot}monetizedFor`,
+  usesCSS: `${understoryRoot}usesCSS`
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Formik, Field, Form } from 'formik';
-import { fetch } from 'solid-auth-fetcher'
 import * as Yup from 'yup';
 import Nav from '../components/nav'
 
