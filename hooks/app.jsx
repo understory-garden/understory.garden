@@ -64,7 +64,6 @@ export function useApp(webId){
   return {app, initApp, saveResource: saveAppResource, ...rest}
 }
 
-
 export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
   const { app } = useApp(webId)
   // we're ignoring the workspaceSlug parameter for now, but eventually we'll want to use this to get the currect workspace

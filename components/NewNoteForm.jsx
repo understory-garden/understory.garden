@@ -5,9 +5,9 @@ import { useRouter } from 'next/router'
 import { useConceptNamesMatching } from '../hooks/concepts'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 
-export default function NewNoteForm() {
+export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=""}) {
   const router = useRouter()
-  const [displayedName, setDisplayedName] = useState("")
+  const [displayedName, setDisplayedName] = useState(initialSelectedName)
   const gotoNote = useCallback((noteName) => {
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
     setDisplayedName("")
@@ -41,8 +41,12 @@ export default function NewNoteForm() {
 
   const selectedNote = (matchingConceptNames && (selectionIndex > 0)) ? matchingConceptNames[selectionIndex - 1] : displayedName
   const onClick = useCallback(() => {
-    gotoNote(selectedNote)
-  }, [selectedNote])
+    if (onSubmit) {
+      onSubmit(selectedNote)
+    } else {
+      gotoNote(selectedNote)
+    }
+  }, [selectedNote, onSubmit])
   return (
     <div className="flex flex-row max-h-9 self-center">
       <div className="relative overflow-y-visible">
@@ -65,7 +69,7 @@ export default function NewNoteForm() {
         <button className="btn"
           onClick={onClick}
           disabled={displayedName === ""}>
-          {(selectionIndex === 0) ? 'create' : 'goto'} {selectedNote}
+          {submitTitle || ((selectionIndex === 0) ? 'create' : 'goto')} {selectedNote}
         </button>
       )}
     </div>
