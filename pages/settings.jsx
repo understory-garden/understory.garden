@@ -130,7 +130,7 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
             ) : (
               <div className="flex justify-between">
                 <h5 className="font-bold">{chosenConceptName}</h5>
-                <button className="btn" onClick={() => setEditingAll(true)}>Pick a different note</button>
+                <button className="btn" onClick={() => setEditingNoteName(true)}>Pick a different note</button>
               </div>
             )}
           </div>
@@ -142,7 +142,7 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd}) {
       ) : (
         <div className="flex justify-between mt-3">
           <GnomeThingEntry thing={thing} />
-          <button className="btn" onClick={() => setEditingAll(true)}>Edit Gate</button>
+          <button className="btn" onClick={() => setEditingGate(true)}>Edit Gate</button>
         </div>
       )}
     </div>
@@ -154,6 +154,7 @@ function GnomesResourceEditor({ webId }) {
   const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
   async function updateThing(newThing) {
+    setAddingNewGnome(false)
     const newResource = setThing(resource, newThing)
     await save(newResource)
     const resourceUrl = getSourceUrl(newResource)
@@ -165,7 +166,6 @@ function GnomesResourceEditor({ webId }) {
     const deployedResource = setThing(newResource, deployedThing)
     await save(deployedResource)
     console.log(`Finished setting up gnome at url: ${thingUrl}`)
-    setAddingNewGnome(false)
   }
   function cancel() {
     setAddingNewGnome(false)
