@@ -13,7 +13,7 @@ import { useAppSettings } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
 import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
-import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome } from '../model/gnomes'
+import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
 
 function SettingToggle({ settings, predicate, onChange, label, description }) {
@@ -69,6 +69,7 @@ function GnomeThingEntry({ thing }) {
   const conceptPrefix = thing && getStringNoLocale(thing, US.conceptPrefix)
   const conceptUrl = thing && getUrl(thing, US.usesConcept)
   const conceptName = conceptUrl && conceptUriToName(conceptUrl)
+  const deployedAt = thing && getUrl(thing, US.deployedAt)
   return (
     <div>
       <h5 className="font-bold">{type}</h5>
@@ -76,6 +77,8 @@ function GnomeThingEntry({ thing }) {
       <h5 className="font-bold">{template}</h5>
         template and
       <h5 className="font-bold">{conceptName}</h5>
+       to
+       <h5 className="font-bold"><a href={deployedAt}>{deployedAt}</a></h5>
     </div>
   )
 }
@@ -155,9 +158,13 @@ function GnomesResourceEditor({ webId }) {
     await save(newResource)
     const resourceUrl = getSourceUrl(newResource)
     const thingUrl = asUrl(newThing, resourceUrl)
-    console.log(`Setting up gnome at url: ${thingUrl}`)
-    const resp = await setupGnome({ url: thingUrl })
-    console.log(resp)
+    console.log(`Requesting setup for gnome at url: ${thingUrl}`)
+    const gnomeConfig = await setupGnome({ url: thingUrl })
+    let deployedThing = getThing(newResource, thingUrl)
+    deployedThing = updateDeploymentStatus(deployedThing, gnomeConfig)
+    const deployedResource = setThing(newResource, deployedThing)
+    await save(deployedResource)
+    console.log(`Finished setting up gnome at url: ${thingUrl}`)
     setAddingNewGnome(false)
   }
   function cancel() {
