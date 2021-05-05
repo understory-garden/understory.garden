@@ -64,10 +64,10 @@ async function loadPublicGnomeConfig(url) {
 
 async function findInIndex(config) {
   try {
-  let { data, error } = await supabase
-    .from('index')
-    .select('*')
-    .eq('url', config.url)
+    let { data, error } = await supabase
+      .from('index')
+      .select('*')
+      .eq('url', config.url)
     const foundConfig = data[0] && data[0].config
     if (foundConfig) {
       console.log('found persistent config ', foundConfig)
@@ -87,14 +87,14 @@ async function findInIndex(config) {
 
 async function updateIndex(config) {
   try {
-  const { data, error } = await supabase
-    .from('index')
-    .insert([
-      { url: config.url,
-        name: config.projectName,
-        config: config
-      },
-    ], { upsert: 'true' })
+    const { data, error } = await supabase
+      .from('index')
+      .insert([
+        { url: config.url,
+          name: config.projectName,
+          config: config
+        },
+      ], { upsert: 'true' })
     const updatedConfig = data[0] && data[0].config
     console.log('updated persistent config ', updatedConfig)
     return updatedConfig
