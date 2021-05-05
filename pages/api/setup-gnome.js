@@ -151,10 +151,11 @@ async function findVercelProject(config) {
   })
   if (response.ok) {
     const data = await response.json()
+    const pageDomain = data.alias && data.alias[0] && data.alias[0].domain
     const updatedConfig = {
       ...config,
       vercelProjectId: data.id,
-      pageUrl: data.alias && data.alias[0] && data.alias[0].domain
+      pageUrl: pageDomain && `https://${pageDomain}`
     }
     console.log(`Found project ${updatedConfig.vercelProjectId} for url ${updatedConfig.url}`)
     return updatedConfig
@@ -182,10 +183,11 @@ async function createAndConfigureVercelProject(config) {
 
   const data = await response.json()
   console.log(data)
+  const pageDomain = data.alias && data.alias[0] && data.alias[0].domain
   const updatedConfig = {
     ...config,
     vercelProjectId: project.id,
-    pageUrl: data.alias && data.alias[0] && data.alias[0].domain
+    pageUrl: pageDomain && `https://${pageDomain}`
   }
 
   console.log(`Configuring GNOME_CONFIG_URL on new Vercel project with id ${data.id} in ${VercelTeam}`)
