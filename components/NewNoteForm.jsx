@@ -12,6 +12,13 @@ export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
     setDisplayedName("")
   }, [router])
+  const onSelectNote = (note) => {
+    if (onSubmit) {
+      onSubmit(selectedNote)
+    } else {
+      gotoNote(selectedNote)
+    }
+  }
 
   const [selectionIndex, setSelectionIndex] = useState(0)
   const matchingConceptNames = useConceptNamesMatching(displayedName)
@@ -31,7 +38,7 @@ export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=
         case 'Enter':
           event.preventDefault()
           const targetNote = (selectionIndex > 0) ? matchingConceptNames[selectionIndex - 1] : event.target.value
-          gotoNote(targetNote)
+          onSelectNote(targetNote)
           setDisplayedName("")
           break
       }
@@ -41,11 +48,7 @@ export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=
 
   const selectedNote = (matchingConceptNames && (selectionIndex > 0)) ? matchingConceptNames[selectionIndex - 1] : displayedName
   const onClick = useCallback(() => {
-    if (onSubmit) {
-      onSubmit(selectedNote)
-    } else {
-      gotoNote(selectedNote)
-    }
+    onSelectNote(selectedNote)
   }, [selectedNote, onSubmit])
   return (
     <div className="flex flex-row max-h-9 self-center">
