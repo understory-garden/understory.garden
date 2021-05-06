@@ -11,13 +11,14 @@ import * as Yup from 'yup';
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
-import { useAppSettings } from '../hooks/app'
+import { useAppSettings, useDevMode } from '../hooks/app'
 import { useConceptPrefix, useConcept } from '../hooks/concepts'
 import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
 import { Loader } from '../components/elements'
+import { deleteResource } from '../utils/fetch';
 
 const SinglePageGateSchema = Yup.object().shape({
   css: Yup.string()
@@ -190,6 +191,7 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
 }
 
 function GnomesResourceEditor({ webId }) {
+  const devMode = useDevMode(webId)
   const { resource, save } = useGnomesResource(webId)
   const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
@@ -217,6 +219,11 @@ function GnomesResourceEditor({ webId }) {
   }
   return (
     <div className="mt-3">
+      {devMode && (
+        <button className="btn" onClick={() => { deleteResource(getSourceUrl(resource)) }}>
+          Delete Gnomes Resource
+        </button>
+      )}
       { gnomeThings && gnomeThings.map((thing, i) => (
         <GnomeThingEditor key={i}
           webId={webId}
@@ -250,6 +257,7 @@ export default function Profile() {
             but expect richer templates soon. Custom domains are available to paid members
             only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.
             </>)} />
+
         <GnomesResourceEditor webId={webId} />
         <SectionHeader title="Zines"
           description={(<>
@@ -258,7 +266,7 @@ export default function Profile() {
             Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.
           </>)} />
 
-        <SectionHeader title="Settings"
+        <SectionHeader title="Miscellaneous"
           description="" />
         {settings && (
           <SettingToggle settings={settings} predicate={US.devMode} onChange={onChange}

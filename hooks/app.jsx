@@ -3,7 +3,7 @@ import { useUnderstoryContainerUri, useConceptContainerUri, useStorageContainer 
 import { useThing, useResource, useWebId } from 'swrlit'
 import {
   createSolidDataset, getSourceUrl, createThing, getThingAll, getDatetime, getUrl, setUrl,
-  setThing, getThing
+  setThing, getThing, getBoolean
 } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/lit-generated-vocab-solid-common'
@@ -113,4 +113,9 @@ export function useAppSettings(webId){
     return saveAppResource(newAppResource)
   }
   return { settings,  save }
+}
+
+export function useDevMode(webId){
+  const { settings } = useAppSettings(webId)
+  return settings && getBoolean(settings, US.devMode)
 }
