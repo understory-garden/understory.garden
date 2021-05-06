@@ -222,7 +222,7 @@ async function createAndConfigureVercelProject(config) {
   return updatedConfig
 }
 
-async function triggerFirstDeploy(config) {
+async function triggerDeploy(config) {
   const main = `heads/${MainBranchName}`
 
   /* TODO compare the templateMainRef to the gnomesMainRef and maybe pull in changes.
@@ -305,7 +305,7 @@ async function setupPublicGnome(url) {
     ...config,
     status: GnomeStatus.Deployed
   }
-  config = await triggerFirstDeploy(config)
+  config = await triggerDeploy(config)
   config = await updateIndex(config)
   return config
 }
