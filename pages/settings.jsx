@@ -118,13 +118,15 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
     setEditingGate(false)
     cancelAdd && cancelAdd()
   }
+
+  const currentCSS = thing && getStringNoLocale(thing, US.usesCSS)
   return (
     <div className="mb-12">
       { editingGate ? (
         <Formik
           initialValues={{
             conceptName: chosenConceptName,
-            css: ''
+            css: currentCSS || ''
           }}
           validationSchema={SinglePageGateSchema}
           onSubmit={save}
