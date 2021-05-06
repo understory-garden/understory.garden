@@ -35,15 +35,15 @@ function SettingToggle({ settings, predicate, onChange, label, description }) {
     onChange && onChange(setBoolean(settings, predicate, newValue))
   }
   return (
-    <div className="">
-      <span>
-        <span className="text-sm font-medium text-gray-900">
+    <div className="flex flex-row justify-between">
+      <div>
+        <div className="text-sm font-medium text-gray-900">
           {label}
-        </span>
-        <span className="text-sm text-gray-500">
+        </div>
+        <div className="text-sm text-gray-500">
           {description}
-        </span>
-      </span>
+        </div>
+      </div>
 
       <button type="button"
         onClick={toggle}
@@ -243,26 +243,29 @@ export default function Profile() {
       <Nav />
       <h1 className="text-5xl text-center mb-12">Settings</h1>
       <div className="mx-36">
-        {settings && (
-          <SettingToggle settings={settings} predicate={US.devMode} onChange={onChange}
-            label="Developer Mode"
-            description="Seatbelts off, maximum information."
-          />
-        )}
         <SectionHeader title="Gates"
           description={(<>
             Gates are customizable websites that serve as gateways to your garden.
             Right now we only support deploying a single note to a simple one page website,
-            but expect richer templates soon. Custom domains are availible to paid members
+            but expect richer templates soon. Custom domains are available to paid members
             only. Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.
             </>)} />
         <GnomesResourceEditor webId={webId} />
         <SectionHeader title="Zines"
           description={(<>
             Zines are rich, interactive html newsletters sent to your subscribers.
-            Zines are availible to paid members only.
+            Zines are available to paid members only.
             Reach out at <a href="mailto:hello@understory.coop">hello@understory.coop</a> to purchase a plan.
           </>)} />
+
+        <SectionHeader title="Settings"
+          description="" />
+        {settings && (
+          <SettingToggle settings={settings} predicate={US.devMode} onChange={onChange}
+            label="Developer Mode"
+            description="Seatbelts off, maximum information."
+          />
+        )}
       </div>
     </div>
   )
