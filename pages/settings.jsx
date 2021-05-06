@@ -17,6 +17,7 @@ import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
+import { Loader } from '../components/elements'
 
 const SinglePageGateSchema = Yup.object().shape({
   css: Yup.string()
@@ -100,18 +101,24 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
   const [chosenConceptName, setChosenConceptName] = useState(currentConceptName)
   const [editingNoteName, setEditingNoteName] = useState(!thing)
   const [editingGate, setEditingGate] = useState(!thing)
+  const [savingGate, setSavingGate] = useState(false)
 
   const conceptPrefix = understoryGardenConceptPrefix(webId, 'default')
   const { concept, index } = useConcept(webId, 'default', chosenConceptName)
 
-  async function save({css}) {
-    if (isNewThing) {
-      const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept, css)
-      await updateThing(newThing)
-    } else {
-      await updateThing(updateSinglePageGateThing(thing, webId, conceptPrefix, index, concept, css))
+  async function save({ css }) {
+    try {
+      setSavingGate(true)
+      if (isNewThing) {
+        const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept, css)
+        await updateThing(newThing)
+      } else {
+        await updateThing(updateSinglePageGateThing(thing, webId, conceptPrefix, index, concept, css))
+      }
+    } finally {
+      setEditingGate(false)
+      setSavingGate(false)
     }
-    setEditingGate(false)
   }
 
   function cancelEdit() {
@@ -122,59 +129,63 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
   const currentCSS = thing && getStringNoLocale(thing, US.usesCSS)
   return (
     <div className="mb-12">
-      { editingGate ? (
-        <Formik
-          initialValues={{
-            conceptName: chosenConceptName,
-            css: currentCSS || ''
-          }}
-          validationSchema={SinglePageGateSchema}
-          onSubmit={save}
-        >
-          {({ errors, touched, setFieldValue, values: {conceptName} }) => (
-
-            <Form>
-              <div className="flex flex-col">
-                <div>
-                  <h3 className="mb-3">What note would you like to use for your Gate?</h3>
-
-                  {editingNoteName ? (
-                    <NewNoteForm onSubmit={(newConceptName) => {
-                      setFieldValue('conceptName', newConceptName)
-                      // we need to set this here so that the concept loader above will
-                      // load the concept
-                      setChosenConceptName(newConceptName)
-                      setEditingNoteName(false)
-                    }}
-                      initialSelectedName={conceptName} submitTitle="choose" />
-                  ) : (
-                    <div className="flex justify-between">
-                      <h5 className="font-bold">{conceptName}</h5>
-                      <button className="btn" onClick={() => setEditingNoteName(true)}>Pick a different note</button>
-                    </div>
-                  )}
-                </div>
-                <Field id="css" name="css"
-                  as="textarea"
-                  className="my-3"
-                  placeholder="add custom css" />
-                {errors.css && touched.css ? <div className="text-red-500">{errors.css}</div> : null}
-
-                <div className="flex mt-1">
-                  <button className="btn" disabled={!conceptName} type="submit">Save and Deploy Gate</button>
-                  <button className="btn" onClick={cancelEdit}>Cancel</button>
-                </div>
-              </div>
-            </Form>
-          )}
-        </Formik>
+      { savingGate ? (
+        <Loader />
       ) : (
-        <div className="flex justify-between mt-3">
-          <GnomeThingEntry thing={thing} />
-          <button className="btn" onClick={() => setEditingGate(true)}>Edit Gate</button>
-        </div>
-      )}
-    </div>
+        editingGate ? (
+          <Formik
+            initialValues={{
+              conceptName: chosenConceptName,
+              css: currentCSS || ''
+            }}
+            validationSchema={SinglePageGateSchema}
+            onSubmit={save}
+          >
+            {({ errors, touched, setFieldValue, values: { conceptName } }) => (
+
+              <Form>
+                <div className="flex flex-col">
+                  <div>
+                    <h3 className="mb-3">What note would you like to use for your Gate?</h3>
+
+                    {editingNoteName ? (
+                      <NewNoteForm onSubmit={(newConceptName) => {
+                        setFieldValue('conceptName', newConceptName)
+                        // we need to set this here so that the concept loader above will
+                        // load the concept
+                        setChosenConceptName(newConceptName)
+                        setEditingNoteName(false)
+                      }}
+                        initialSelectedName={conceptName} submitTitle="choose" />
+                    ) : (
+                      <div className="flex justify-between">
+                        <h5 className="font-bold">{conceptName}</h5>
+                        <button className="btn" onClick={() => setEditingNoteName(true)}>Pick a different note</button>
+                      </div>
+                    )}
+                  </div>
+                  <Field id="css" name="css"
+                    as="textarea"
+                    className="my-3"
+                    placeholder="add custom css" />
+                  {errors.css && touched.css ? <div className="text-red-500">{errors.css}</div> : null}
+
+                  <div className="flex mt-1">
+                    <button className="btn" disabled={!conceptName} type="submit">Save and Deploy Gate</button>
+                    <button className="btn" onClick={cancelEdit}>Cancel</button>
+                  </div>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        ) : (
+          <div className="flex justify-between mt-3">
+            <GnomeThingEntry thing={thing} />
+            <button className="btn" onClick={() => setEditingGate(true)}>Edit Gate</button>
+          </div>
+        ))
+      }
+    </div >
   )
 }
 
