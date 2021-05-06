@@ -26,6 +26,7 @@ import emptyGitHubCommit from 'make-empty-github-commit'
 import { createClient } from '@supabase/supabase-js'
 import { encodeGnomeUrl, randomReadableId, GnomeStatus } from '../../model/gnomes.jsx'
 
+const MainBranchName = "main"
 const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
 const GithubToken = process.env.GITHUB_TOKEN_UGK
@@ -218,16 +219,72 @@ async function createAndConfigureVercelProject(config) {
   })
   const newProject = await newProjectResponse.json()
 
-  console.log(`Triggering deployment of new Vercel project with id ${data.id} in ${VercelTeam}`)
-  const { sha } = await emptyGitHubCommit({
-    owner: GnomesOrg,
-    repo: config.projectName,
-    token: GithubToken,
-    message: 'Empty Commit to Trigger Vercel Deploy',
-    branch: 'main'
-  })
-
   return updatedConfig
+}
+
+async function triggerFirstDeploy(config) {
+  const main = `heads/${MainBranchName}`
+
+  /* TODO compare the templateMainRef to the gnomesMainRef and maybe pull in changes.
+   * I think we need to use actual git for this though, instead of the github api,
+   * and I'm not totally sure how to do that in a serverless function. - ianconsolata
+  const templateMainRef = await octokit.request('GET /repos/{owner}/{repo}/git/ref/{ref}', {
+    owner: TemplateOrg,
+    repo: config.template,
+    ref: main
+  })
+  */
+
+  try {
+    const gnomesMainRef = await octokit.request('GET /repos/{owner}/{repo}/git/ref/{ref}', {
+      headers: GithubAuthHeaders,
+      owner: GnomesOrg,
+      repo: config.projectName,
+      ref: main
+    })
+    let sha = gnomesMainRef.data.object.sha
+    console.log("Found main ref", sha)
+
+    const gnomesMainCommit = await octokit.request('GET /repos/{owner}/{repo}/git/commits/{commit_sha}', {
+      headers: GithubAuthHeaders,
+      owner: GnomesOrg,
+      repo: config.projectName,
+      commit_sha: gnomesMainRef.data.object.sha
+    })
+    sha = gnomesMainCommit.data.sha
+    console.log("Getting parent commit data ", sha)
+
+    const newGnomesCommit = await octokit.request('POST /repos/{owner}/{repo}/git/commits', {
+      headers: GithubAuthHeaders,
+      owner: GnomesOrg,
+      repo: config.projectName,
+      message: 'I am Talia, Mother Gnome',
+      tree: gnomesMainCommit.data.tree.sha,
+      parents: [gnomesMainCommit.data.sha],
+    })
+    sha = newGnomesCommit.data.sha
+    console.log("Creating empty commit ", sha)
+
+    const updatedGnomesMainRef = await octokit.request('PATCH /repos/{owner}/{repo}/git/refs/{ref}', {
+      headers: GithubAuthHeaders,
+      owner: GnomesOrg,
+      repo: config.projectName,
+      ref: main,
+      sha: newGnomesCommit.data.sha,
+      force: true // Just clobber the existing template and replace it with current main
+    })
+    sha = updatedGnomesMainRef.data.object.sha
+    console.log("Updated main ref to ", sha)
+
+    return {
+      ...config,
+      sha: sha
+    }
+  }
+    catch (e) {
+      console.log(e)
+      return null
+    }
 }
 
 async function findOrCreateVercelProject(config) {
@@ -235,7 +292,8 @@ async function findOrCreateVercelProject(config) {
   if (exists) {
     return exists
   } else {
-    return await createAndConfigureVercelProject(config)
+    let updatedConfig = await createAndConfigureVercelProject(config)
+    return updatedConfig
   }
 }
 
@@ -247,7 +305,8 @@ async function setupPublicGnome(url) {
     ...config,
     status: GnomeStatus.Deployed
   }
-  config = await (updateIndex(config))
+  config = await triggerFirstDeploy(config)
+  config = await updateIndex(config)
   return config
 }
 
