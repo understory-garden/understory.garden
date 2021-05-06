@@ -190,9 +190,13 @@ function GnomesResourceEditor({ webId }) {
     const thingUrl = asUrl(newThing, resourceUrl)
    console.log(`Requesting setup for gnome at url: ${thingUrl}`)
     const gnomeConfig = await setupGnome({ url: thingUrl })
+    console.log("gnome is set up")
     let deployedThing = getThing(newResource, thingUrl)
+    console.log("got deployed thing")
     deployedThing = updateDeploymentStatus(deployedThing, gnomeConfig)
+    console.log("updated deployed thing")
     const deployedResource = setThing(newResource, deployedThing)
+    console.log(`Saving deployment info to gnome at url: ${thingUrl}`)
     await save(deployedResource)
     console.log(`Finished setting up gnome at url: ${thingUrl}`)
   }
