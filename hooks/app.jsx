@@ -3,7 +3,7 @@ import { useUnderstoryContainerUri, useConceptContainerUri, useStorageContainer 
 import { useThing, useResource, useWebId } from 'swrlit'
 import {
   createSolidDataset, getSourceUrl, createThing, getThingAll, getDatetime, getUrl, setUrl,
-  setThing, getThing
+  setThing, getThing, getBoolean
 } from '@inrupt/solid-client'
 import { DCTERMS } from '@inrupt/vocab-common-rdf'
 import { WS } from '@inrupt/lit-generated-vocab-solid-common'
@@ -64,7 +64,6 @@ export function useApp(webId){
   return {app, initApp, saveResource: saveAppResource, ...rest}
 }
 
-
 export function useWorkspacePreferencesFileUris(webId, workspaceSlug='default'){
   const { app } = useApp(webId)
   // we're ignoring the workspaceSlug parameter for now, but eventually we'll want to use this to get the currect workspace
@@ -114,4 +113,9 @@ export function useAppSettings(webId){
     return saveAppResource(newAppResource)
   }
   return { settings,  save }
+}
+
+export function useDevMode(webId){
+  const { settings } = useAppSettings(webId)
+  return settings && getBoolean(settings, US.devMode)
 }

@@ -5,13 +5,20 @@ import { useRouter } from 'next/router'
 import { useConceptNamesMatching } from '../hooks/concepts'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 
-export default function NewNoteForm() {
+export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=""}) {
   const router = useRouter()
-  const [displayedName, setDisplayedName] = useState("")
+  const [displayedName, setDisplayedName] = useState(initialSelectedName)
   const gotoNote = useCallback((noteName) => {
     router.push(`/notes/default/${conceptNameToUrlSafeId(noteName)}`)
     setDisplayedName("")
   }, [router])
+  const onSelectNote = (note) => {
+    if (onSubmit) {
+      onSubmit(selectedNote)
+    } else {
+      gotoNote(selectedNote)
+    }
+  }
 
   const [selectionIndex, setSelectionIndex] = useState(0)
   const matchingConceptNames = useConceptNamesMatching(displayedName)
@@ -31,7 +38,7 @@ export default function NewNoteForm() {
         case 'Enter':
           event.preventDefault()
           const targetNote = (selectionIndex > 0) ? matchingConceptNames[selectionIndex - 1] : event.target.value
-          gotoNote(targetNote)
+          onSelectNote(targetNote)
           setDisplayedName("")
           break
       }
@@ -41,8 +48,8 @@ export default function NewNoteForm() {
 
   const selectedNote = (matchingConceptNames && (selectionIndex > 0)) ? matchingConceptNames[selectionIndex - 1] : displayedName
   const onClick = useCallback(() => {
-    gotoNote(selectedNote)
-  }, [selectedNote])
+    onSelectNote(selectedNote)
+  }, [selectedNote, onSubmit])
   return (
     <div className="flex flex-row max-h-9 self-center">
       <div className="relative overflow-y-visible">
@@ -65,7 +72,7 @@ export default function NewNoteForm() {
         <button className="btn"
           onClick={onClick}
           disabled={displayedName === ""}>
-          {(selectionIndex === 0) ? 'create' : 'goto'} {selectedNote}
+          {submitTitle || ((selectionIndex === 0) ? 'create' : 'goto')} {selectedNote}
         </button>
       )}
     </div>

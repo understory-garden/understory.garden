@@ -44,5 +44,13 @@ export const US = {
   tagged: `${understoryRoot}tagged`,
   tagPrefix: `${understoryRoot}tagPrefix`,
   hasSettings: `${understoryRoot}hasSettings`,
-  devMode: `${understoryRoot}devMode`
+  devMode: `${understoryRoot}devMode`,
+  hasGnomeType: `${understoryRoot}hasGnomeType`,
+  usesGateTemplate: `${understoryRoot}usesGateTemplate`,
+  usesConcept: `${understoryRoot}usesConcept`,
+  usesConceptIndex: `${understoryRoot}usesConceptIndex`,
+  deployedAt: `${understoryRoot}deployedAt`,
+  hasGnomeStatus: `${understoryRoot}hasGnomeStatus`,
+  monetizedFor: `${understoryRoot}monetizedFor`,
+  usesCSS: `${understoryRoot}usesCSS`
 }
