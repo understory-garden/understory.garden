@@ -17,7 +17,7 @@ import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
 import NewNoteForm from '../components/NewNoteForm'
-import { Loader } from '../components/elements'
+import { Loader, InlineLoader } from '../components/elements'
 import { deleteResource } from '../utils/fetch';
 
 const SinglePageGateSchema = Yup.object().shape({
@@ -86,7 +86,13 @@ function GnomeThingEntry({ thing }) {
         template and
       <h5 className="font-bold">{conceptName}</h5>
         to
-      <h5 className="font-bold"><a href={deployedAt} target='_blank' rel='noopener noreferrer'>{deployedAt}</a></h5>
+      {deployedAt ? (
+        <h5 className="font-bold">
+          <a href={deployedAt} target='_blank' rel='noopener noreferrer'>{deployedAt}</a>
+        </h5>
+      ) : (
+        <InlineLoader/>
+      )}
     </div>
   )
 }
