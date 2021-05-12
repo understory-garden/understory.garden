@@ -29,7 +29,7 @@
     "micro-base58": "^0.4.3",
     "next": "latest",
     "node-fetch": "^2.6.1",
-    "postcss": "^7.0.35",
+    "postcss": "^8.2.10",
     "rdf-namespaces": "^1.9.2",
     "react": "^16.13.1",
     "react-cropper": "^2.1.4",
