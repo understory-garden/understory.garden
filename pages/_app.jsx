@@ -18,6 +18,10 @@ function MyApp({ Component, pageProps }) {
       includedDomains: ['understory.garden'],
     })
 
+    Fathom.load('TGJRMEAN', {
+      includedDomains: ['staging.understory.garden'],
+    })
+
     function onRouteChangeComplete() {
       Fathom.trackPageview()
     }
