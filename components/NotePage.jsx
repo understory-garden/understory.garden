@@ -47,8 +47,67 @@ import { useConceptAutocomplete } from '../hooks/editor'
 
 import WebMonetization from '../components/WebMonetization'
 import { Loader, Portal } from '../components/elements'
+import ConceptElement from '../components/edit/ConceptElement'
+
+import {
+  SlatePlugins,
+  createReactPlugin,
+  createHistoryPlugin,
+  createParagraphPlugin,
+  createBlockquotePlugin,
+  createCodeBlockPlugin,
+  createHeadingPlugin,
+  createBoldPlugin,
+  createItalicPlugin,
+  createUnderlinePlugin,
+  createStrikethroughPlugin,
+  createCodePlugin,
+  createLinkPlugin,
+  createSlatePluginsComponents,
+  createSlatePluginsOptions,
+  ELEMENT_LINK,
+  getRenderElement
+ } from '@udecode/slate-plugins'
 
 const emptyBody = [{ children: [{ text: "" }] }]
+
+const ELEMENT_CONCEPT = 'concept'
+const createConceptPlugin = () => ({
+  pluginKeys: ELEMENT_CONCEPT,
+  renderElement: getRenderElement(ELEMENT_CONCEPT),
+})
+
+const editorPlugins = [
+  // editor
+  createReactPlugin(),          // withReact
+  createHistoryPlugin(),        // withHistory
+
+  // elements
+  createParagraphPlugin(),      // paragraph element
+  createBlockquotePlugin(),     // blockquote element
+  createCodeBlockPlugin(),      // code block element
+  createHeadingPlugin(),        // heading elements
+
+  // marks
+  createBoldPlugin(),           // bold mark
+  createItalicPlugin(),         // italic mark
+  createUnderlinePlugin(),      // underline mark
+  createStrikethroughPlugin(),  // strikethrough mark
+  createCodePlugin(),           // code mark
+
+  // links
+  createLinkPlugin(),
+  createConceptPlugin()
+]
+
+const editorComponents = createSlatePluginsComponents({
+  [ELEMENT_CONCEPT]: ConceptElement
+});
+const editorOptions = createSlatePluginsOptions({
+  [ELEMENT_LINK]: {
+    type: 'link'
+  }
+});
 
 function LinkToConcept({ uri, ...props }) {
   const id = conceptIdFromUri(uri)
@@ -286,7 +345,7 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const router = useRouter()
   useEffect(() => {
     const handleRouteChange = (url) => {
-      if (url !== window.location.pathname){
+      if (url !== window.location.pathname) {
         setValue(undefined)
         editor.selection = null
       }
@@ -395,78 +454,83 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
         {showPrivacy && <PrivacyControl name={name} />}
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
+            <div className="flex-grow flex flex-row mt-3">
+              <div>
+              <SlatePlugins
+                editor={editor}
+                value={value}
+                onChange={onChange}
+                plugins={editorPlugins}
+                components={editorComponents}
+                options={editorOptions}
+                editableProps={{
+                  readOnly, onKeyDown, editor,
+                  className: "flex-grow text-gray-900"
+                }}
+              >
+                {(value !== undefined) ? (
+                  <>
+                    {!readOnly && (
+                      <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                        className="sticky top-0 z-20" />
+                    )}
 
-            <Slate
-              editor={editor}
-              value={value}
-              onChange={onChange}
-            >
-              {(value !== undefined) ? (
-                <>
-                  {!readOnly && (
-                    <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                      className="sticky top-0 z-20" />
-                  )}
-                  <div className="flex-grow flex flex-row mt-3">
-                    <Editable readOnly={readOnly}
-                      onKeyDown={onKeyDown}
-                      editor={editor}
-                      className="flex-grow text-gray-900" />
-                    <div className="relative">
-                      <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
-                        {sidebarOpen ? ">>" : "<<"}
-                      </button>
-                      <Transition
-                        show={sidebarOpen}
-                        enter="transform transition ease-in-out duration-500 sm:duration-700"
-                        enterFrom="translate-x-full"
-                        enterTo="translate-x-0"
-                        leave="transform transition ease-in-out duration-500 sm:duration-700"
-                        leaveFrom="translate-x-0"
-                        leaveTo="translate-x-full">
-                        {
-                          (ref) => (
-                            <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                              <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                                <div className="px-6 sm:px-6">
-                                  <div className="flex items-start justify-between">
-                                    <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                                      Links
+                  </>
+                ) : (
+                  <Loader />
+                )}
+              </SlatePlugins>
+              </div>
+              <div className="relative">
+                <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
+                  {sidebarOpen ? ">>" : "<<"}
+                </button>
+                <Transition
+                  show={sidebarOpen}
+                  enter="transform transition ease-in-out duration-500 sm:duration-700"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0"
+                  leave="transform transition ease-in-out duration-500 sm:duration-700"
+                  leaveFrom="translate-x-0"
+                  leaveTo="translate-x-full">
+                  {
+                    (ref) => (
+                      <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                        <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                          <div className="px-6 sm:px-6">
+                            <div className="flex items-start justify-between">
+                              <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                Links
                                     </h2>
-                                  </div>
-                                </div>
-                                <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                                  <div>
-                                    <h3>Links to</h3>
-                                    {concept && (
-                                      <LinksTo name={name} />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <h3>Linked from</h3>
-                                    {conceptIndex && (
-                                      <LinksFrom conceptUri={conceptUri} />
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="px-6 mt-6">
-                                  <h2 className="text-xl">
-                                    Actions
-                                  </h2>
-                                </div>
-                              </div>
                             </div>
-                          )
-                        }
-                      </Transition>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <Loader />
-              )}
-            </Slate>
+                          </div>
+                          <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                            <div>
+                              <h3>Links to</h3>
+                              {concept && (
+                                <LinksTo name={name} />
+                              )}
+                            </div>
+                            <div>
+                              <h3>Linked from</h3>
+                              {conceptIndex && (
+                                <LinksFrom conceptUri={conceptUri} />
+                              )}
+                            </div>
+                          </div>
+                          <div className="px-6 mt-6">
+                            <h2 className="text-xl">
+                              Actions
+                                  </h2>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                </Transition>
+              </div>
+            </div>
             {/*
                  <div>
                  <pre>
