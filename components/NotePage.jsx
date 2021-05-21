@@ -19,7 +19,8 @@ import ReactModal from 'react-modal'
 import Fuse from 'fuse.js'
 
 import EditorToolbar from "./EditorToolbar"
-import Editable, { useNewEditor } from "./Editable";
+import Editable, { useNewEditor, renderElement, renderLeaf, BlockElement } from "./Editable";
+import { editorPlugins, editorOptions } from "./Editor"
 import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
@@ -35,11 +36,10 @@ import {
   conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
-import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
+import { conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
-import { sendMessage } from '../utils/message'
-import { insertConcept } from '../utils/editor'
+
 
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
@@ -47,67 +47,10 @@ import { useConceptAutocomplete } from '../hooks/editor'
 
 import WebMonetization from '../components/WebMonetization'
 import { Loader, Portal } from '../components/elements'
-import ConceptElement from '../components/edit/ConceptElement'
 
-import {
-  SlatePlugins,
-  createReactPlugin,
-  createHistoryPlugin,
-  createParagraphPlugin,
-  createBlockquotePlugin,
-  createCodeBlockPlugin,
-  createHeadingPlugin,
-  createBoldPlugin,
-  createItalicPlugin,
-  createUnderlinePlugin,
-  createStrikethroughPlugin,
-  createCodePlugin,
-  createLinkPlugin,
-  createSlatePluginsComponents,
-  createSlatePluginsOptions,
-  ELEMENT_LINK,
-  getRenderElement
- } from '@udecode/slate-plugins'
+import { SlatePlugins, useStoreEditor } from '@udecode/slate-plugins'
 
 const emptyBody = [{ children: [{ text: "" }] }]
-
-const ELEMENT_CONCEPT = 'concept'
-const createConceptPlugin = () => ({
-  pluginKeys: ELEMENT_CONCEPT,
-  renderElement: getRenderElement(ELEMENT_CONCEPT),
-})
-
-const editorPlugins = [
-  // editor
-  createReactPlugin(),          // withReact
-  createHistoryPlugin(),        // withHistory
-
-  // elements
-  createParagraphPlugin(),      // paragraph element
-  createBlockquotePlugin(),     // blockquote element
-  createCodeBlockPlugin(),      // code block element
-  createHeadingPlugin(),        // heading elements
-
-  // marks
-  createBoldPlugin(),           // bold mark
-  createItalicPlugin(),         // italic mark
-  createUnderlinePlugin(),      // underline mark
-  createStrikethroughPlugin(),  // strikethrough mark
-  createCodePlugin(),           // code mark
-
-  // links
-  createLinkPlugin(),
-  createConceptPlugin()
-]
-
-const editorComponents = createSlatePluginsComponents({
-  [ELEMENT_CONCEPT]: ConceptElement
-});
-const editorOptions = createSlatePluginsOptions({
-  [ELEMENT_LINK]: {
-    type: 'link'
-  }
-});
 
 function LinkToConcept({ uri, ...props }) {
   const id = conceptIdFromUri(uri)
@@ -297,10 +240,7 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const [saving, setSaving] = useState(false)
   const saved = ((value === undefined) || (bodyJSON === JSON.stringify(value)))
 
-  const editor = useNewEditor()
-  useEffect(function resetSelectionOnNameChange() {
-    editor.selection = null
-  }, [name])
+  const editor = useStoreEditor(conceptUri)
 
   useEffect(function setValueFromNote() {
     if (bodyJSON) {
@@ -345,9 +285,10 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const router = useRouter()
   useEffect(() => {
     const handleRouteChange = (url) => {
+      console.log("HANDLING ROUTE CHANGE")
       if (url !== window.location.pathname) {
+        console.log("resetting value")
         setValue(undefined)
-        editor.selection = null
       }
     }
     router.events.on('routeChangeStart', handleRouteChange)
@@ -456,30 +397,33 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
           <div className="w-full flex flex-col flex-grow">
             <div className="flex-grow flex flex-row mt-3">
               <div>
-              <SlatePlugins
-                editor={editor}
-                value={value}
-                onChange={onChange}
-                plugins={editorPlugins}
-                components={editorComponents}
-                options={editorOptions}
-                editableProps={{
-                  readOnly, onKeyDown, editor,
-                  className: "flex-grow text-gray-900"
-                }}
-              >
-                {(value !== undefined) ? (
-                  <>
-                    {!readOnly && (
-                      <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                        className="sticky top-0 z-20" />
-                    )}
+                {value && (
+                  <SlatePlugins
+                    id={conceptUri}
+                    editor={editor}
+                    value={value}
+                    onChange={onChange}
+                    plugins={editorPlugins}
+                    options={editorOptions}
+                    editableProps={{
+                      readOnly, onKeyDown,
+                      renderElement, renderLeaf,
+                      className: "flex-grow text-gray-900"
+                    }}
+                  >
+                    {(value !== undefined) ? (
+                      <>
+                        {!readOnly && (
+                          <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                            className="sticky top-0 z-20" />
+                        )}
 
-                  </>
-                ) : (
-                  <Loader />
+                      </>
+                    ) : (
+                      <Loader />
+                    )}
+                  </SlatePlugins>
                 )}
-              </SlatePlugins>
               </div>
               <div className="relative">
                 <button onClick={() => setSidebarOpen(!sidebarOpen)}

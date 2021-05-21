@@ -70,8 +70,8 @@ const Element = (props) => {
       return <LinkElement {...props} />
     case 'concept':
       return <ConceptElement {...props} />
-  case 'tag':
-    return <TagElement {...props} />
+    case 'tag':
+      return <TagElement {...props} />
     case 'check-list-item':
       return <Block element={element}><ChecklistItemElement {...props} /></Block>
     case 'table':
@@ -118,21 +118,27 @@ const Editable = ({ editor, readOnly, ...props }) => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const renderElement = useCallback(props => <Element {...props} />, [])
   return <SlateEditable
-           renderLeaf={renderLeaf}
-           renderElement={renderElement}
-           readOnly={readOnly}
-           spellCheck
-           placeholder={readOnly ? "" : "Click here to add content..."}
-           onKeyDown={(event) => {
-             for (const hotkey in HOTKEYS) {
-               if (isHotkey(hotkey, event.nativeEvent)) {
-                 event.preventDefault()
-                 const mark = HOTKEYS[hotkey]
-                 toggleMark(editor, mark)
-               }
-             }
-           }}
-           {...props} />
+    renderLeaf={renderLeaf}
+    renderElement={renderElement}
+    readOnly={readOnly}
+    spellCheck
+    placeholder={readOnly ? "" : "Click here to add content..."}
+    onKeyDown={(event) => {
+      for (const hotkey in HOTKEYS) {
+        if (isHotkey(hotkey, event.nativeEvent)) {
+          event.preventDefault()
+          const mark = HOTKEYS[hotkey]
+          toggleMark(editor, mark)
+        }
+      }
+    }}
+    {...props} />
 }
 
 export default Editable
+
+export const BlockElement = ({ element, attributes, children }) => (
+  <Block element={element}><p {...attributes}>{children}</p></Block>
+)
+export const renderLeaf = props => <Leaf {...props} />
+export const renderElement = props => <Element {...props} />

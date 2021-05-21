@@ -56,11 +56,15 @@ const ImageElement = ({ attributes, children, element }) => {
             <div className="flex-grow-1 image-icon"
                  draggable={true}
                  onDragStart={e => {
+                   console.log("DRAG START")
                    Transforms.select(editor, path)
                    setDragStartImageWidth(image && image.current && image.current.clientWidth)
                    setDragStart(e.clientX)
+                   console.log("DRAG START END")
+
                  }}
                  onDrag={e => {
+                   console.log("ON DRAG")
                    if (dragStartImageWidth && dragStart) {
                      const newWidth = dragStartImageWidth + (e.clientX - dragStart)
                      if (width !== newWidth) {
