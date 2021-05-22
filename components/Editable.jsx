@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { createEditor, Text, Editor } from 'slate';
+import { createEditor } from 'slate';
 import { Editable as SlateEditable, withReact } from 'slate-react';
 import isHotkey from 'is-hotkey';
 
@@ -7,7 +7,7 @@ import { withHistory } from 'slate-history';
 
 import {
   withImages, withLinks, withChecklists, withLists, toggleMark,
-  withTables, withConcepts, withShortcuts, withTags
+  withConcepts, withShortcuts, withTags
 } from '../utils/editor';
 
 import ChecklistItemElement from './edit/ChecklistItemElement'

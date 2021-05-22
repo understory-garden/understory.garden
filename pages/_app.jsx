@@ -1,4 +1,3 @@
-import { useContext } from 'react'
 import '../styles/index.css'
 import "cropperjs/dist/cropper.css";
 import { AuthenticationProvider } from 'swrlit'

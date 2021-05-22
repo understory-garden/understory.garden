@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 import { getUrl, getSourceUrl, getBoolean } from '@inrupt/solid-client'
@@ -12,7 +12,7 @@ import { MailIcon } from '../components/icons'
 import NewNoteForm from '../components/NewNoteForm'
 import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
-import { appPrefix, conceptNameToUrlSafeId } from '../utils/uris'
+import { appPrefix } from '../utils/uris'
 import { US } from '../vocab'
 
 function DevTools() {

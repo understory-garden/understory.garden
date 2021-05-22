@@ -1,33 +1,28 @@
 import { useMemo, useState, useEffect, useCallback, createContext, useContext, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Editor, Transforms, Range } from 'slate'
-import { ReactEditor, Slate, withReact } from 'slate-react'
+import { ReactEditor, Slate } from 'slate-react'
 import {
-  useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile
+  useWebId, useThing, useAuthentication, useProfile
 } from 'swrlit'
 import {
-  createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
-  addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl, removeUrl, getSourceUrl, asUrl
+  createThing, setStringNoLocale, getStringNoLocale,
+  addUrl, setThing, createSolidDataset, getUrlAll, setDatetime,
+  removeThing, getUrl, setUrl, removeUrl, getSourceUrl, asUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
+import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
-import ReactModal from 'react-modal'
-import Fuse from 'fuse.js'
 
 import EditorToolbar from "./EditorToolbar"
 import Editable, { useNewEditor } from "./Editable";
-import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
-import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
+import { useWorkspaceContext } from '../contexts/WorkspaceContext'
 
-import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex, useCombinedConceptIndex, useConcept, useConcepts } from '../hooks/concepts'
+import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
 import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 
 import {
@@ -35,11 +30,9 @@ import {
   conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
-import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
+import { conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
-import { sendMessage } from '../utils/message'
-import { insertConcept } from '../utils/editor'
 
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
@@ -286,7 +279,7 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const router = useRouter()
   useEffect(() => {
     const handleRouteChange = (url) => {
-      if (url !== window.location.pathname){
+      if (url !== window.location.pathname) {
         setValue(undefined)
         editor.selection = null
       }

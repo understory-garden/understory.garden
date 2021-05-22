@@ -98,24 +98,6 @@ function LinkButton(){
   )
 }
 
-const InsertImageButton = () => {
-  const editor = useEditor()
-  return (
-    <IconButton
-      title="Insert Image"
-      onMouseDown={event => {
-        event.preventDefault()
-        const url = window.prompt('Enter the URL of the image:')
-        if (!url) return
-        insertImage(editor, url)
-      }}
-    >
-      <ImageIcon/>
-    </IconButton>
-  )
-}
-
-
 function ConceptLink(){
   const editor = useSlate()
   const onUpdateConcept = () => {

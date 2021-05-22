@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { useMyProfile, useWebId } from 'swrlit'
 import Link from 'next/link'
 import {
-  setStringNoLocale, getStringNoLocale, getUrl, setUrl, createSolid, getThingAll, asUrl,
-  getDatetime
+  setStringNoLocale, getStringNoLocale, getUrl, setUrl
 } from '@inrupt/solid-client'
 import { FOAF } from '@inrupt/vocab-common-rdf'
-import { US } from "../vocab"
 
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'

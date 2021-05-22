@@ -1,5 +1,3 @@
-import ReactDOM from 'react-dom'
-
 import { Transition } from '@headlessui/react'
 
 export const Menu = ({open, ...props}) => (

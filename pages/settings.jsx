@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useWebId } from 'swrlit'
 import {
   getBoolean, setBoolean, getThingAll,
-  thingAsMarkdown, getUrl, setThing, getThing,
+  getUrl, setThing, getThing,
   asUrl, getStringNoLocale, getSourceUrl
 } from '@inrupt/solid-client'
 import { Formik, Field, Form } from 'formik';
@@ -12,7 +12,7 @@ import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
 import { US } from '../vocab'
 import { useAppSettings, useDevMode } from '../hooks/app'
-import { useConceptPrefix, useConcept } from '../hooks/concepts'
+import { useConcept } from '../hooks/concepts'
 import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
