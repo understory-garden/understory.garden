@@ -88,9 +88,9 @@ function LinkButton(){
                  value={url}
                  onChange={e => setUrl(e.target.value)}/>
           <div className="flex justify-between">
-            <button onClick={onUpdateLink}>update link</button>
+            <button className="btn" onClick={onUpdateLink}>update link</button>
             {currentActiveLink && <button onClick={onUnlink}>unlink</button>}
-            <button onClick={() => setEditingLink(false)}>cancel</button>
+            <button className="btn" onClick={() => setEditingLink(false)}>cancel</button>
           </div>
         </div>
       </ReactModal>
