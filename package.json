@@ -43,7 +43,7 @@
     "slate-history": "^0.59.0",
     "slate-react": "^0.59.0",
     "solid-auth-fetcher": "^1.5.2",
-    "swrlit": "0.14.0",
+    "swrlit": "0.15.0",
     "use-debounce": "^5.2.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.8"
