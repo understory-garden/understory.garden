@@ -7,6 +7,7 @@ import {
 } from '@inrupt/solid-client'
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
+import { FG, trackGoal } from '../model/fathom';
 
 import Nav from '../components/nav'
 import WebMonetization from '../components/WebMonetization'
@@ -202,6 +203,7 @@ function GnomesResourceEditor({ webId }) {
   const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
   async function updateThing(newThing) {
+    const goal = isThingLocal(newThing) ? FG.gateCreated : FG.gateEdited
     setAddingNewGnome(false)
     const newResource = setThing(resource, newThing)
     const updatedResource = await save(newResource)
@@ -219,6 +221,7 @@ function GnomesResourceEditor({ webId }) {
     console.log(`Saving deployment info to gnome at url: ${thingUrl}`)
     await save(deployedResource)
     console.log(`Finished setting up gnome at url: ${thingUrl}`)
+    trackGoal(goal)
   }
   function cancel() {
     setAddingNewGnome(false)

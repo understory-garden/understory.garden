@@ -7,32 +7,11 @@ import { useRouter } from 'next/router'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SWRConfig } from 'swr'
-import * as Fathom from 'fathom-client'
+import { useFathom } from '../hooks/fathom'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
-
-  useEffect(() => {
-    // Initialize Fathom when the app loads
-    Fathom.load('TMUOYFGA', {
-      includedDomains: ['understory.garden'],
-    })
-
-    Fathom.load('TGJRMEAN', {
-      includedDomains: ['staging.understory.garden'],
-    })
-
-    function onRouteChangeComplete() {
-      Fathom.trackPageview()
-    }
-    // Record a pageview when route changes
-    router.events.on('routeChangeComplete', onRouteChangeComplete)
-
-    // Unassign event listener
-    return () => {
-      router.events.off('routeChangeComplete', onRouteChangeComplete)
-    }
-  }, [])
+  useFathom()
 
   return (
     <>
