@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import * as Fathom from 'fathom-client'
 
 const VercelEnv = process.env.VERCEL_ENV || ''
