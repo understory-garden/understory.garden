@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
 import * as Fathom from 'fathom-client'
+import { useRouter } from 'next/router'
 
 const VercelEnv = process.env.VERCEL_ENV || ''
 const FathomSiteId = process.env.FATHOM_SITE_ID || ''
 
 export function useFathom() {
+  const router = useRouter()
   return useEffect(() => {
     Fathom.load(FathomSiteId, {
       includedDomains: [
