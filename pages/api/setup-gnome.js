@@ -31,7 +31,6 @@ const TemplateOrg = process.env.GITHUB_TEMPLATE_ORG
 const GnomesOrg = process.env.GITHUB_GNOMES_ORG
 const GithubToken = process.env.GITHUB_TOKEN_UGK
 const GithubAuthHeaders = { authorization: `token ${GithubToken}` }
-const GnomesIndexRepo = 'index'
 const VercelToken = process.env.VERCEL_TOKEN_UGK
 const VercelHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${VercelToken}` }
 const VercelTeam = process.env.VERCEL_TEAM_ID || 'team_Mb1ivhnQAH2uo2nNrPBbDwk4' // Understory's team
