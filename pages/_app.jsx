@@ -12,7 +12,7 @@ import { useFathom } from '../hooks/fathom'
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
   // disable to debug issues in staging
-  // useFathom()
+  useFathom()
 
   return (
     <>
