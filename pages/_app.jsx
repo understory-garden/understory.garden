@@ -1,13 +1,19 @@
-import { useContext } from 'react'
+import { useEffect } from 'react'
 import '../styles/index.css'
 import "cropperjs/dist/cropper.css";
 import { AuthenticationProvider } from 'swrlit'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { SWRConfig } from 'swr'
+import { useFathom } from '../hooks/fathom'
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter()
+  // disable to debug issues in staging
+  useFathom()
+
   return (
     <>
       <Head>

@@ -22,57 +22,59 @@ const ImageElement = ({ attributes, children, element }) => {
   const width = element.width;
   const path = ReactEditor.findPath(editor, element)
   const { note, save } = useContext(NoteContext)
-  async function setAsCoverImage(){
+  async function setAsCoverImage() {
     await save(setUrl(note, FOAF.img, element.url))
   }
   const { profile, save: saveProfile } = useMyProfile()
-  async function setAsProfileImage(){
+  async function setAsProfileImage() {
     await saveProfile(setUrl(profile, FOAF.img, element.url))
   }
   return (
     <div {...attributes}>
       {editing ? (
         <ImageEditor element={element}
-                     onClose={() => setEditing(false)}
-                     onSave={(savedUrl) => {
-                       const u = new URL(savedUrl)
-                       u.searchParams.set("updated", Date.now().toString())
-                       Transforms.setNodes(editor, { url: u.toString() }, { at: path })
-                       setEditing(false)
-                     }} />
+          onClose={() => setEditing(false)}
+          onSave={(savedUrl) => {
+            const u = new URL(savedUrl)
+            u.searchParams.set("updated", Date.now().toString())
+            Transforms.setNodes(editor, { url: u.toString() }, { at: path })
+            setEditing(false)
+          }} />
       ) : (
-      <div contentEditable={false} className="select-none flex flex-row">
-        <img className="self-start"
-             ref={image}
-             alt={element.alt || ""}
-             src={element.url}
-             style={{width}}
-        />
-        {!readOnly && (
-          <div className="flex flex-col flex-shrink-0">
-            <EditIcon className="image-icon" onClick={() => setEditing(true)} />
-            <CoverImageIcon className="image-icon" onClick={() => setAsCoverImage()} />
-            <ProfileImageIcon className="image-icon" onClick={() => setAsProfileImage()} />
-            <div className="flex-grow-1 image-icon"
-                 draggable={true}
-                 onDragStart={e => {
-                   Transforms.select(editor, path)
-                   setDragStartImageWidth(image && image.current && image.current.clientWidth)
-                   setDragStart(e.clientX)
-                 }}
-                 onDrag={e => {
-                   if (dragStartImageWidth && dragStart) {
-                     const newWidth = dragStartImageWidth + (e.clientX - dragStart)
-                     if (width !== newWidth) {
-                       Transforms.setNodes(editor, { width: newWidth }, { at: path })
-                     }
-                   }
-                 }}>
-              <ArrowRight />
+        <div contentEditable={false} className="select-none flex flex-row">
+          <img className="self-start"
+            ref={image}
+            alt={element.alt || ""}
+            src={element.url}
+            style={{ width }}
+          />
+          {!readOnly && (
+            <div className="flex flex-col flex-shrink-0">
+              <EditIcon className="image-icon" onClick={() => setEditing(true)} />
+              <CoverImageIcon className="image-icon" onClick={() => setAsCoverImage()} />
+              <ProfileImageIcon className="image-icon" onClick={() => setAsProfileImage()} />
+              <div className="flex-grow-1 image-icon"
+                draggable={true}
+                onDragStart={e => {
+                  Transforms.select(editor, path)
+                  setDragStartImageWidth(image && image.current && image.current.clientWidth)
+                  setDragStart(e.clientX)
+                  e.stopPropagation()
+                }}
+                onDrag={e => {
+                  if (dragStartImageWidth && dragStart) {
+                    const newWidth = dragStartImageWidth + (e.clientX - dragStart)
+                    if ((newWidth > 0) && (width !== newWidth)) {
+                      Transforms.setNodes(editor, { width: newWidth }, { at: path })
+                    }
+                  }
+                  e.stopPropagation()
+                }}>
+                <ArrowRight />
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       )}
       {children}
     </div>

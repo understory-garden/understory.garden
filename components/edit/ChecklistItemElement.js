@@ -11,7 +11,7 @@ export default function CheckListItemElement({ attributes, children, element }) 
   const { checked } = element
   return (
     <div {...attributes}>
-      <input type="checkbox" class="form-checkbox h-5 w-5 mr-2"
+      <input type="checkbox" className="form-checkbox h-5 w-5 mr-2"
         checked={!!checked}
         onChange={event => {
           const path = ReactEditor.findPath(editor, element)

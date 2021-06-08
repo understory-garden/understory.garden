@@ -102,6 +102,10 @@ b, strong {
   @apply outline-none;
 }
 
+.ReactModal__Overlay {
+  @apply z-40;
+}
+
 /* Start purging... */
 @tailwind utilities;
 /* Stop purging. */

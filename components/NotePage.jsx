@@ -1,33 +1,28 @@
 import { useMemo, useState, useEffect, useCallback, createContext, useContext, useRef } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { Editor, Transforms, Range } from 'slate'
-import { ReactEditor, Slate, withReact } from 'slate-react'
+import { ReactEditor, Slate } from 'slate-react'
 import {
-  useWebId, useEnsured, useResource, useThing, useAuthentication, useProfile
+  useWebId, useThing, useAuthentication, useProfile
 } from 'swrlit'
 import {
-  createThing, setStringNoLocale, getStringNoLocale, thingAsMarkdown,
-  addUrl, setThing, createSolidDataset, getThing, getUrlAll, setDatetime,
-  removeThing, getUrl, setDecimal, setUrl, removeUrl, getSourceUrl, asUrl
+  createThing, setStringNoLocale, getStringNoLocale,
+  addUrl, setThing, createSolidDataset, getUrlAll, setDatetime,
+  removeThing, getUrl, setUrl, removeUrl, getSourceUrl, asUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-import { DCTERMS, FOAF, RDF, LDP } from '@inrupt/vocab-common-rdf'
+import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
-import ReactModal from 'react-modal'
-import Fuse from 'fuse.js'
 
 import EditorToolbar from "./EditorToolbar"
 import Editable, { useNewEditor } from "./Editable";
-import { ExternalLinkIcon, ReportIcon } from './icons'
 import Nav from './nav'
 
 import NoteContext from '../contexts/NoteContext'
-import { WorkspaceProvider, useWorkspaceContext } from '../contexts/WorkspaceContext'
+import { useWorkspaceContext } from '../contexts/WorkspaceContext'
 
-import { useConceptContainerUri } from '../hooks/uris'
-import { useConceptIndex, useCombinedConceptIndex, useConcept, useConcepts } from '../hooks/concepts'
+import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
 import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 
 import {
@@ -35,11 +30,9 @@ import {
   conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
-import { conceptNameFromUri, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
+import { conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
-import { sendMessage } from '../utils/message'
-import { insertConcept } from '../utils/editor'
 
 import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
@@ -286,7 +279,7 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const router = useRouter()
   useEffect(() => {
     const handleRouteChange = (url) => {
-      if (url !== window.location.pathname){
+      if (url !== window.location.pathname) {
         setValue(undefined)
         editor.selection = null
       }
@@ -396,77 +389,77 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
         <section className="relative w-full flex flex-grow" aria-labelledby="slide-over-heading">
           <div className="w-full flex flex-col flex-grow">
 
-            <Slate
-              editor={editor}
-              value={value}
-              onChange={onChange}
-            >
-              {(value !== undefined) ? (
-                <>
-                  {!readOnly && (
-                    <EditorToolbar saving={saving} saved={saved} save={saveCallback}
-                      className="sticky top-0 z-20" />
-                  )}
-                  <div className="flex-grow flex flex-row mt-3">
-                    <Editable readOnly={readOnly}
-                      onKeyDown={onKeyDown}
-                      editor={editor}
-                      className="flex-grow text-gray-900" />
-                    <div className="relative">
-                      <button onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
-                        {sidebarOpen ? ">>" : "<<"}
-                      </button>
-                      <Transition
-                        show={sidebarOpen}
-                        enter="transform transition ease-in-out duration-500 sm:duration-700"
-                        enterFrom="translate-x-full"
-                        enterTo="translate-x-0"
-                        leave="transform transition ease-in-out duration-500 sm:duration-700"
-                        leaveFrom="translate-x-0"
-                        leaveTo="translate-x-full">
-                        {
-                          (ref) => (
-                            <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
-                              <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                                <div className="px-6 sm:px-6">
-                                  <div className="flex items-start justify-between">
-                                    <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
-                                      Links
+
+            {(value !== undefined) ? (
+              <Slate
+                editor={editor}
+                value={value}
+                onChange={onChange}
+              >
+                {!readOnly && (
+                  <EditorToolbar saving={saving} saved={saved} save={saveCallback}
+                    className="sticky top-0 z-20" />
+                )}
+                <div className="flex-grow flex flex-row mt-3">
+                  <Editable readOnly={readOnly}
+                    onKeyDown={onKeyDown}
+                    editor={editor}
+                    className="flex-grow text-gray-900" />
+                  <div className="relative">
+                    <button onClick={() => setSidebarOpen(!sidebarOpen)}
+                      className="h-2 text-3xl text-pink-500 font-bold fixed right-2">
+                      {sidebarOpen ? ">>" : "<<"}
+                    </button>
+                    <Transition
+                      show={sidebarOpen}
+                      enter="transform transition ease-in-out duration-500 sm:duration-700"
+                      enterFrom="translate-x-full"
+                      enterTo="translate-x-0"
+                      leave="transform transition ease-in-out duration-500 sm:duration-700"
+                      leaveFrom="translate-x-0"
+                      leaveTo="translate-x-full">
+                      {
+                        (ref) => (
+                          <div className="w-screen max-w-md flex-grow min-w-min" ref={ref}>
+                            <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
+                              <div className="px-6 sm:px-6">
+                                <div className="flex items-start justify-between">
+                                  <h2 id="slide-over-heading" className="text-xl font-bold text-gray-100">
+                                    Links
                                     </h2>
-                                  </div>
-                                </div>
-                                <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                                  <div>
-                                    <h3>Links to</h3>
-                                    {concept && (
-                                      <LinksTo name={name} />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <h3>Linked from</h3>
-                                    {conceptIndex && (
-                                      <LinksFrom conceptUri={conceptUri} />
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="px-6 mt-6">
-                                  <h2 className="text-xl">
-                                    Actions
-                                  </h2>
                                 </div>
                               </div>
+                              <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
+                                <div>
+                                  <h3>Links to</h3>
+                                  {concept && (
+                                    <LinksTo name={name} />
+                                  )}
+                                </div>
+                                <div>
+                                  <h3>Linked from</h3>
+                                  {conceptIndex && (
+                                    <LinksFrom conceptUri={conceptUri} />
+                                  )}
+                                </div>
+                              </div>
+                              <div className="px-6 mt-6">
+                                <h2 className="text-xl">
+                                  Actions
+                                  </h2>
+                              </div>
                             </div>
-                          )
-                        }
-                      </Transition>
-                    </div>
+                          </div>
+                        )
+                      }
+                    </Transition>
                   </div>
-                </>
-              ) : (
-                <Loader />
-              )}
-            </Slate>
+                </div>
+              </Slate>
+            ) : (
+              <Loader />
+            )}
+
             {/*
                  <div>
                  <pre>

@@ -33,7 +33,10 @@ export function useConceptIndex(webId, workspaceSlug = 'default', storage = 'pub
 export function useCombinedConceptIndex(webId, workspaceSlug) {
   const { index: privateIndex, save: savePrivateIndex } = useConceptIndex(webId, workspaceSlug, 'private')
   const { index: publicIndex, save: savePublicIndex } = useConceptIndex(webId, workspaceSlug, 'public')
-  return { index: dataset([...privateIndex ? privateIndex.quads : [], ...publicIndex ? publicIndex.quads : []]) }
+  return { index: dataset([
+    ...((privateIndex && privateIndex.quads) ? privateIndex.quads : []),
+    ...((publicIndex && publicIndex.quads) ? publicIndex.quads : [])
+  ]) }
 }
 
 export function useConceptPrefix(webId, workspaceSlug) {
