@@ -1,23 +1,15 @@
 import { useEffect } from 'react'
-import * as Fathom from 'fathom-client'
+import * as fathom from '../model/fathom';
 import { useRouter } from 'next/router'
 
-const VercelEnv = process.env.VERCEL_ENV || ''
-const FathomSiteId = process.env.FATHOM_SITE_ID || ''
 
 export function useFathom() {
   const router = useRouter()
   return useEffect(() => {
-    Fathom.load(FathomSiteId, {
-      includedDomains: [
-        (VercelEnv === "production") ?
-        'understory.garden' :
-        'staging.understory.garden'
-      ],
-    })
+    fathom.load()
 
     function onRouteChangeComplete() {
-      Fathom.trackPageview()
+      fathom.trackPageview()
     }
     // Record a pageview when route changes
     router.events.on('routeChangeComplete', onRouteChangeComplete)
