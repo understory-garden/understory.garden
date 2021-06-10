@@ -120,8 +120,10 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
       if (isNewThing) {
         const newThing = newSinglePageGateThing(webId, conceptPrefix, index, concept, css)
         await updateThing(newThing)
+        trackGoal(FG.gateCreated)
       } else {
         await updateThing(updateSinglePageGateThing(thing, webId, conceptPrefix, index, concept, css))
+        trackGoal(FG.gateEdited)
       }
     } finally {
       setEditingGate(false)
@@ -203,7 +205,6 @@ function GnomesResourceEditor({ webId }) {
   const [addingNewGnome, setAddingNewGnome] = useState(false)
   const gnomeThings = resource && getThingAll(resource)
   async function updateThing(newThing) {
-    const goal = isThingLocal(newThing) ? FG.gateCreated : FG.gateEdited
     setAddingNewGnome(false)
     const newResource = setThing(resource, newThing)
     const updatedResource = await save(newResource)
@@ -221,7 +222,6 @@ function GnomesResourceEditor({ webId }) {
     console.log(`Saving deployment info to gnome at url: ${thingUrl}`)
     await save(deployedResource)
     console.log(`Finished setting up gnome at url: ${thingUrl}`)
-    trackGoal(goal)
   }
   function cancel() {
     setAddingNewGnome(false)
