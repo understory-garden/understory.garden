@@ -51,7 +51,6 @@ export default function Nav() {
   const profileImage = profile && getUrl(profile, FOAF.img)
   const inboxUri = profile && getUrl(profile, LDP.inbox)
   const { resources } = useContainer(inboxUri)
-  const hasMessages = resources && (resources.length > 0)
   const [menuOpen, setMenuOpen] = useState(false)
   return (
     <nav className="pt-3 flex flex-col">
@@ -72,20 +71,6 @@ export default function Nav() {
         </li>
         <li>
           <ul className="flex justify-between items-center space-x-4">
-            {loggedIn && (
-              <Link href="/messages">
-                <a className="text-white">
-                  <div className="relative">
-                    <MailIcon className="w-12" />
-                    {hasMessages && (
-                      <div className="absolute top-0 right-0 block h-5 w-5 rounded-full ring-2 ring-white bg-red-400 pl-2 leading-3 pt-0.5">
-                        { resources.length}
-                      </div>
-                    )}
-                  </div>
-                </a>
-              </Link>
-            )}
             {loggedIn && (
               <div>
                 {profileImage ? (
