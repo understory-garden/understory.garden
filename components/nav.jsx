@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 
 import { getUrl, getSourceUrl, getBoolean } from '@inrupt/solid-client'
@@ -10,7 +10,7 @@ import Image from 'next/image'
 
 import { MailIcon } from '../components/icons'
 import NewNoteForm from '../components/NewNoteForm'
-import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
+import { useApp, useWorkspacePreferencesFileUris, useWorkspace, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 import { appPrefix } from '../utils/uris'
 import { US } from '../vocab'
@@ -36,6 +36,20 @@ function DevTools() {
         </button>
       </li>
     </ul>
+  )
+}
+
+function LoginVerifier(){
+  const { logout } = useAuthentication()
+  const webId = useWebId()
+  const { error } = useWorkspace(webId, "default", "private")
+  useEffect(function(){
+    if (error && (error.statusCode == 401)){
+      logout()
+    }
+  }, [error && error.statusCode])
+  return (
+    <></>
   )
 }
 
@@ -85,6 +99,9 @@ export default function Nav() {
                   </div>
                 </a>
               </Link>
+            )}
+            {loggedIn && (
+              <LoginVerifier/>
             )}
             {loggedIn && (
               <div>
