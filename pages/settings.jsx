@@ -17,7 +17,7 @@ import { useConcept } from '../hooks/concepts'
 import { conceptUriToName, understoryGardenConceptPrefix } from '../utils/uris'
 import { useGnomesResource } from '../hooks/gnomes'
 import { newSinglePageGateThing, updateSinglePageGateThing, setupGnome, updateDeploymentStatus } from '../model/gnomes'
-import NewNoteForm from '../components/NewNoteForm'
+import NotePicker from '../components/NotePicker'
 import { Loader, InlineLoader } from '../components/elements'
 import { deleteResource } from '../utils/fetch';
 
@@ -159,14 +159,14 @@ function GnomeThingEditor({ webId, thing, updateThing, cancelAdd }) {
                     <h3 className="mb-3">What note would you like to use for your Gate?</h3>
 
                     {editingNoteName ? (
-                      <NewNoteForm onSubmit={(newConceptName) => {
+                      <NotePicker onSubmit={(newConceptName) => {
                         setFieldValue('conceptName', newConceptName)
                         // we need to set this here so that the concept loader above will
                         // load the concept
                         setChosenConceptName(newConceptName)
                         setEditingNoteName(false)
                       }}
-                        initialSelectedName={conceptName} submitTitle="choose" />
+                        initialSelectedName={conceptName}/>
                     ) : (
                       <div className="flex justify-between">
                         <h5 className="font-bold">{conceptName}</h5>

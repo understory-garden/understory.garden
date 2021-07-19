@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useConceptNamesMatching } from '../hooks/concepts'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 
-export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=""}) {
+export default function NotePicker({onSubmit, initialSelectedName=""}) {
   const router = useRouter()
   const [displayedName, setDisplayedName] = useState(initialSelectedName)
   const gotoNote = useCallback((noteName) => {
@@ -57,7 +57,7 @@ export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=
           onChange={e => setDisplayedName(e.target.value)}
           onKeyDown={onKeyDown}
           className="input-text mr-3 max-h-8" type="text"
-          placeholder="Note Name" />
+          placeholder="Search" />
         <ul className="z-30 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
           {matchingConceptNames && matchingConceptNames.map((name, i) => (
             <li key={name}
@@ -68,13 +68,6 @@ export default function NewNoteForm({onSubmit, submitTitle, initialSelectedName=
           ))}
         </ul>
       </div>
-      {(displayedName !== "") && (
-        <button className="btn"
-          onClick={onClick}
-          disabled={displayedName === ""}>
-          {submitTitle || ((selectionIndex === 0) ? 'create' : 'goto')} {selectedNote}
-        </button>
-      )}
     </div>
   )
 }
