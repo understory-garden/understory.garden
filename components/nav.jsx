@@ -39,6 +39,51 @@ function DevTools() {
   )
 }
 
+function CreateButton({onClick}) {
+  return (
+    <div className="flex flex-row max-h-9 self-center">
+      <button className="flex btn text-l h-9" onClick={onClick}>
+        Create
+      </button>
+    </div>
+  )
+}
+
+export function Modal({ submitTitle="Submit", onSubmit, onCancel}  ) {
+  return (
+    <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div>
+            <div class="mt-3 text-center sm:mt-5">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Whoa a concept
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">
+                  Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eius aliquam laudantium explicabo pariatur iste dolorem animi vitae error totam. At sapiente aliquam accusamus facere veritatis.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+            <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm" onClick={onSubmit}>
+             { submitTitle }
+            </button>
+            <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm" onClick={onCancel}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Nav() {
   const router = useRouter()
   const { query: { devtools } } = router
@@ -52,9 +97,15 @@ export default function Nav() {
   const inboxUri = profile && getUrl(profile, LDP.inbox)
   const { resources } = useContainer(inboxUri)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
     <nav className="pt-3 flex flex-col">
       <ul className="flex justify-between items-center">
+        {modalOpen && (
+          <Modal onSubmit={() => setModalOpen(false)}
+            onCancel={() => setModalOpen(false)}/>
+        )}
         <li className="flex flex-row">
           <Link href="/">
             <a className="mr-6">
@@ -67,6 +118,13 @@ export default function Nav() {
           </Link>
           {loggedIn && (
             <NewNoteForm />
+          )}
+          {loggedIn && (
+            <CreateButton onClick={() => {
+              console.log('setModalOpen')
+              setModalOpen(true)}
+              }
+            />
           )}
         </li>
         <li>
