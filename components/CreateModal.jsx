@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import { ReactEditor, Slate } from 'slate-react'
 import Editable, { useNewEditor } from "./Editable";
+import { useCurrentWorkspace } from '../hooks/app'
+import { useWebId } from 'swrlit'
 
 export default function CreateModal({ initialTitle="", create, closeModal}) {
   const editor = useNewEditor()
+  const webId = useWebId()
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
   const emptySlate = [{ children: [{ text: "" }] }]
   const [title, setTitle] = useState(initialTitle)
   const [slate, setSlate] = useState(emptySlate)
   const [createAnother, setCreateAnother] = useState(false)
+  const { concept, saveConcept } = useConcept(webId, slug)
   const resetModal = () => {
     setTitle("")
     setSlate(emptySlate)
