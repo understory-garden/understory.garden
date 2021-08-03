@@ -17,3 +17,7 @@ export function conceptUrisThatReference(index, conceptUri){
 export function conceptUrisTaggedWith(index, tagUri){
   return Array.from(index.match(null, namedNode(US.tagged), namedNode(tagUri))).map(({subject}) => subject.value)
 }
+
+export function saveNewConcept(name, ) {
+
+}
