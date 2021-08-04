@@ -333,7 +333,7 @@ export const insertConcept = (editor, name) => {
   Transforms.insertNodes(editor, concept)
 }
 
-const conceptRegex = /\[\[(.*)\]\]/
+const conceptRegex = /\[\[(.+)\]\]/
 
 function hasConceptParent(editor, path){
   const parent = Node.get(editor, path.slice(0, -1))
