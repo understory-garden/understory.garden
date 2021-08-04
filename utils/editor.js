@@ -379,7 +379,7 @@ export const withConcepts = editor => {
   return editor
 }
 
-const tagRegex = /\B\#([a-zA-Z]+\b)./
+const tagRegex = /\B\#([\w-]+)\b/
 
 function hasTagParent(editor, path){
   const parent = Node.get(editor, path.slice(0, -1))
