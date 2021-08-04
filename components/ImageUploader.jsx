@@ -24,6 +24,8 @@ const ImageEditingModule = ({ src, onSave, onClose, ...props }) => {
       <Cropper
         ref={cropperRef}
         src={src}
+        autoCropArea={1}
+        viewMode={1}
         crossOrigin="use-credentials"
         className="h-48"
       />
