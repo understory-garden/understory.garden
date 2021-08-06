@@ -51,18 +51,6 @@ export const ToolbarButtonsBasicElements = () => {
         icon={<Looks3 />}
       />
       <P.ToolbarElement
-        type={P.getPlatePluginType(editor, P.ELEMENT_H4)}
-        icon={<Looks4 />}
-      />
-      <P.ToolbarElement
-        type={P.getPlatePluginType(editor, P.ELEMENT_H5)}
-        icon={<Looks5 />}
-      />
-      <P.ToolbarElement
-        type={P.getPlatePluginType(editor, P.ELEMENT_H6)}
-        icon={<Looks6 />}
-      />
-      <P.ToolbarElement
         type={P.getPlatePluginType(editor, P.ELEMENT_BLOCKQUOTE)}
         icon={<FormatQuote />}
       />
@@ -109,48 +97,17 @@ export const ToolbarButtonsBasicMarks = () => {
         icon={<FormatUnderlined />}
       />
       <P.ToolbarMark
-        type={P.getPlatePluginType(editor, P.MARK_STRIKETHROUGH)}
-        icon={<FormatStrikethrough />}
-      />
-      <P.ToolbarMark
         type={P.getPlatePluginType(editor, P.MARK_CODE)}
         icon={<CodeAlt />}
       />
       <P.ToolbarMark
-        type={P.getPlatePluginType(editor, P.MARK_SUPERSCRIPT)}
-        clear={P.getPlatePluginType(editor, P.MARK_SUBSCRIPT)}
-        icon={<Superscript />}
-      />
-      <P.ToolbarMark
-        type={P.getPlatePluginType(editor, P.MARK_SUBSCRIPT)}
-        clear={P.getPlatePluginType(editor, P.MARK_SUPERSCRIPT)}
-        icon={<Subscript />}
+        type={P.getPlatePluginType(editor, P.MARK_HIGHLIGHT)}
+        icon={<Highlight />}
+        tooltip={{ content: 'Highlight', ...tooltip }}
       />
     </>
   );
 };
-
-export const ToolbarHighlight = () => {
-  const editor = P.useStoreEditorRef(P.useEventEditorId('focus'));
-
-  return (
-    <P.ToolbarMark
-      type={P.getPlatePluginType(editor, MARK_HIGHLIGHT)}
-      icon={<Highlight />}
-    />
-  );
-};
-
-export const ToolbarButtonsTable = () => (
-  <>
-    <P.ToolbarTable icon={<GridOn />} transform={P.insertTable} />
-    <P.ToolbarTable icon={<GridOff />} transform={P.deleteTable} />
-    <P.ToolbarTable icon={<GetApp />} transform={P.addRow} />
-    <P.ToolbarTable icon={<Upload />} transform={P.deleteRow} />
-    <P.ToolbarTable icon={<SkipNext />} transform={P.addColumn} />
-    <P.ToolbarTable icon={<SkipPrevious />} transform={P.deleteColumn} />
-  </>
-);
 
 export const BallonToolbarMarks = () => {
   const editor = P.useStoreEditorRef(P.useEventEditorId('focus'));
@@ -189,6 +146,16 @@ export const BallonToolbarMarks = () => {
         type={P.getPlatePluginType(editor, P.MARK_UNDERLINE)}
         icon={<FormatUnderlined />}
         tooltip={{ content: 'Underline (⌘U)', ...tooltip }}
+      />
+      <P.ToolbarMark
+        type={P.getPlatePluginType(editor, P.MARK_CODE)}
+        icon={<CodeAlt />}
+        tooltip={{ content: 'Code', ...tooltip }}
+      />
+      <P.ToolbarMark
+        type={P.getPlatePluginType(editor, P.MARK_HIGHLIGHT)}
+        icon={<Highlight />}
+        tooltip={{ content: 'Highlight', ...tooltip }}
       />
     </P.BalloonToolbar>
   );
