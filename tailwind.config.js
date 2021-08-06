@@ -3,11 +3,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'accent-1': '#333',
+        passionflower: '#944c7d',
+        lagoon: '#0e90a3',
+        echeveria: '#9fae6f',
+        chanterelle: '#edb156',
+        coral: '#f6895a',
+        ember: '#d44d51',
+
+        ocean: '#2d6da6',
+        aloe: '#579f89',
+        kelp: '#c6b063',
+        apricot: '#f29d58',
+        salmon: '#e56b56',
+
+        amethyst: '#e0c3d7',
+        aquamarine: '#9ed3db',
+        jade: '#dce1c9',
+        citrine: '#f7deb7',
+        topaz: '#fbcbb7',
+        morganite: '#f0bfc2',
+
+        snow: '#ffffff',
+        mist: '#f4f3f3',
+        fog: '#b2aeb1',
+        storm: '#665e63',
+        night: '#190d15',
       },
     },
     fontFamily: {
-      sans: ['omnes-pro', 'sans-serif'],
+      sans: ['Montserrat', 'sans-serif'],
       logo: ['Marisa', 'sans-serif'],
       mono: ['fira-mono', 'monospace']
     },
