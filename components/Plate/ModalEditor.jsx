@@ -9,7 +9,6 @@ import {
 } from './Toolbars'
 import { Image } from '@styled-icons/material/Image';
 import { Link } from '@styled-icons/material/Link';
-import { Search } from '@styled-icons/material/Search';
 import { FontDownload } from '@styled-icons/material/FontDownload';
 import { FormatColorText } from '@styled-icons/material/FormatColorText';
 
@@ -27,19 +26,6 @@ export default function ModalEditor() {
       },
     }),
   });
-
-  styledComponents = P.withPlaceholders(styledComponents, [
-    {
-      key: P.ELEMENT_H1,
-      placeholder: 'Title goes here',
-      hideOnBlur: false,
-    },
-    {
-      key: P.ELEMENT_PARAGRAPH,
-      placeholder: 'Brilliant ideas go here',
-      hideOnBlur: true,
-    },
-  ]);
 
   const defaultOptions = P.createPlateOptions();
   const preFormat = (editor) => P.unwrapList(editor);
@@ -172,97 +158,86 @@ export default function ModalEditor() {
   /* TODO:" add mentionables for Concepts, and friends */
 
   const Editor = () => {
-    const { setSearch, plugin: searchHighlightPlugin } = P.useFindReplacePlugin();
-
-    const pluginsMemo = useMemo(() => {
-      const plugins = [
-        P.createReactPlugin(),
-        P.createHistoryPlugin(),
-        P.createParagraphPlugin(),
-        P.createBlockquotePlugin(),
-        P.createTodoListPlugin(),
-        P.createHeadingPlugin(),
-        P.createImagePlugin(),
-        P.createLinkPlugin(),
-        P.createListPlugin(),
-        P.createTablePlugin(),
-        P.createMediaEmbedPlugin(),
-        P.createCodeBlockPlugin(),
-        P.createBoldPlugin(),
-        P.createCodePlugin(),
-        P.createItalicPlugin(),
-        P.createHighlightPlugin(),
-        P.createUnderlinePlugin(),
-        P.createStrikethroughPlugin(),
-        P.createSubscriptPlugin(),
-        P.createSuperscriptPlugin(),
-        P.createFontColorPlugin(),
-        P.createFontBackgroundColorPlugin(),
-        P.createKbdPlugin(),
-        P.createNodeIdPlugin(),
-        P.createAutoformatPlugin(optionsAutoformat),
-        P.createResetNodePlugin(optionsResetBlockTypePlugin),
-        P.createSoftBreakPlugin({
-          rules: [
-            { hotkey: 'shift+enter' },
-            {
-              hotkey: 'enter',
-              query: {
-                allow: [P.ELEMENT_CODE_BLOCK, P.ELEMENT_BLOCKQUOTE, P.ELEMENT_TD],
-              },
+    const plugins = [
+      P.createReactPlugin(),
+      P.createHistoryPlugin(),
+      P.createParagraphPlugin(),
+      P.createBlockquotePlugin(),
+      P.createTodoListPlugin(),
+      P.createHeadingPlugin(),
+      P.createImagePlugin(),
+      P.createLinkPlugin(),
+      P.createListPlugin(),
+      P.createMediaEmbedPlugin(),
+      P.createCodeBlockPlugin(),
+      P.createFontColorPlugin(),
+      P.createFontBackgroundColorPlugin(),
+      P.createKbdPlugin(),
+      P.createNodeIdPlugin(),
+      P.createAutoformatPlugin(optionsAutoformat),
+      P.createResetNodePlugin(optionsResetBlockTypePlugin),
+      P.createSoftBreakPlugin({
+        rules: [
+          { hotkey: 'shift+enter' },
+          {
+            hotkey: 'enter',
+            query: {
+              allow: [P.ELEMENT_CODE_BLOCK, P.ELEMENT_BLOCKQUOTE, P.ELEMENT_TD],
             },
-          ],
-        }),
-        P.createExitBreakPlugin({
-          rules: [
-            {
-              hotkey: 'mod+enter',
+          },
+        ],
+      }),
+      P.createExitBreakPlugin({
+        rules: [
+          {
+            hotkey: 'mod+enter',
+          },
+          {
+            hotkey: 'mod+shift+enter',
+            before: true,
+          },
+          {
+            hotkey: 'enter',
+            query: {
+              start: true,
+              end: true,
+              allow: P.KEYS_HEADING,
             },
-            {
-              hotkey: 'mod+shift+enter',
-              before: true,
-            },
-            {
-              hotkey: 'enter',
-              query: {
-                start: true,
-                end: true,
-                allow: P.KEYS_HEADING,
-              },
-            },
-          ],
-        }),
-        P.createNormalizeTypesPlugin({
-          rules: [{ path: [0], strictType: P.ELEMENT_H1 }],
-        }),
-        P.createTrailingBlockPlugin({ type: P.ELEMENT_PARAGRAPH }),
-        P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
-        searchHighlightPlugin,
-      ];
+          },
+        ],
+      }),
+      P.createNormalizeTypesPlugin({
+        rules: [{ path: [0], strictType: P.ELEMENT_H1 }],
+      }),
+      P.createTrailingBlockPlugin({ type: P.ELEMENT_PARAGRAPH }),
+      P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
+    ];
 
-      plugins.push(...[
-        P.createDeserializeMDPlugin({ plugins }),
-        P.createDeserializeCSVPlugin({ plugins }),
-        P.createDeserializeHTMLPlugin({ plugins }),
-        P.createDeserializeAstPlugin({ plugins }),
-      ]);
+    const editableProps = {
+      placeholder: 'Title',
+      style: {
+        padding: '15px',
+      },
+    };
 
-      return plugins;
-    }, [defaultOptions, searchHighlightPlugin]);
-
+    const initialTitleElement = [
+      {
+        type: P.ELEMENT_H1,
+        children: [ { text: '' }, ],
+      },
+    ];
     return (
       <P.Plate
         id="modal-editor"
-        plugins={pluginsMemo}
+        plugins={plugins}
         components={styledComponents}
         options={defaultOptions}
+        editableProps={editableProps}
+        initialValue={initialTitleElement}
       >
-        <P.ToolbarSearchHighlight icon={Search} setSearch={setSearch} />
         <P.HeadingToolbar>
           <ToolbarButtonsBasicElements />
           <ToolbarButtonsList />
-          <ToolbarButtonsBasicMarks />
-          <ToolbarButtonsTable />
           <P.ToolbarColorPicker pluginKey={P.MARK_COLOR} icon={<FormatColorText />} />
           <P.ToolbarColorPicker pluginKey={P.MARK_BG_COLOR} icon={<FontDownload />} />
           <P.ToolbarLink icon={<Link />} />
