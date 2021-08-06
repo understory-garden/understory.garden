@@ -1,24 +1,21 @@
 import { useState } from 'react'
-import { ReactEditor, Slate } from 'slate-react'
-import Editable, { useNewEditor } from "./Editable";
 import { useCurrentWorkspace } from '../hooks/app'
 import { useWebId } from 'swrlit'
+import ModalEditor from './Plate/ModalEditor'
 
 export default function CreateModal({ initialTitle="", create, closeModal}) {
-  const editor = useNewEditor()
   const webId = useWebId()
   const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
   const emptySlate = [{ children: [{ text: "" }] }]
   const [title, setTitle] = useState(initialTitle)
   const [slate, setSlate] = useState(emptySlate)
   const [createAnother, setCreateAnother] = useState(false)
-  const { concept, saveConcept } = useConcept(webId, slug)
   const resetModal = () => {
     setTitle("")
     setSlate(emptySlate)
   }
   const onSubmit = () => {
-    create({title, slate})
+    // create({title, slate})
     if (createAnother) {
       resetModal()
     } else {
@@ -34,22 +31,8 @@ export default function CreateModal({ initialTitle="", create, closeModal}) {
           <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="sm:flex sm:items-start">
               <div className="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  <input className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
-                    type="text"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    placeholder="Note Name" />
-                </h3>
-                <div className="w-full flex flex-col flex-grow">
-                  <Slate
-                    editor={editor}
-                    value={slate}
-                    onChange={(value) => setSlate(value)} >
-                    <Editable
-                      editor={editor}
-                      className="flex-grow text-gray-900" />
-                    </Slate>
+                  <div className="w-full flex flex-col flex-grow">
+                    <ModalEditor/>
                   </div>
                 </div>
               </div>
