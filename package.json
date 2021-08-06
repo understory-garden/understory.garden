@@ -13,6 +13,8 @@
     "@inrupt/lit-generated-vocab-solid-common": "^0.3.9",
     "@inrupt/solid-common-vocab": "^0.5.3",
     "@octokit/request": "^5.4.15",
+    "@styled-icons/fa-regular": "^10.34.0",
+    "@styled-icons/fa-solid": "^10.34.0",
     "@supabase/supabase-js": "^1.11.9",
     "@udecode/plate": "^1.1.4",
     "copy-to-clipboard": "^3.3.1",
