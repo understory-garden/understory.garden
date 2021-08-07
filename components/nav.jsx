@@ -10,7 +10,7 @@ import Image from 'next/image'
 
 import { MailIcon } from '../components/icons'
 import NotePicker from '../components/NotePicker'
-import CreateModal from '../components/CreateModal'
+import ModalEditor from '../components/Plate/ModalEditor'
 import { useApp, useWorkspacePreferencesFileUris, useAppSettings } from '../hooks/app'
 import { deleteResource } from '../utils/fetch'
 import { appPrefix } from '../utils/uris'
@@ -52,7 +52,7 @@ function CreateButton() {
         Create
       </button>
       {modalOpen && (
-        <CreateModal
+        <ModalEditor
           create={create}
           closeModal={() => setModalOpen(false)}/>
       )}

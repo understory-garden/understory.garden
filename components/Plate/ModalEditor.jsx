@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState } from 'react'
 import * as P from '@udecode/plate'
 import {
   ToolbarButtonsList,
@@ -7,16 +7,16 @@ import {
   ToolbarButtonsTable,
   BallonToolbarMarks,
 } from './Toolbars'
-import { Image } from '@styled-icons/material/Image';
-import { Link } from '@styled-icons/material/Link';
-import { FontDownload } from '@styled-icons/material/FontDownload';
-import { FormatColorText } from '@styled-icons/material/FormatColorText';
+import { Image } from '@styled-icons/material/Image'
+import { Link } from '@styled-icons/material/Link'
 
+import { useCurrentWorkspace } from '../../hooks/app'
+import { useWebId } from 'swrlit'
 
 const components = P.createPlateComponents({
-  [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: 'H1', }),
-  [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: 'H2', }),
-  [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: 'H3', }),
+  [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: 'h1', }),
+  [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: 'h2', }),
+  [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: 'h3', }),
 });
 
 const defaultOptions = P.createPlateOptions();
@@ -220,33 +220,88 @@ const plugins = [
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
-export default function ModalEditor() {
 
-    const editableProps = {
-      placeholder: 'Title',
-    };
 
-    const initialTitleElement = [
-      {
-        type: P.ELEMENT_H1,
-        children: [ { text: '' }, ],
-      },
-    ];
+export default function ModalEditor({create, closeModal}) {
+  const editableProps = { placeholder: 'Title' }
+  const initialTitleElement = [{
+    type: P.ELEMENT_H1,
+    children: [{ text: '' }],
+  }]
+  const plateId = 'modal-editor'
+  const { setValue: setPlateValue, resetEditor } = P.usePlateActions(plateId)
 
-    return (
-        <P.Plate id="modal-editor"
-          plugins={plugins}
-          components={components}
-          options={defaultOptions}
-          editableProps={editableProps}
-          initialValue={initialTitleElement}>
-          <BallonToolbarMarks />
-          <P.HeadingToolbar>
-            <ToolbarButtonsBasicElements />
-            <ToolbarButtonsList />
-            <P.ToolbarLink icon={<Link />} />
-            <P.ToolbarImage icon={<Image />} />
-          </P.HeadingToolbar>
-        </P.Plate>
-    );
+
+  const webId = useWebId()
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
+  const [value, setValue] = useState(initialTitleElement)
+  const [createAnother, setCreateAnother] = useState(false)
+  const resetModal = () => {
+    setValue(initialTitleElement)
+    setPlateValue(initialTitleElement)
+    resetEditor()
+  }
+  const onChange = (newValue) => {
+    setValue(newValue)
+  }
+  const onSubmit = () => {
+    // create({title, slate})
+    console.log(value)
+    if (createAnother) {
+      resetModal()
+    } else {
+      closeModal()
+    }
+  }
+
+  return (
+    <div className="fixed w-full h-full top-0 left-0 flex items-center justify-center">
+      <div className="absolute w-full h-full bg-storm opacity-95"></div>
+      <div className="flex-column fixed align-bottom min-w-2/5 min-h-1/5 max-w-4/5 max-h-4/5 overflow-y-auto overflow-x-hidden bg-snow z-50 opactiy-100 rounded-lg shadow-xl">
+        <button type="button" className="absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-fog text-sm z-50" onClick={closeModal}>
+          <svg className="fill-current text-mist" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 18 18">
+            <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+          </svg>
+        </button>
+
+        <div className="flow-root w-full text-left p-4">
+          <P.Plate id={plateId}
+            plugins={plugins}
+            components={components}
+            options={defaultOptions}
+            editableProps={editableProps}
+            initialValue={value}
+            onChange={onChange}>
+            <BallonToolbarMarks />
+            <P.HeadingToolbar>
+              <ToolbarButtonsBasicElements />
+              <ToolbarButtonsList />
+              <P.ToolbarLink icon={<Link />} />
+              <P.ToolbarImage icon={<Image />} />
+            </P.HeadingToolbar>
+          </P.Plate>
+        </div>
+
+        <div className="block flex-none bottom-0 right-0 w-full bg-mist px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button"
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-echeveria text-base font-medium text-white hover:bg-echeveria :outline-none focus:ring-2 focus:ring-offset-2 focus:ring-echeveria-700 sm:ml-3 sm:w-auto sm:text-sm"
+            onClick={onSubmit}>
+            Create
+          </button>
+          <button type="button"
+            className="mt-3 w-full inline-flex justify-center rounded-md border border-mist shadow-sm px-4 py-2 bg-white text-base font-medium text-storm hover:bg-mist focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            onClick={closeModal}>
+            Cancel
+          </button>
+          <label className="inline-flex items-center">
+            <input className="form-checkbox text-echeveria"
+              type="checkbox"
+              checked={createAnother}
+              onChange={e => setCreateAnother(e.target.checked)} />
+            <span className="ml-2">Create another</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
 }
