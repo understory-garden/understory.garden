@@ -115,3 +115,24 @@ b, strong {
 .logo-bg {
     @apply bg-gradient-to-b from-green-400 via-purple-500 to-pink-500 bg-clip-text;
 }
+
+
+.slate-h1 {
+  @apply text-3xl;
+}
+
+.slate-h2 {
+  @apply text-2xl;
+}
+
+.slate-h3 {
+  @apply text-xl;
+}
+
+.slate-ul {
+  @apply list-disc list-outside;
+}
+
+.slate-ol {
+  @apply list-decimal list-outside;
+}
