@@ -13,7 +13,12 @@ import { FontDownload } from '@styled-icons/material/FontDownload';
 import { FormatColorText } from '@styled-icons/material/FormatColorText';
 
 
-const defaultComponents = P.createPlateComponents();
+const components = P.createPlateComponents({
+  [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: 'H1', }),
+  [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: 'H2', }),
+  [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: 'H3', }),
+});
+
 const defaultOptions = P.createPlateOptions();
 
 const preFormat = (editor) => P.unwrapList(editor);
@@ -212,7 +217,6 @@ const plugins = [
   P.createNormalizeTypesPlugin({
     rules: [{ path: [0], strictType: P.ELEMENT_H1 }],
   }),
-  P.createTrailingBlockPlugin({ type: P.ELEMENT_PARAGRAPH }),
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
@@ -220,9 +224,6 @@ export default function ModalEditor() {
 
     const editableProps = {
       placeholder: 'Title',
-      style: {
-        padding: '36px',
-      },
     };
 
     const initialTitleElement = [
@@ -233,23 +234,19 @@ export default function ModalEditor() {
     ];
 
     return (
-      <P.Plate
-        id="modal-editor"
-        plugins={plugins}
-        components={defaultComponents}
-        options={defaultOptions}
-        editableProps={editableProps}
-        initialValue={initialTitleElement}
-      >
-        <P.HeadingToolbar>
-          <ToolbarButtonsBasicElements />
-          <ToolbarButtonsList />
-          <P.ToolbarLink icon={<Link />} />
-          <P.ToolbarImage icon={<Image />} />
-        </P.HeadingToolbar>
-
-        <BallonToolbarMarks />
-
-      </P.Plate>
+        <P.Plate id="modal-editor"
+          plugins={plugins}
+          components={components}
+          options={defaultOptions}
+          editableProps={editableProps}
+          initialValue={initialTitleElement}>
+          <BallonToolbarMarks />
+          <P.HeadingToolbar>
+            <ToolbarButtonsBasicElements />
+            <ToolbarButtonsList />
+            <P.ToolbarLink icon={<Link />} />
+            <P.ToolbarImage icon={<Image />} />
+          </P.HeadingToolbar>
+        </P.Plate>
     );
 }
