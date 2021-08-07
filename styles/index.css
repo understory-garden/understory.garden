@@ -136,3 +136,7 @@ b, strong {
 .slate-ol {
   @apply list-decimal list-outside;
 }
+
+.slate-p {
+  @apply font-normal;
+}
