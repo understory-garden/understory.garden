@@ -25,6 +25,21 @@ const preFormat = (editor) => P.unwrapList(editor);
 
 const optionsAutoformat = {
   rules: [
+      {
+        type: P.ELEMENT_H1,
+        markup: '#',
+        preFormat,
+      },
+      {
+        type: P.ELEMENT_H2,
+        markup: '##',
+        preFormat,
+      },
+      {
+        type: P.ELEMENT_H3,
+        markup: '###',
+        preFormat,
+      },
     {
       type: P.ELEMENT_LI,
       markup: ['*', '-'],
