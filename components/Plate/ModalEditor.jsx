@@ -107,12 +107,6 @@ const optionsAutoformat = {
       insertTrigger: true,
     },
     {
-      type: P.MARK_STRIKETHROUGH,
-      between: ['~~', '~~'],
-      mode: 'inline',
-      insertTrigger: true,
-    },
-    {
       type: P.ELEMENT_CODE_BLOCK,
       markup: '``',
       trigger: '`',

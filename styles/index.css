@@ -116,7 +116,7 @@ b, strong {
     @apply bg-gradient-to-b from-green-400 via-purple-500 to-pink-500 bg-clip-text;
 }
 
-
+/* slate editor -- classes assigned automatically by Plate */
 .slate-h1 {
   @apply text-3xl;
 }
@@ -130,13 +130,13 @@ b, strong {
 }
 
 .slate-ul {
-  @apply list-disc list-outside;
+  @apply list-disc list-outside font-normal text-base;
 }
 
 .slate-ol {
-  @apply list-decimal list-outside;
+  @apply list-decimal list-outside font-normal text-base;
 }
 
 .slate-p {
-  @apply font-normal;
+  @apply font-normal text-base;
 }
