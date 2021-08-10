@@ -188,7 +188,6 @@ const plugins = [
   P.createTodoListPlugin(),
   P.createImagePlugin(),
   P.createLinkPlugin(),
-  P.createMediaEmbedPlugin(),
   P.createKbdPlugin(),
   P.createNodeIdPlugin(),
   P.createAutoformatPlugin(optionsAutoformat),
