@@ -47,12 +47,41 @@ module.exports = {
     },
     extend: {
       colors: {
-        passionflower: '#944c7d',
-        lagoon: '#0e90a3',
-        echeveria: '#9fae6f',
-        chanterelle: '#edb156',
-        coral: '#f6895a',
-        ember: '#d44d51',
+        passionflower: {
+          light: '#e0c3d7',
+          DEFAULT: '#944c7d',
+          dark: '#633353',
+        },
+
+        lagoon: {
+          light: '#9ed3db',
+          DEFAULT: '#0e90a3',
+          dark: '#09606d',
+        },
+
+        echeveria: {
+          light: '#dce1c9',
+          DEFAULT: '#9fae6f',
+          dark: '#6a744a',
+        },
+
+        chanterelle: {
+          light: '#f7deb7',
+          DEFAULT: '#edb156',
+          dark: '#9e7639',
+        },
+
+        coral: {
+          light:  '#fbcbb7',
+          DEFAULT: '#f6895a',
+          dark: '#a45b3c',
+        },
+
+        ember: {
+          light: '#f0bfc2',
+          DEFAULT: '#d44d51',
+          dark: '#8d3336',
+        },
 
         ocean: '#2d6da6',
         aloe: '#579f89',
