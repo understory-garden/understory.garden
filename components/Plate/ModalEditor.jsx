@@ -292,12 +292,12 @@ export default function ModalEditor({create, closeModal}) {
 
         <div className="block flex-none bottom-0 right-0 w-full bg-mist px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button type="button"
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-echeveria text-base font-medium text-white hover:bg-echeveria :outline-none focus:ring-2 focus:ring-offset-2 focus:ring-echeveria-700 sm:ml-3 sm:w-auto sm:text-sm"
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-echeveria text-base font-medium text-white hover:bg-echeveria-dark :outline-none focus:ring-2 focus:ring-offset-2 focus:ring-echeveria-dark sm:ml-3 sm:w-auto sm:text-sm"
             onClick={onSubmit}>
             Create
           </button>
           <button type="button"
-            className="mt-3 w-full inline-flex justify-center rounded-md border border-mist shadow-sm px-4 py-2 bg-white text-base font-medium text-storm hover:bg-mist focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            className="mt-3 w-full inline-flex justify-center rounded-md border border-mist shadow-sm px-4 py-2 bg-white text-base font-medium text-storm hover:bg-mist focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-storm sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             onClick={closeModal}>
             Cancel
           </button>
