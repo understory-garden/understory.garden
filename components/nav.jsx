@@ -76,7 +76,7 @@ export default function Nav() {
 
   return (
     <nav className="pt-3 flex flex-col">
-      <ul className="flex justify-between items-center">
+      <ul className="flex justify-between items-center ">
         <li className="flex flex-row">
           <Link href="/">
             <a className="mr-6">
@@ -123,30 +123,30 @@ export default function Nav() {
                   {
                     (ref) => (
                       <div ref={ref} className="z-30 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                        <div className="p-1 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <div className="p-2 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                           <Link href="/profile">
                             <a className="block">
                               edit profile
-                          </a>
+                            </a>
                           </Link>
                           <Link href="/settings">
                             <a className="block">
                               settings
-                          </a>
+                            </a>
                           </Link>
                           <a href="/privacy" className="block" role="menuitem">
                             privacy
-                        </a>
-                        <a href="/tos" className="block" role="menuitem">
+                          </a>
+                          <a href="/tos" className="block" role="menuitem">
                             terms of service
-                        </a>
+                          </a>
                           {loggedIn && (
-                            <button type="submit" className="block a w-full text-left text-l hover:bg-ember hover:text-mist" role="menuitem"
+                            <button type="submit" className="mx-0 w-full text-left block destructive btn rounded-md" role="menuitem"
                               onClick={logout}>
                               log out
                             </button>
                           )}
-                        </div>
+                          </div>
                       </div>
                     )
                   }
