@@ -48,7 +48,7 @@ function CreateButton() {
   }
   return (
     <div className="flex flex-row max-h-9 self-center">
-      <button className="flex btn text-l h-9" onClick={() => setModalOpen(true)}>
+      <button className="flex btn" onClick={() => setModalOpen(true)}>
         Create
       </button>
       {modalOpen && (
@@ -125,23 +125,23 @@ export default function Nav() {
                       <div ref={ref} className="z-30 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div className="p-1 text-lg" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                           <Link href="/profile">
-                            <a className="block hover:bg-gray-100 hover:text-gray-900">
+                            <a className="block">
                               edit profile
                           </a>
                           </Link>
                           <Link href="/settings">
-                            <a className="block hover:bg-gray-100 hover:text-gray-900">
+                            <a className="block">
                               settings
                           </a>
                           </Link>
-                          <a href="/privacy" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                          <a href="/privacy" className="block" role="menuitem">
                             privacy
                         </a>
-                          <a href="/tos" className="block hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                        <a href="/tos" className="block" role="menuitem">
                             terms of service
                         </a>
                           {loggedIn && (
-                            <button type="submit" className="block w-full text-left text-purple-500 font-semibold hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem"
+                            <button type="submit" className="block a w-full text-left text-l hover:bg-ember hover:text-mist" role="menuitem"
                               onClick={logout}>
                               log out
                             </button>
