@@ -105,7 +105,7 @@ module.exports = {
     },
     fontFamily: {
       sans: ['Montserrat', 'sans-serif'],
-      logo: ['Marisa', 'sans-serif'],
+      logo: ['Sansita Swashed', 'cursive', 'sans-serif'],
       mono: ['fira-mono', 'monospace']
     },
   },

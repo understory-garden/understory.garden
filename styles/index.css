@@ -99,7 +99,7 @@ b, strong {
 }
 
 .btn {
-    @apply mx-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-echeveria text-base font-medium text-white;
+    @apply mx-2 rounded-xl border-none shadow-lg px-4 py-2 gradient-echeveria text-base font-medium text-white;
 }
 
 .btn:hover {
@@ -115,19 +115,19 @@ b, strong {
 }
 
 .cancel {
-  @apply bg-fog;
+  @apply gradient-ember;
 }
 
 .cancel:hover {
-  @apply ring-mist ring-offset-fog bg-storm;
+  @apply ring-ember-light ring-offset-ember bg-ember-dark;
 }
 
 .cancel:focus {
-  @apply ring-fog ring-offset-mist;
+  @apply ring-ember ring-offset-ember-light;
 }
 
 .cancel:active {
-  @apply ring-fog ring-offset-mist
+  @apply ring-ember ring-offset-ember-light
 }
 
 .block {
@@ -163,8 +163,36 @@ b, strong {
 
 /* Your own custom utilities */
 
-.logo-bg {
-    @apply bg-gradient-to-b from-green-400 via-purple-500 to-pink-500 bg-clip-text;
+.gradient-passionflower {
+    @apply bg-gradient-to-br from-lagoon via-passionflower to-passionflower;
+}
+
+.gradient-echeveria {
+    @apply bg-gradient-to-br from-aloe via-echeveria to-echeveria;
+}
+
+.gradient-lagoon {
+    @apply bg-gradient-to-br from-echeveria via-lagoon to-lagoon;
+}
+
+.gradient-chanterelle {
+    @apply bg-gradient-to-br from-echeveria via-chanterelle to-chanterelle;
+}
+
+.gradient-ember {
+    @apply bg-gradient-to-br from-chanterelle via-ember to-ember;
+}
+
+.gradient-salmon {
+    @apply bg-gradient-to-br from-passionflower via-salmon to-salmon;
+}
+
+h1.font-logo {
+    @apply gradient-passionflower bg-clip-text;
+}
+
+h2.font-logo {
+    @apply gradient-echeveria bg-clip-text;
 }
 
 /* slate editor -- classes assigned automatically by Plate */

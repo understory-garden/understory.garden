@@ -22,6 +22,8 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet" />
+        {/* Temporary Logo Wordmark Font */}
+        <link href="https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@300&display=swap" rel="stylesheet" />
         <meta name="monetization" content="$ilp.uphold.com/DYPhbXPmDa2P" />
       </Head>
       <SWRConfig value={{ shouldRetryOnError: false }}>
