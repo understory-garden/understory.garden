@@ -179,8 +179,8 @@ function InitPage({ initApp }) {
 function LoadingPage() {
   return (
     <>
-      <div className="text-center pt-12">
-        <Loader />
+      <div className="text-center h-full w-full">
+        <Loader className="absolute top-1/2 left-1/2" />
       </div>
     </>
   )

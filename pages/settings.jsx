@@ -65,7 +65,7 @@ function SectionHeader({ title, description }) {
       <h2 className="text-3xl font-large text-gray-900 mb-3">
         {title}
       </h2>
-      <p className="text-sm text-gray-500">
+      <p className="">
         {description}
       </p>
     </div>

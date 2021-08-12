@@ -3,7 +3,31 @@
 /* Write your own custom base styles here */
 
 a {
-    @apply text-purple-500;
+    @apply text-ocean;
+}
+
+a:hover {
+    @apply underline bg-mist;
+}
+
+a:visited {
+    @apply text-passionflower;
+}
+
+a:active {
+    @apply text-passionflower;
+}
+
+.a {
+    @apply text-ocean bg-transparent;
+}
+
+.a:hover {
+    @apply underline bg-mist;
+}
+
+.a:active {
+    @apply text-passionflower;
 }
 
 blockquote {
@@ -19,7 +43,7 @@ input {
 }
 
 body {
-    @apply font-semibold;
+    @apply font-normal text-lg;
 }
 
 b, strong {
@@ -75,8 +99,35 @@ b, strong {
 }
 
 .btn {
-    @apply bg-purple-500 text-gray-100 text-xl rounded-lg px-3 font-bold border-2 border-gray-100;
+    @apply mx-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-echeveria text-base font-medium text-white;
+}
 
+.btn:hover {
+  @apply outline-none ring-2 ring-offset-2 ring-echeveria-light ring-offset-echeveria bg-echeveria-dark;
+}
+
+.btn:focus {
+  @apply outline-none ring-2 ring-offset-2 ring-echeveria ring-offset-echeveria-light;
+}
+
+.btn:active {
+  @apply outline-none ring-2 ring-offset-2 ring-echeveria ring-offset-echeveria-light
+}
+
+.cancel {
+  @apply bg-fog;
+}
+
+.cancel:hover {
+  @apply ring-mist ring-offset-fog bg-storm;
+}
+
+.cancel:focus {
+  @apply ring-fog ring-offset-mist;
+}
+
+.cancel:active {
+  @apply ring-fog ring-offset-mist
 }
 
 .block {
