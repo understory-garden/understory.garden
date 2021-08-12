@@ -54,14 +54,14 @@ export default function Welcome() {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="my-12">
-        <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-logo text-transparent">
+        <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-logo">
           Welcome to the
         </h2>
-        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-logo text-transparent">
+        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-logo">
           Mysilio Network
         </h1>
       </div>
-      If you already have a with us, just let us know which one and we'll get you logged in:
+      If you already have a Pod with us, just let us know which one and we'll get you logged in:
       <input type="text" className="pl-2 w-2/3 m-auto text-2xl rounded text-center text-black"
         placeholder="what is your username?"
         value={username} onChange={onChange} onKeyPress={onKeyPress} />
