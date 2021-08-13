@@ -163,27 +163,31 @@ b, strong {
 /* Your own custom utilities */
 
 .gradient-passionflower {
-    @apply bg-gradient-to-br from-lagoon via-passionflower to-passionflower;
+    @apply bg-gradient-to-tr from-lagoon via-passionflower to-passionflower;
+}
+
+.gradient-amethyst {
+    @apply bg-gradient-to-tr from-aquamarine via-amethyst to-amethyst;
 }
 
 .gradient-echeveria {
-    @apply bg-gradient-to-br from-aloe via-echeveria to-echeveria;
+    @apply bg-gradient-to-tr from-aloe via-echeveria to-echeveria;
 }
 
 .gradient-lagoon {
-    @apply bg-gradient-to-br from-echeveria via-lagoon to-lagoon;
+    @apply bg-gradient-to-tr from-echeveria via-lagoon to-lagoon;
 }
 
 .gradient-chanterelle {
-    @apply bg-gradient-to-br from-echeveria via-chanterelle to-chanterelle;
+    @apply bg-gradient-to-tr from-echeveria via-chanterelle to-chanterelle;
 }
 
 .gradient-ember {
-    @apply bg-gradient-to-br from-chanterelle via-ember to-ember;
+    @apply bg-gradient-to-tr from-chanterelle via-ember to-ember;
 }
 
 .gradient-salmon {
-    @apply bg-gradient-to-br from-passionflower via-salmon to-salmon;
+    @apply bg-gradient-to-tr from-passionflower via-salmon to-salmon;
 }
 
 h1.font-logo {
