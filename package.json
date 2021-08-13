@@ -26,7 +26,7 @@
     "is-url": "^1.2.4",
     "make-empty-github-commit": "^1.2.1",
     "micro-base58": "^0.4.3",
-    "next": "^10.2.2",
+    "next": "^11.1.0",
     "node-fetch": "^2.6.1",
     "rdf-namespaces": "^1.9.2",
     "react": "^17.0.2",
