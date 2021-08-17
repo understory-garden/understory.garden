@@ -42,9 +42,8 @@ function DevTools() {
 
 function CreateButton() {
   const [modalOpen, setModalOpen] = useState(false)
-  const create = ({title,slate}) => {
-    console.log(`onCreate ${title}`)
-    console.log(slate)
+  const create = (slateJSON) => {
+    console.log('create:', slateJSON)
   }
   return (
     <div className="flex flex-row max-h-9 self-center">

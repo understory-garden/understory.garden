@@ -1,22 +1,66 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import * as P from '@udecode/plate'
+import { useSelected, useReadOnly } from 'slate-react';
+import {  Editor } from 'slate';
 import {
   ToolbarButtonsList,
   ToolbarButtonsBasicElements,
-  ToolbarButtonsBasicMarks,
-  ToolbarButtonsTable,
   BallonToolbarMarks,
 } from './Toolbars'
 import { Image } from '@styled-icons/material/Image'
 import { Link } from '@styled-icons/material/Link'
 
 import { useCurrentWorkspace } from '../../hooks/app'
+import { useConcepts } from '../../hooks/concepts'
 import { useWebId } from 'swrlit'
+
+import { asUrl } from '@inrupt/solid-client'
+import { urlSafeIdToConceptName } from '../../utils/uris'
+import { conceptIdFromUri } from '../../model/concept'
+import { useCustomMentionPlugin, Patterns, toMentionable, fromMentionable} from './hooks/useCustomMentionPlugin'
+
+const ELEMENT_CONCEPT = "concept"
+const ELEMENT_TAG = "tag"
+
+const TestMentionables = [
+  { value: '0', name: 'Aayla Secura', email: 'aayla_secura@force.com' },
+  { value: '1', name: 'Adi Gallia', email: 'adi_gallia@force.com' },
+  { value: '2', name: 'Admiral Dodd Rancit', email: 'admiral_dodd_rancit@force.com', },
+  { value: '3', name: 'Admiral Firmus Piett', email: 'admiral_firmus_piett@force.com', },
+  { value: '4', name: 'Admiral Gial Ackbar', email: 'admiral_gial_ackbar@force.com', },
+]
+
+const ConceptSelectLabel = (m) => {
+  const name = fromMentionable(m)
+  console.log('cs', m)
+  return <span className='text-lagoon'>[[{name}]]</span>
+}
+
+const TagSelectLabel = (m) => {
+  const tag = fromMentionable(m)
+  console.log('ts', tag)
+  return <span className='text-lagoon'>#{tag}</span>
+}
+
+const MentionSelectLabel = (m) => {
+  const mention = fromMentionable(m)
+  console.log('ms', mention)
+  return <span className='text-lagoon'>@{mention}</span>
+}
 
 const components = P.createPlateComponents({
   [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: 'h1', }),
   [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: 'h2', }),
   [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: 'h3', }),
+  [ELEMENT_CONCEPT]: P.withProps(P.MentionElement, {
+    renderLabel: ConceptSelectLabel,
+  }),
+  [ELEMENT_TAG]: P.withProps(P.MentionElement, {
+    renderLabel: TagSelectLabel,
+  }),
+  [P.ELEMENT_MENTION]: P.withProps(P.MentionElement, {
+    renderLabel: MentionSelectLabel,
+  }),
 });
 
 const defaultOptions = P.createPlateOptions();
@@ -128,21 +172,8 @@ const optionsAutoformat = {
       triggerAtBlockStart: false,
       preFormat,
       format: (editor) => {
-        P.insertEmptyCodeBlock(editor , {
-          defaultType: P.getPlatePluginType(editor , P.ELEMENT_DEFAULT),
-          insertNodesOptions: { select: true },
-        });
-      },
-    },
-    {
-      type: P.ELEMENT_CODE_BLOCK,
-      markup: '``',
-      trigger: '`',
-      triggerAtBlockStart: false,
-      preFormat,
-      format: (editor) => {
-        P.insertEmptyCodeBlock(editor , {
-          defaultType: P.getPlatePluginType(editor , P.ELEMENT_DEFAULT),
+        P.insertEmptyCodeBlock(editor, {
+          defaultType: P.getPlatePluginType(editor, P.ELEMENT_DEFAULT),
           insertNodesOptions: { select: true },
         });
       },
@@ -172,7 +203,7 @@ const optionsResetBlockTypePlugin = {
 
 /* TODO:" add mentionables for Concepts, and friends */
 
-const plugins = [
+const defaultPlugins = [
   P.createReactPlugin(),
   P.createHistoryPlugin(),
   P.createHeadingPlugin({ levels: 3 }),
@@ -228,38 +259,72 @@ const plugins = [
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
-
-
 export default function ModalEditor({create, closeModal}) {
+  const webId = useWebId()
+  const { concepts } = useConcepts(webId)
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
+
+  const plateId = 'modal-editor'
   const editableProps = { placeholder: 'Title' }
   const initialTitleElement = [{
     type: P.ELEMENT_H1,
     children: [{ text: '' }],
   }]
-  const plateId = 'modal-editor'
-  const { setValue: setPlateValue, resetEditor } = P.usePlateActions(plateId)
 
-
-  const webId = useWebId()
-  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
-  const [value, setValue] = useState(initialTitleElement)
+  const value = P.useStoreEditorValue(plateId) 
+  const editor = P.useStoreEditorState(plateId) 
+  const { setValue, resetEditor } = P.usePlateActions(plateId)
   const [createAnother, setCreateAnother] = useState(false)
   const resetModal = () => {
     setValue(initialTitleElement)
-    setPlateValue(initialTitleElement)
     resetEditor()
   }
-  const onChange = (newValue) => {
-    setValue(newValue)
-  }
   const onSubmit = () => {
-    create({title, slate})
+    create(value)
     if (createAnother) {
       resetModal()
     } else {
       closeModal()
     }
   }
+
+
+  const { getMentionSelectProps: getConceptProps, plugin: conceptPlugin } = useCustomMentionPlugin({
+    mentionables: concepts.map(c => toMentionable(urlSafeIdToConceptName(conceptIdFromUri(asUrl(c))))),
+    pluginKey: ELEMENT_CONCEPT,
+    pattern: Patterns.Concept,
+    newMentionable: (s) => {
+      return toMentionable(s)
+    }
+  })
+
+  const { getMentionSelectProps: getTagProps, plugin: tagPlugin } = useCustomMentionPlugin({
+    mentionables: TestMentionables.map((m) => toMentionable(m.email)),
+    pluginKey: ELEMENT_TAG,
+    pattern: Patterns.Tag,
+    newMentionable: (s) => {
+      return toMentionable(s)
+    }
+  })
+
+  const { getMentionSelectProps: getMentionProps, plugin: mentionPlugin } = useCustomMentionPlugin({
+    mentionables: TestMentionables.map((m) => toMentionable(m.name)),
+    pluginKey: P.ELEMENT_MENTION,
+    pattern: Patterns.Mention,
+    newMentionable: (s) => {
+      return toMentionable(s)
+    }
+  })
+
+  const plugins = useMemo(
+    () => [
+      ...defaultPlugins,
+      conceptPlugin,
+      tagPlugin,
+      mentionPlugin,
+    ],
+    [conceptPlugin, tagPlugin, mentionPlugin]
+  )
 
   return (
     <div className="fixed w-full h-full top-0 left-0 flex items-center justify-center">
@@ -277,15 +342,31 @@ export default function ModalEditor({create, closeModal}) {
             components={components}
             options={defaultOptions}
             editableProps={editableProps}
-            initialValue={value}
-            onChange={onChange}>
-            <BallonToolbarMarks />
+            initialValue={initialTitleElement}>
+
             <P.HeadingToolbar>
               <ToolbarButtonsBasicElements />
               <ToolbarButtonsList />
               <P.ToolbarLink icon={<Link />} />
               <P.ToolbarImage icon={<Image />} />
             </P.HeadingToolbar>
+
+            <BallonToolbarMarks />
+
+            <P.MentionSelect
+              {...getConceptProps()}
+              renderLabel={ConceptSelectLabel}
+            />
+            <P.MentionSelect
+              {...getTagProps()}
+              renderLabel={TagSelectLabel}
+            />
+            <P.MentionSelect
+              {...getMentionProps()}
+              renderLabel={MentionSelectLabel}
+            />
+
+
           </P.Plate>
         </div>
 
