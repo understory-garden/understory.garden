@@ -86,7 +86,7 @@ b, strong {
 }
 
 .btn:hover {
-  @apply outline-none ring-2 ring-offset-2 ring-echeveria-light ring-offset-echeveria bg-echeveria-dark;
+  @apply outline-none ring-2 ring-offset-2 ring-echeveria-dark ring-offset-echeveria-light bg-echeveria-dark;
 }
 
 .btn:focus {
@@ -94,7 +94,7 @@ b, strong {
 }
 
 .btn:active {
-  @apply outline-none ring-inset ring-2 ring-offset-2 ring-echeveria ring-offset-echeveria-light
+  @apply outline-none ring-inset ring-2 ring-offset-0 ring-echeveria
 }
 
 .destructive {
@@ -102,7 +102,7 @@ b, strong {
 }
 
 .destructive:hover {
-  @apply ring-ember-light ring-offset-ember bg-ember-dark;
+  @apply ring-ember-dark ring-offset-ember-light bg-ember-dark;
 }
 
 .destructive:focus {
@@ -110,7 +110,7 @@ b, strong {
 }
 
 .destructive:active {
-  @apply ring-inset ring-ember ring-offset-ember-light
+  @apply ring-ember
 }
 
 .cancel {
@@ -118,7 +118,7 @@ b, strong {
 }
 
 .cancel:hover {
-  @apply ring-mist ring-offset-fog bg-storm;
+  @apply ring-storm ring-offset-mist bg-storm;
 }
 
 .cancel:focus {
@@ -126,7 +126,7 @@ b, strong {
 }
 
 .cancel:active {
-  @apply ring-inset ring-fog ring-offset-mist;
+  @apply ring-fog;
 }
 
 .block {

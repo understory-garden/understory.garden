@@ -32,19 +32,16 @@ const TestMentionables = [
 
 const ConceptSelectLabel = (m) => {
   const name = fromMentionable(m)
-  console.log('cs', m)
   return <span className='text-lagoon'>[[{name}]]</span>
 }
 
 const TagSelectLabel = (m) => {
   const tag = fromMentionable(m)
-  console.log('ts', tag)
   return <span className='text-lagoon'>#{tag}</span>
 }
 
 const MentionSelectLabel = (m) => {
   const mention = fromMentionable(m)
-  console.log('ms', mention)
   return <span className='text-lagoon'>@{mention}</span>
 }
 
