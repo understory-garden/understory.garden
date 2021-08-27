@@ -78,7 +78,7 @@ b, strong {
 }
 
 .page {
-    @apply text-gray-700 h-screen overflow-y-scroll px-6 pb-12;
+    @apply gradient-amethyst text-storm h-screen overflow-y-scroll w-screen;
 }
 
 .btn {
@@ -167,7 +167,7 @@ b, strong {
 }
 
 .gradient-amethyst {
-    @apply bg-gradient-to-tr from-aquamarine via-amethyst to-amethyst;
+    @apply bg-gradient-to-tl from-aquamarine via-aquamarine to-amethyst;
 }
 
 .gradient-echeveria {
