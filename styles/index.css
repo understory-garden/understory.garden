@@ -1,5 +1,4 @@
 @tailwind base;
-
 /* Write your own custom base styles here */
 
 a {
@@ -31,7 +30,7 @@ a:active {
 }
 
 blockquote {
-    @apply m-2 p-2 bg-gray-100 border-l-2 border-gray-400 text-gray-600 ;
+    @apply m-2 p-2 bg-gray-100 border-l-2 border-gray-400 text-gray-600;
 }
 
 p {
@@ -55,6 +54,7 @@ b, strong {
 }
 
 /* Start purging... */
+
 @tailwind components;
 /* Stop purging. */
 
@@ -67,7 +67,6 @@ b, strong {
 .tab-btn:focus {
     @apply outline-none;
 }
-
 
 .tab-btn.active {
     @apply bg-gray-200;
@@ -130,33 +129,35 @@ b, strong {
 }
 
 .block {
-  @apply relative pl-4 border-b-2 border-transparent;
+    @apply relative pl-4 border-b-2 border-transparent;
 }
 
 .block.is-over {
-  @apply border-blue-300;
+    @apply border-blue-300;
 }
 
 .block-sidebar-button {
-  @apply inline-flex items-center border border-transparent text-gray-500 rounded-full invisible;
+    @apply inline-flex items-center border border-transparent text-gray-500 rounded-full invisible;
 }
 
 .block:hover .block-sidebar-button {
-  @apply visible;
+    @apply visible;
 }
 
 .block-sidebar-button:hover {
-  @apply bg-gray-500 text-white visible;
+    @apply bg-gray-500 text-white visible;
 }
+
 .block-sidebar-button:focus {
-  @apply outline-none;
+    @apply outline-none;
 }
 
 .ReactModal__Overlay {
-  @apply z-40;
+    @apply z-40;
 }
 
 /* Start purging... */
+
 @tailwind utilities;
 /* Stop purging. */
 
@@ -221,4 +222,116 @@ h2.font-logo {
 
 .slate-p {
   @apply font-normal text-base;
+}
+
+/* hex grid inspired by https://github.com/web-tiki/responsive-grid-of-hexagons/blob/css-grid/hexagons.css */
+
+.grid.hex {
+}
+
+.grid.hex>* {
+    grid-column-end: span 2;
+    position: relative;
+    visibility: hidden;
+    /* fix for jagged edges in FF on hover transition */
+    outline: 1px solid transparent;
+}
+
+.grid.hex>*::after {
+    content: '';
+    display: block;
+    padding-bottom: 86.602%;
+    /* =  100 / tan(60) * 1.5 */
+}
+
+.grid.hex>*>* {
+    position: absolute;
+    width: 100%;
+    padding-bottom: 115.470%;
+    /* =  width / sin(60) */
+    overflow: hidden;
+    visibility: hidden;
+    outline: 1px solid transparent;
+    /* fix for jagged edges in FF on hover transition */
+    -webkit-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+    -ms-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+    transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+}
+
+.grid.hex>*>* * {
+    position: absolute;
+    visibility: visible;
+    outline: 1px solid transparent;
+    /* fix for jagged edges in FF on hover transition */
+}
+
+.grid.hex>*>*>* {
+    @apply bg-gradient-to-br from-pink-400 via-red-500 to-purple-500;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    background-color: blue;
+    color: #fff;
+    overflow: hidden;
+    -webkit-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+    -ms-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+    transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+}
+
+/* <- 2-1  hexagons per row */
+
+.grid.hex {
+    grid-template-columns: repeat(4, 1fr);
+    padding-bottom: 11.2%;
+}
+
+.grid.hex>*:nth-child(3n+3) {
+    /* first hexagon of even rows */
+    grid-column-start: 2;
+}
+
+@media screen(sm) {
+    /* <- 3-2  hexagons per row */
+    .grid.hex {
+        grid-template-columns: repeat(6, 1fr);
+        padding-bottom: 7.4%;
+    }
+    .grid.hex>*:nth-child(3n+3) {
+        grid-column-start: auto;
+    }
+    .grid.hex>*:nth-child(5n+4) {
+        /* first hexagon of even rows */
+        grid-column-start: 2;
+    }
+}
+
+@media screen(md) {
+    /* <- 4-3  hexagons per row */
+    .grid.hex {
+        grid-template-columns: repeat(8, 1fr);
+        padding-bottom: 5.5%;
+    }
+    .grid.hex>*:nth-child(5n+4) {
+        grid-column-start: auto;
+    }
+    .grid.hex>*:nth-child(7n+5) {
+        /* first hexagon of even rows */
+        grid-column-start: 2;
+    }
+}
+
+@media screen(lg) {
+    /* <- 5-4  hexagons per row */
+    .grid.hex {
+        padding-bottom: 4.4%;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .grid.hex>*:nth-child(7n+5) {
+        grid-column-start: auto;
+    }
+    .grid.hex>*:nth-child(9n+6) {
+        /* first hexagon of even rows */
+        grid-column-start: 2;
+    }
 }
