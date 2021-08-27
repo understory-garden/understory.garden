@@ -74,16 +74,14 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="pt-3 flex flex-col">
+    <nav className="p-3 pl-6 pr-6 flex flex-col bg-passionflower-dark w-full">
       <ul className="flex justify-between items-center ">
         <li className="flex flex-row">
           <Link href="/">
-            <a className="mr-6">
-              <Image src="/logo.png"
-                alt="a logo consisting of a multi-colored mushroom with roots digging deep into the understory"
-                width={60}
-                height={60}
-              />
+            <a className="flex items-center mr-6 rounded hover:bg-lagoon-dark hover:no-underline">
+              <img src='/logo.png'
+                className="p-1 rounded-full h-12 w-12 object-cover" />
+              <span className="flex mr-3 font-logo text-amethyst items-center">Mysilio Garden</span>
             </a>
           </Link>
           {loggedIn && (

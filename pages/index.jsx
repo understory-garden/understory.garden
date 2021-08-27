@@ -43,44 +43,23 @@ function Dashboard() {
         <WorkspaceProvider webId={webId} slug={'default'}>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
-              {false && oldConceptIndex && (
-                <div>
-                  It looks like you have some itme.online data. You can
-                  visit <Link href="/migrate"><a>the migration page</a></Link> to migrate it.
-                </div>
-              )}
-              {needsDowncaseMigration ? (
-                <>
-                <h2 className="text-2xl mb-1">migration required</h2>
-                <p className="font-normal mb-1">
-                  Hello! Before you use Understory Garden you'll need to migrate your
-                  data to the new format. Please head to <Link href="/migrate"><a>the migration page</a></Link>
-                  &nbsp;to complete the migration.
-                </p>
-                </>
+              <div className="flex mb-6">
+                <TabButton name="notes" activeName={tab} setTab={setTab}>
+                  notes
+                </TabButton>
+                <TabButton name="following" activeName={tab} setTab={setTab}>
+                  following
+                </TabButton>
+              </div>
+              {tab === "notes" ? (
+                <Notes webId={webId} />
+              ) : (tab === "following" ? (
+                <Follows />
               ) : (
-                  <>
-                    <div className="flex mb-6">
-                      <TabButton name="notes" activeName={tab} setTab={setTab}>
-                        notes
-                      </TabButton>
-                      <TabButton name="following" activeName={tab} setTab={setTab}>
-                        following
-                      </TabButton>
-                    </div>
-                    {tab === "notes" ? (
-                      <Notes webId={webId} />
-                    ) : (tab === "following" ? (
-                      <Follows />
-                    ) : (
-                        <div className="font-logo">
-                          you are in a maze of twisty passages, all alike
-                        </div>
-                      )
-                      )}
-                  </>
-                )}
-
+                <div className="font-logo">
+                  you are in a maze of twisty passages, all alike
+                </div>
+              ))}
             </div>
           </div>
         </WorkspaceProvider>
