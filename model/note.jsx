@@ -16,3 +16,9 @@ export function defaultNoteStorageUri(workspace, name){
   const containerUri = workspace && getUrl(workspace, US.noteStorage)
   return containerUri && `${containerUri}${noteStorageFileAndThingName(name)}`
 }
+
+export function createOrUpdateNote(note, value) {
+  let newNote = note || createNote()
+  newNote = setStringNoLocale(newNote, US.noteBody, JSON.stringify(value))
+  return newNote
+}

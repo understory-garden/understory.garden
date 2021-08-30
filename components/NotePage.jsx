@@ -31,10 +31,10 @@ import {
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
 import { conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
-import { createNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
+import { createNote, createOrUpdateNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 
-import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
+import { createOrUpdateConceptIndex, getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
 import { useConceptAutocomplete } from '../hooks/editor'
 
@@ -84,48 +84,6 @@ function LinksFrom({ conceptUri }) {
       ))}
     </ul>
   )
-}
-
-function createOrUpdateNote(note, value) {
-  let newNote = note || createNote()
-  newNote = setStringNoLocale(newNote, US.noteBody, JSON.stringify(value))
-  return newNote
-}
-
-function createConcept(prefix, name) {
-  return createThing({ url: `${prefix}${conceptNameToUrlSafeId(name)}` })
-}
-
-function createTag(prefix, name) {
-  return createThing({ url: `${prefix}${tagNameToUrlSafeId(name)}` })
-}
-
-function createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames) {
-  let concept = createConcept(conceptPrefix, name)
-  for (const conceptName of conceptNames) {
-    concept = addUrl(concept, US.refersTo, createConcept(conceptPrefix, conceptName))
-  }
-  for (const tagName of tagNames) {
-    concept = addUrl(concept, US.tagged, createTag(tagPrefix, tagName))
-  }
-  return concept
-}
-
-function createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name) {
-  const conceptPrefix = getUrl(workspace, US.conceptPrefix)
-  const tagPrefix = getUrl(workspace, US.tagPrefix)
-  const storageUri = concept ? getUrl(concept, US.storedAt) : defaultNoteStorageUri(workspace, name)
-
-  const conceptNames = getConceptNodes(editor).map(
-    ([concept]) => getConceptNameFromNode(concept)
-  )
-  const tagNames = getTagNodes(editor).map(
-    ([tag]) => getTagNameFromNode(tag)
-  )
-  let newConcept = createConceptFor(name, conceptPrefix, conceptNames, tagPrefix, tagNames)
-  newConcept = addUrl(newConcept, US.storedAt, storageUri)
-  newConcept = setDatetime(newConcept, DCTERMS.modified, new Date())
-  return setThing(conceptIndex || createSolidDataset(), newConcept)
 }
 
 function PrivacyControl({ name, ...rest }) {
