@@ -5,7 +5,7 @@ export default function HexGridPage() {
   return (
     <div className="page">
       <Nav />
-      <div className="grid hex gap-2">
+      <div className="grid hex gap-6 p-6">
         <div><div><h1>1</h1></div></div>
         <div><div><h2>2</h2></div></div>
         <div><div><h3>3</h3></div></div>
