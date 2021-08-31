@@ -262,7 +262,6 @@ h2.font-logo {
 }
 
 .grid.hex>*>*>* {
-    @apply bg-lagoon-light text-lagoon-dark content-center;
     width: 100%;
     height: 100%;
     overflow: hidden;

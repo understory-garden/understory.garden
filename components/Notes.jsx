@@ -12,6 +12,24 @@ import { useConcepts } from '../hooks/concepts'
 import NoteContext from '../contexts/NoteContext'
 import { urlSafeIdToConceptName } from '../utils/uris'
 
+export function Hex({children}) {
+  return (
+    <div><div>
+      <div className="flex flex-col justify-center items-center bg-lagoon-dark">
+        {children}
+      </div>
+    </div></div>
+  )
+}
+
+export function HexGrid({children}) {
+  return (
+    <div className="grid hex gap-6 p-6">
+      {children}
+    </div>
+  )
+}
+
 export function Note({ concept }) {
   const uri = asUrl(concept)
   const id = conceptIdFromUri(uri)
@@ -19,17 +37,13 @@ export function Note({ concept }) {
   const { path } = useContext(NoteContext)
 
   return (
-    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200 overflow-x-scroll">
+    <Hex>
       <Link href={`${path}/${id}`}>
-        <a>
-          <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
-            <h3 className="text-gray-900 text-xl font-medium truncate text-center">
-              {name}
-            </h3>
-          </div>
-        </a>
+        <h1 className="flex items-center py-3 px-6 rounded hover:bg-lagoon cursor-pointer text-2xl text-lagoon-light">
+          {name}
+        </h1>
       </Link>
-    </li>
+    </Hex>
   )
 }
 
@@ -37,9 +51,9 @@ export function NotesFromConcepts({ path = "/notes", webId, concepts }) {
   const { slug: workspaceSlug } = useContext(WorkspaceContext)
   return (
     <NoteContext.Provider value={{ path: `${path}/${workspaceSlug}` }}>
-      <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <HexGrid>
         {concepts && concepts.map(concept => <Note key={asUrl(concept)} concept={concept} />)}
-      </ul>
+      </HexGrid>
     </NoteContext.Provider>
   )
 }
