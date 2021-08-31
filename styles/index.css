@@ -263,10 +263,8 @@ h2.font-logo {
 
 .grid.hex>*>*>* {
     @apply bg-lagoon-light text-lagoon-dark content-center;
-    display: block;
     width: 100%;
     height: 100%;
-    text-align: center;
     overflow: hidden;
     -webkit-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
     -ms-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
