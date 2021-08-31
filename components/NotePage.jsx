@@ -30,11 +30,11 @@ import {
   conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
 } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
-import { conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
+import { createOrUpdateConceptIndex, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, createOrUpdateNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 
-import { createOrUpdateConceptIndex, getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
+import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
 import { useConceptAutocomplete } from '../hooks/editor'
 
