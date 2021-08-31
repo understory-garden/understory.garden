@@ -74,7 +74,7 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="p-3 pl-6 pr-6 flex flex-col bg-passionflower-dark w-full">
+    <nav className="py-3 px-6 flex flex-col bg-passionflower-dark w-full">
       <ul className="flex justify-between items-center ">
         <li className="flex flex-row">
           <Link href="/">
