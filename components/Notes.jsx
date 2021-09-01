@@ -39,7 +39,7 @@ export function Note({ concept }) {
   return (
     <Hex>
       <Link href={`${path}/${id}`}>
-        <h1 className="flex items-center py-3 px-6 rounded hover:bg-lagoon cursor-pointer text-2xl text-lagoon-light">
+        <h1 className="flex items-center py-3 px-6 rounded hover:bg-lagoon-light hover:text-lagoon-dark cursor-pointer text-2xl text-lagoon-light">
           {name}
         </h1>
       </Link>
