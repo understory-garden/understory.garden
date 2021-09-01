@@ -6,12 +6,12 @@ import {
   useWebId, useThing, useAuthentication, useProfile
 } from 'swrlit'
 import {
-  createThing, setStringNoLocale, getStringNoLocale,
-  addUrl, setThing, createSolidDataset, getUrlAll, setDatetime,
-  removeThing, getUrl, setUrl, removeUrl, getSourceUrl, asUrl
+  setStringNoLocale, getStringNoLocale,
+  setThing, createSolidDataset, getUrlAll,
+  removeThing, getUrl, setUrl
 } from '@inrupt/solid-client'
 import { namedNode } from "@rdfjs/dataset";
-import { DCTERMS, FOAF } from '@inrupt/vocab-common-rdf'
+import { FOAF } from '@inrupt/vocab-common-rdf'
 import { Transition } from '@headlessui/react'
 import { useDebounce } from 'use-debounce';
 
@@ -25,16 +25,12 @@ import { useWorkspaceContext } from '../contexts/WorkspaceContext'
 import { useConceptIndex, useCombinedConceptIndex, useConcept } from '../hooks/concepts'
 import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 
-import {
-  publicNotePath, privateNotePath, profilePath, conceptUriToName,
-  conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
-} from '../utils/uris'
+import { publicNotePath, privateNotePath, profilePath, urlSafeIdToConceptName } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
 import { createOrUpdateConceptIndex, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
 import { createNote, createOrUpdateNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
 import { US } from '../vocab'
 
-import { getConceptNodes, getConceptNameFromNode, getTagNodes, getTagNameFromNode } from '../utils/slate'
 import { useBackups } from '../hooks/backups'
 import { useConceptAutocomplete } from '../hooks/editor'
 

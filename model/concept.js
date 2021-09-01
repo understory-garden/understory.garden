@@ -1,7 +1,17 @@
-import { urlSafeIdToConceptName } from '../utils/uris'
 import { US } from '../vocab'
 import { namedNode } from "@rdfjs/dataset";
-import { createOrUpdateNote } from "./note";
+import {
+  createThing, addUrl, setThing,
+  createSolidDataset, setDatetime, getUrl
+} from '@inrupt/solid-client'
+import { DCTERMS } from '@inrupt/vocab-common-rdf'
+import {
+  getConceptNodes, getConceptNameFromNode,
+  getTagNodes, getTagNameFromNode
+} from '../utils/slate'
+import {
+  conceptNameToUrlSafeId, urlSafeIdToConceptName, tagNameToUrlSafeId
+} from '../utils/uris'
 
 export function conceptIdFromUri(uri){
   return uri.substring(uri.lastIndexOf('#') + 1)
