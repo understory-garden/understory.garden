@@ -256,7 +256,7 @@ const defaultPlugins = [
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
-export default function ModalEditor({create, closeModal}) {
+export default function ModalEditor() {
   const webId = useWebId()
   const { concepts } = useConcepts(webId)
   const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
@@ -272,17 +272,9 @@ export default function ModalEditor({create, closeModal}) {
   const editor = P.useStoreEditorState(plateId) 
   const { setValue, resetEditor } = P.usePlateActions(plateId)
   const [createAnother, setCreateAnother] = useState(false)
-  const resetModal = () => {
+  const reset = () => {
     setValue(initialTitleElement)
     resetEditor()
-  }
-  const onSubmit = () => {
-    create(value)
-    if (createAnother) {
-      resetModal()
-    } else {
-      closeModal()
-    }
   }
 
 
@@ -324,69 +316,34 @@ export default function ModalEditor({create, closeModal}) {
   )
 
   return (
-    <div className="fixed w-full h-full top-0 left-0 flex items-center justify-center">
-      <div className="absolute w-full h-full bg-storm opacity-95"></div>
-      <div className="flex-column fixed align-bottom min-w-2/5 min-h-1/5 max-w-4/5 max-h-4/5 overflow-y-auto overflow-x-hidden bg-snow z-50 opactiy-100 rounded-lg shadow-xl">
-        <button type="button" className="absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-fog text-sm z-50" onClick={closeModal}>
-          <svg className="fill-current text-mist" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 18 18">
-            <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
-          </svg>
-        </button>
+    <P.Plate id={plateId}
+      plugins={plugins}
+      components={components}
+      options={defaultOptions}
+      editableProps={editableProps}
+      initialValue={initialTitleElement}>
 
-        <div className="flow-root w-full text-left p-4">
-          <P.Plate id={plateId}
-            plugins={plugins}
-            components={components}
-            options={defaultOptions}
-            editableProps={editableProps}
-            initialValue={initialTitleElement}>
+      <P.HeadingToolbar>
+        <ToolbarButtonsBasicElements />
+        <ToolbarButtonsList />
+        <P.ToolbarLink icon={<Link />} />
+        <P.ToolbarImage icon={<Image />} />
+      </P.HeadingToolbar>
 
-            <P.HeadingToolbar>
-              <ToolbarButtonsBasicElements />
-              <ToolbarButtonsList />
-              <P.ToolbarLink icon={<Link />} />
-              <P.ToolbarImage icon={<Image />} />
-            </P.HeadingToolbar>
+      <BallonToolbarMarks />
 
-            <BallonToolbarMarks />
-
-            <P.MentionSelect
-              {...getConceptProps()}
-              renderLabel={ConceptSelectLabel}
-            />
-            <P.MentionSelect
-              {...getTagProps()}
-              renderLabel={TagSelectLabel}
-            />
-            <P.MentionSelect
-              {...getMentionProps()}
-              renderLabel={MentionSelectLabel}
-            />
-
-
-          </P.Plate>
-        </div>
-
-        <div className="block flex-none bottom-0 right-0 w-full bg-mist px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-          <button type="button"
-            className="btn"
-            onClick={onSubmit}>
-            Create
-          </button>
-          <button type="button"
-            className="cancel btn"
-            onClick={closeModal}>
-            Cancel
-          </button>
-          <label className="inline-flex items-center">
-            <input className="form-checkbox text-echeveria"
-              type="checkbox"
-              checked={createAnother}
-              onChange={e => setCreateAnother(e.target.checked)} />
-            <span className="ml-2">Create another</span>
-          </label>
-        </div>
-      </div>
-    </div>
+      <P.MentionSelect
+        {...getConceptProps()}
+        renderLabel={ConceptSelectLabel}
+      />
+      <P.MentionSelect
+        {...getTagProps()}
+        renderLabel={TagSelectLabel}
+      />
+      <P.MentionSelect
+        {...getMentionProps()}
+        renderLabel={MentionSelectLabel}
+      />
+    </P.Plate>
   );
 }

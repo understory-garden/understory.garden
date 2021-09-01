@@ -39,27 +39,10 @@ function Dashboard() {
       <WebMonetization webId={webId} />
       <Nav />
       <div className="px-6">
-        <h3 className="text-xl">hi {name}!</h3>
         <WorkspaceProvider webId={webId} slug={'default'}>
           <div className="flex justify-between">
             <div className="mr-6 flex-grow">
-              <div className="flex mb-6">
-                <TabButton name="notes" activeName={tab} setTab={setTab}>
-                  notes
-                </TabButton>
-                <TabButton name="following" activeName={tab} setTab={setTab}>
-                  following
-                </TabButton>
-              </div>
-              {tab === "notes" ? (
                 <Notes webId={webId} />
-              ) : (tab === "following" ? (
-                <Follows />
-              ) : (
-                <div className="font-logo">
-                  you are in a maze of twisty passages, all alike
-                </div>
-              ))}
             </div>
           </div>
         </WorkspaceProvider>
