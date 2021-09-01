@@ -1,4 +1,6 @@
-import { createThing, getUrl } from '@inrupt/solid-client'
+import {
+  createThing, setStringNoLocale,  getUrl
+} from '@inrupt/solid-client'
 import { conceptNameToUrlSafeId } from '../utils/uris'
 import { US } from '../vocab'
 
