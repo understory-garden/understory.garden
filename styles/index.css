@@ -2,55 +2,48 @@
 /* Write your own custom base styles here */
 
 a {
-    @apply text-ocean;
+  @apply text-ocean;
 }
 
 a:hover {
-    @apply underline bg-mist;
+  @apply underline bg-mist;
 }
 
 a:visited {
-    @apply text-passionflower;
+  @apply text-passionflower;
 }
 
 a:active {
-    @apply text-passionflower;
+  @apply text-passionflower;
 }
 
 .a {
-    @apply text-ocean bg-transparent;
+  @apply text-ocean bg-transparent;
 }
 
 .a:hover {
-    @apply underline bg-mist;
+  @apply underline bg-mist;
 }
 
 .a:active {
-    @apply text-passionflower;
+  @apply text-passionflower;
 }
 
 blockquote {
-    @apply m-2 p-2 bg-gray-100 border-l-2 border-gray-400 text-gray-600;
+  @apply m-2 p-2 bg-gray-100 border-l-2 border-gray-400 text-gray-600;
 }
 
 p {
-    @apply text-lg;
-}
-
-input[type="text"] {
-    @apply rounded-xl;
-}
-
-input[type="text"]:focus {
-    @apply outline-none border-lagoon ring-1 ring-offset-1 ring-lagoon-light ring-offset-lagoon;
+  @apply text-lg;
 }
 
 body {
-    @apply font-normal text-lg text-night;
+  @apply font-normal text-lg text-night;
 }
 
-b, strong {
-    @apply font-bold;
+b,
+strong {
+  @apply font-bold;
 }
 
 /* Start purging... */
@@ -61,27 +54,27 @@ b, strong {
 /* Write your own custom component styles here */
 
 .tab-btn {
-    @apply text-xl rounded-lg p-3;
+  @apply text-xl rounded-lg p-3;
 }
 
 .tab-btn:focus {
-    @apply outline-none;
+  @apply outline-none;
 }
 
 .tab-btn.active {
-    @apply bg-gray-200;
+  @apply bg-gray-200;
 }
 
 .image-icon:hover {
-    @apply text-gray-500 cursor-pointer;
+  @apply text-gray-500 cursor-pointer;
 }
 
 .page {
-    @apply bg-mist text-night h-screen overflow-y-scroll w-screen;
+  @apply bg-mist text-night h-screen overflow-y-scroll w-screen;
 }
 
 .btn {
-    @apply mx-2 rounded-xl border-none drop-shadow-lg shadow-lg px-4 py-2 bg-echeveria text-base font-medium text-snow;
+  @apply mx-2 rounded-xl border-none drop-shadow-lg shadow-lg px-4 py-2 bg-echeveria text-base font-medium text-snow;
 }
 
 .btn:hover {
@@ -93,7 +86,7 @@ b, strong {
 }
 
 .btn:active {
-  @apply outline-none ring-inset ring-2 ring-offset-0 ring-echeveria
+  @apply outline-none ring-inset ring-2 ring-offset-0 ring-echeveria;
 }
 
 .destructive {
@@ -109,7 +102,7 @@ b, strong {
 }
 
 .destructive:active {
-  @apply ring-ember
+  @apply ring-ember;
 }
 
 .cancel {
@@ -129,31 +122,35 @@ b, strong {
 }
 
 .block {
-    @apply relative pl-4 border-b-2 border-transparent;
+  @apply relative pl-4 border-b-2 border-transparent;
 }
 
 .block.is-over {
-    @apply border-blue-300;
+  @apply border-blue-300;
 }
 
 .block-sidebar-button {
-    @apply inline-flex items-center border border-transparent text-gray-500 rounded-full invisible;
+  @apply inline-flex items-center border border-transparent text-gray-500 rounded-full invisible;
 }
 
 .block:hover .block-sidebar-button {
-    @apply visible;
+  @apply visible;
 }
 
 .block-sidebar-button:hover {
-    @apply bg-gray-500 text-white visible;
+  @apply bg-gray-500 text-white visible;
 }
 
 .block-sidebar-button:focus {
-    @apply outline-none;
+  @apply outline-none;
 }
 
 .ReactModal__Overlay {
-    @apply z-40;
+  @apply z-40;
+}
+
+.ReactModal__Content {
+  padding: 0px;
 }
 
 /* Start purging... */
@@ -164,35 +161,35 @@ b, strong {
 /* Your own custom utilities */
 
 .gradient-passionflower {
-    @apply bg-gradient-to-tr from-lagoon via-passionflower to-passionflower;
+  @apply bg-gradient-to-tr from-lagoon via-passionflower to-passionflower;
 }
 
 .gradient-echeveria {
-    @apply bg-gradient-to-tr from-aloe via-echeveria to-echeveria;
+  @apply bg-gradient-to-tr from-aloe via-echeveria to-echeveria;
 }
 
 .gradient-lagoon {
-    @apply bg-gradient-to-tr from-echeveria via-lagoon to-lagoon;
+  @apply bg-gradient-to-tr from-echeveria via-lagoon to-lagoon;
 }
 
 .gradient-chanterelle {
-    @apply bg-gradient-to-tr from-echeveria via-chanterelle to-chanterelle;
+  @apply bg-gradient-to-tr from-echeveria via-chanterelle to-chanterelle;
 }
 
 .gradient-ember {
-    @apply bg-gradient-to-tr from-chanterelle via-ember to-ember;
+  @apply bg-gradient-to-tr from-chanterelle via-ember to-ember;
 }
 
 .gradient-salmon {
-    @apply bg-gradient-to-tr from-passionflower via-salmon to-salmon;
+  @apply bg-gradient-to-tr from-passionflower via-salmon to-salmon;
 }
 
 h1.font-logo {
-    @apply text-passionflower drop-shadow-lg;
+  @apply text-passionflower drop-shadow-lg;
 }
 
 h2.font-logo {
-    @apply text-echeveria drop-shadow-lg;
+  @apply text-echeveria drop-shadow-lg;
 }
 
 /* slate editor -- classes assigned automatically by Plate */
@@ -225,104 +222,104 @@ h2.font-logo {
 .grid.hex {
 }
 
-.grid.hex>* {
-    grid-column-end: span 2;
-    position: relative;
-    visibility: hidden;
-    /* fix for jagged edges in FF on hover transition */
-    outline: 1px solid transparent;
+.grid.hex > * {
+  grid-column-end: span 2;
+  position: relative;
+  visibility: hidden;
+  /* fix for jagged edges in FF on hover transition */
+  outline: 1px solid transparent;
 }
 
-.grid.hex>*::after {
-    content: '';
-    display: block;
-    padding-bottom: 86.602%;
-    /* =  100 / tan(60) * 1.5 */
+.grid.hex > *::after {
+  content: "";
+  display: block;
+  padding-bottom: 86.602%;
+  /* =  100 / tan(60) * 1.5 */
 }
 
-.grid.hex>*>* {
-    position: absolute;
-    width: 100%;
-    padding-bottom: 115.470%;
-    /* =  width / sin(60) */
-    overflow: hidden;
-    visibility: hidden;
-    outline: 1px solid transparent;
-    /* fix for jagged edges in FF on hover transition */
-    -webkit-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
-    -ms-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
-    transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+.grid.hex > * > * {
+  position: absolute;
+  width: 100%;
+  padding-bottom: 115.47%;
+  /* =  width / sin(60) */
+  overflow: hidden;
+  visibility: hidden;
+  outline: 1px solid transparent;
+  /* fix for jagged edges in FF on hover transition */
+  -webkit-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+  -ms-transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
+  transform: rotate3d(0, 0, 1, -60deg) skewY(30deg);
 }
 
-.grid.hex>*>* * {
-    position: absolute;
-    visibility: visible;
-    outline: 1px solid transparent;
-    /* fix for jagged edges in FF on hover transition */
+.grid.hex > * > * * {
+  position: absolute;
+  visibility: visible;
+  outline: 1px solid transparent;
+  /* fix for jagged edges in FF on hover transition */
 }
 
-.grid.hex>*>*>* {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    -webkit-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
-    -ms-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
-    transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+.grid.hex > * > * > * {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+  -ms-transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
+  transform: skewY(-30deg) rotate3d(0, 0, 1, 60deg);
 }
 
 /* <- 2-1  hexagons per row */
 
 .grid.hex {
-    grid-template-columns: repeat(4, 1fr);
-    padding-bottom: 11.2%;
+  grid-template-columns: repeat(4, 1fr);
+  padding-bottom: 11.2%;
 }
 
-.grid.hex>*:nth-child(3n+3) {
-    /* first hexagon of even rows */
-    grid-column-start: 2;
+.grid.hex > *:nth-child(3n + 3) {
+  /* first hexagon of even rows */
+  grid-column-start: 2;
 }
 
 @media screen(sm) {
-    /* <- 3-2  hexagons per row */
-    .grid.hex {
-        grid-template-columns: repeat(6, 1fr);
-        padding-bottom: 7.4%;
-    }
-    .grid.hex>*:nth-child(3n+3) {
-        grid-column-start: auto;
-    }
-    .grid.hex>*:nth-child(5n+4) {
-        /* first hexagon of even rows */
-        grid-column-start: 2;
-    }
+  /* <- 3-2  hexagons per row */
+  .grid.hex {
+    grid-template-columns: repeat(6, 1fr);
+    padding-bottom: 7.4%;
+  }
+  .grid.hex > *:nth-child(3n + 3) {
+    grid-column-start: auto;
+  }
+  .grid.hex > *:nth-child(5n + 4) {
+    /* first hexagon of even rows */
+    grid-column-start: 2;
+  }
 }
 
 @media screen(md) {
-    /* <- 4-3  hexagons per row */
-    .grid.hex {
-        grid-template-columns: repeat(8, 1fr);
-        padding-bottom: 5.5%;
-    }
-    .grid.hex>*:nth-child(5n+4) {
-        grid-column-start: auto;
-    }
-    .grid.hex>*:nth-child(7n+5) {
-        /* first hexagon of even rows */
-        grid-column-start: 2;
-    }
+  /* <- 4-3  hexagons per row */
+  .grid.hex {
+    grid-template-columns: repeat(8, 1fr);
+    padding-bottom: 5.5%;
+  }
+  .grid.hex > *:nth-child(5n + 4) {
+    grid-column-start: auto;
+  }
+  .grid.hex > *:nth-child(7n + 5) {
+    /* first hexagon of even rows */
+    grid-column-start: 2;
+  }
 }
 
 @media screen(lg) {
-    /* <- 5-4  hexagons per row */
-    .grid.hex {
-        padding-bottom: 4.4%;
-        grid-template-columns: repeat(10, 1fr);
-    }
-    .grid.hex>*:nth-child(7n+5) {
-        grid-column-start: auto;
-    }
-    .grid.hex>*:nth-child(9n+6) {
-        /* first hexagon of even rows */
-        grid-column-start: 2;
-    }
+  /* <- 5-4  hexagons per row */
+  .grid.hex {
+    padding-bottom: 4.4%;
+    grid-template-columns: repeat(10, 1fr);
+  }
+  .grid.hex > *:nth-child(7n + 5) {
+    grid-column-start: auto;
+  }
+  .grid.hex > *:nth-child(9n + 6) {
+    /* first hexagon of even rows */
+    grid-column-start: 2;
+  }
 }
