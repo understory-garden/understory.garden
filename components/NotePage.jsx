@@ -28,7 +28,7 @@ import { useWorkspace, useCurrentWorkspace } from '../hooks/app'
 import { publicNotePath, privateNotePath, profilePath, urlSafeIdToConceptName } from '../utils/uris'
 import { deleteResource } from '../utils/fetch'
 import { createOrUpdateConceptIndex, conceptIdFromUri, conceptUrisThatReference } from '../model/concept'
-import { createNote, createOrUpdateNote, noteStorageFileAndThingName, defaultNoteStorageUri } from '../model/note'
+import { createNote, createOrUpdateNote, noteStorageFileAndThingName, } from '../model/note'
 import { US } from '../vocab'
 
 import { useBackups } from '../hooks/backups'
@@ -204,7 +204,7 @@ export default function NotePage({ encodedName, webId, path = "/notes", readOnly
   const authorName = authorProfile && getStringNoLocale(authorProfile, FOAF.name)
 
   const saveCallback = async function saveNote() {
-    const newNote = createOrUpdateNote(note, value)
+    const newNote = createOrUpdateNoteBody(note, value)
     const newConceptIndex = createOrUpdateConceptIndex(editor, workspace, conceptIndex, concept, name)
     setSaving(true)
     try {

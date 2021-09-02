@@ -1,17 +1,21 @@
 // forked from https://raw.githubusercontent.com/udecode/plate/ac3f7d9072c3dd12e971d52af68d07ee18496f57/packages/elements/mention/src/useMentionPlugin.ts
 
-import { useCallback, useMemo, useState } from 'react';
-import * as P from '@udecode/plate'
-import { Range, Transforms, Editor } from 'slate'
+import { useCallback, useMemo, useState } from "react";
+import * as P from "@udecode/plate";
+import { Range, Transforms, Editor } from "slate";
 
 export const Patterns = {
   Concept: /\B\[\[([^\]]*)\]{0,2}$/,
   Tag: /\B\#([\w-]*)\b$/,
   Mention: /\B\@([\w-]*)\b$/,
-}
+};
 
-export const toMentionable = data => { return {value: data} }
-export const fromMentionable = m => { return m.value }
+export const toMentionable = (data) => {
+  return { value: data };
+};
+export const fromMentionable = (m) => {
+  return m.value;
+};
 
 /**
  * Enables support for autocompleting @mentions and #tags.
@@ -27,17 +31,19 @@ export function useCustomMentionPlugin({
   insertSpaceAfterMention = true,
   pluginKey = ELEMENT_MENTION,
   pattern = Patterns.Mention,
-  newMentionable = undefined // if not defined, won't create new mentionable.
+  newMentionable = undefined, // if not defined, won't create new mentionable.
 }) {
   const [targetRange, setTargetRange] = useState(null);
   const [valueIndex, setValueIndex] = useState(0);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const values = useMemo(() => {
-    const filtered = mentionables.filter(mentionableFilter(search)).slice(0, maxSuggestions)
+    const filtered = mentionables
+      .filter(mentionableFilter(search))
+      .slice(0, maxSuggestions);
     if (newMentionable && search) {
-      return filtered.concat(newMentionable(search))
+      return filtered.concat(newMentionable(search));
     } else {
-      return filtered
+      return filtered;
     }
   }, [maxSuggestions, mentionableFilter, mentionables, search]);
 
@@ -54,20 +60,22 @@ export function useCustomMentionPlugin({
   const onKeyDownMention = useCallback(
     (editor) => (e) => {
       if (targetRange) {
-        if (e.key === 'ArrowDown') {
+        if (e.key === "ArrowDown") {
           e.preventDefault();
           return setValueIndex(P.getNextIndex(valueIndex, values.length - 1));
         }
-        if (e.key === 'ArrowUp') {
+        if (e.key === "ArrowUp") {
           e.preventDefault();
-          return setValueIndex(P.getPreviousIndex(valueIndex, values.length - 1));
+          return setValueIndex(
+            P.getPreviousIndex(valueIndex, values.length - 1)
+          );
         }
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           e.preventDefault();
           return setTargetRange(null);
         }
 
-        if (['Tab', 'Enter'].includes(e.key)) {
+        if (["Tab", "Enter"].includes(e.key)) {
           e.preventDefault();
           onAddMention(editor, values[valueIndex]);
           return false;
@@ -83,10 +91,10 @@ export function useCustomMentionPlugin({
 
       if (selection && P.isCollapsed(selection)) {
         const cursor = Range.start(selection);
-        const at = cursor 
-       
+        const at = cursor;
+
         // Point
-        const lineStart = Editor.before(editor, at, { unit: 'line' });
+        const lineStart = Editor.before(editor, at, { unit: "line" });
 
         // Range from before to start
         const beforeRange = lineStart && Editor.range(editor, lineStart, at);
@@ -96,13 +104,12 @@ export function useCustomMentionPlugin({
 
         // Match regex on before text
         const match = !!beforeText && beforeText.match(pattern);
-        console.log('m', match)
         // Point at the start of mention
         const mentionStart = match
           ? Editor.before(editor, at, {
-            unit: 'character',
-            distance: match[0].length,
-          })
+              unit: "character",
+              distance: match[0].length,
+            })
           : null;
 
         // Range from mention to start
@@ -119,11 +126,7 @@ export function useCustomMentionPlugin({
         setTargetRange(null);
       }
     },
-    [
-      setTargetRange,
-      setSearch,
-      setValueIndex,
-    ]
+    [setTargetRange, setSearch, setValueIndex]
   );
 
   return {
@@ -152,4 +155,4 @@ export function useCustomMentionPlugin({
     ),
     searchValue: search,
   };
-};
+}

@@ -1,54 +1,71 @@
-import React, { useState, useMemo } from 'react'
-import * as P from '@udecode/plate'
-import { useSelected, useReadOnly } from 'slate-react';
-import {  Editor } from 'slate';
+import React, { useState, useMemo } from "react";
+import * as P from "@udecode/plate";
+import { useSelected, useReadOnly } from "slate-react";
+import { Editor } from "slate";
 import {
   ToolbarButtonsList,
   ToolbarButtonsBasicElements,
   BallonToolbarMarks,
-} from './Toolbars'
-import { Image } from '@styled-icons/material/Image'
-import { Link } from '@styled-icons/material/Link'
+} from "./Toolbars";
+import { Image } from "@styled-icons/material/Image";
+import { Link } from "@styled-icons/material/Link";
 
-import { useCurrentWorkspace } from '../../hooks/app'
-import { useConcepts } from '../../hooks/concepts'
-import { useWebId } from 'swrlit'
+import { useCurrentWorkspace } from "../../hooks/app";
+import { useConcepts } from "../../hooks/concepts";
+import { useWebId } from "swrlit";
 
-import { asUrl } from '@inrupt/solid-client'
-import { urlSafeIdToConceptName } from '../../utils/uris'
-import { conceptIdFromUri } from '../../model/concept'
-import { useCustomMentionPlugin, Patterns, toMentionable, fromMentionable} from './hooks/useCustomMentionPlugin'
+import { asUrl } from "@inrupt/solid-client";
+import { urlSafeIdToConceptName } from "../../utils/uris";
+import { conceptIdFromUri } from "../../model/concept";
+import {
+  useCustomMentionPlugin,
+  Patterns,
+  toMentionable,
+  fromMentionable,
+} from "./hooks/useCustomMentionPlugin";
 
-const ELEMENT_CONCEPT = "concept"
-const ELEMENT_TAG = "tag"
+const ELEMENT_CONCEPT = "concept";
+const ELEMENT_TAG = "tag";
 
 const TestMentionables = [
-  { value: '0', name: 'Aayla Secura', email: 'aayla_secura@force.com' },
-  { value: '1', name: 'Adi Gallia', email: 'adi_gallia@force.com' },
-  { value: '2', name: 'Admiral Dodd Rancit', email: 'admiral_dodd_rancit@force.com', },
-  { value: '3', name: 'Admiral Firmus Piett', email: 'admiral_firmus_piett@force.com', },
-  { value: '4', name: 'Admiral Gial Ackbar', email: 'admiral_gial_ackbar@force.com', },
-]
+  { value: "0", name: "Aayla Secura", email: "aayla_secura@force.com" },
+  { value: "1", name: "Adi Gallia", email: "adi_gallia@force.com" },
+  {
+    value: "2",
+    name: "Admiral Dodd Rancit",
+    email: "admiral_dodd_rancit@force.com",
+  },
+  {
+    value: "3",
+    name: "Admiral Firmus Piett",
+    email: "admiral_firmus_piett@force.com",
+  },
+  {
+    value: "4",
+    name: "Admiral Gial Ackbar",
+    email: "admiral_gial_ackbar@force.com",
+  },
+];
 
 const ConceptSelectLabel = (m) => {
-  const name = fromMentionable(m)
-  return <span className='text-lagoon'>[[{name}]]</span>
-}
+  const name = fromMentionable(m);
+  return <span className="text-lagoon">[[{name}]]</span>;
+};
 
 const TagSelectLabel = (m) => {
-  const tag = fromMentionable(m)
-  return <span className='text-lagoon'>#{tag}</span>
-}
+  const tag = fromMentionable(m);
+  return <span className="text-lagoon">#{tag}</span>;
+};
 
 const MentionSelectLabel = (m) => {
-  const mention = fromMentionable(m)
-  return <span className='text-lagoon'>@{mention}</span>
-}
+  const mention = fromMentionable(m);
+  return <span className="text-lagoon">@{mention}</span>;
+};
 
 const components = P.createPlateComponents({
-  [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: 'h1', }),
-  [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: 'h2', }),
-  [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: 'h3', }),
+  [P.ELEMENT_H1]: P.withProps(P.StyledElement, { as: "h1" }),
+  [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: "h2" }),
+  [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: "h3" }),
   [ELEMENT_CONCEPT]: P.withProps(P.MentionElement, {
     renderLabel: ConceptSelectLabel,
   }),
@@ -66,24 +83,24 @@ const preFormat = (editor) => P.unwrapList(editor);
 
 const optionsAutoformat = {
   rules: [
-      {
-        type: P.ELEMENT_H1,
-        markup: '#',
-        preFormat,
-      },
-      {
-        type: P.ELEMENT_H2,
-        markup: '##',
-        preFormat,
-      },
-      {
-        type: P.ELEMENT_H3,
-        markup: '###',
-        preFormat,
-      },
+    {
+      type: P.ELEMENT_H1,
+      markup: "#",
+      preFormat,
+    },
+    {
+      type: P.ELEMENT_H2,
+      markup: "##",
+      preFormat,
+    },
+    {
+      type: P.ELEMENT_H3,
+      markup: "###",
+      preFormat,
+    },
     {
       type: P.ELEMENT_LI,
-      markup: ['*', '-'],
+      markup: ["*", "-"],
       preFormat,
       format: (editor) => {
         if (editor.selection) {
@@ -104,7 +121,7 @@ const optionsAutoformat = {
     },
     {
       type: P.ELEMENT_LI,
-      markup: ['1.', '1)'],
+      markup: ["1.", "1)"],
       preFormat,
       format: (editor) => {
         if (editor.selection) {
@@ -125,47 +142,47 @@ const optionsAutoformat = {
     },
     {
       type: P.ELEMENT_TODO_LI,
-      markup: ['[]'],
+      markup: ["[]"],
     },
     {
       type: P.ELEMENT_BLOCKQUOTE,
-      markup: ['>'],
+      markup: [">"],
       preFormat,
     },
     {
       type: P.MARK_BOLD,
-      between: ['**', '**'],
-      mode: 'inline',
+      between: ["**", "**"],
+      mode: "inline",
       insertTrigger: true,
     },
     {
       type: P.MARK_BOLD,
-      between: ['__', '__'],
-      mode: 'inline',
+      between: ["__", "__"],
+      mode: "inline",
       insertTrigger: true,
     },
     {
       type: P.MARK_ITALIC,
-      between: ['*', '*'],
-      mode: 'inline',
+      between: ["*", "*"],
+      mode: "inline",
       insertTrigger: true,
     },
     {
       type: P.MARK_ITALIC,
-      between: ['_', '_'],
-      mode: 'inline',
+      between: ["_", "_"],
+      mode: "inline",
       insertTrigger: true,
     },
     {
       type: P.MARK_CODE,
-      between: ['`', '`'],
-      mode: 'inline',
+      between: ["`", "`"],
+      mode: "inline",
       insertTrigger: true,
     },
     {
       type: P.ELEMENT_CODE_BLOCK,
-      markup: '``',
-      trigger: '`',
+      markup: "``",
+      trigger: "`",
       triggerAtBlockStart: false,
       preFormat,
       format: (editor) => {
@@ -187,12 +204,12 @@ const optionsResetBlockTypePlugin = {
   rules: [
     {
       ...resetBlockTypesCommonRule,
-      hotkey: 'Enter',
+      hotkey: "Enter",
       predicate: P.isBlockAboveEmpty,
     },
     {
       ...resetBlockTypesCommonRule,
-      hotkey: 'Backspace',
+      hotkey: "Backspace",
       predicate: P.isSelectionAtBlockStart,
     },
   ],
@@ -222,9 +239,9 @@ const defaultPlugins = [
   P.createResetNodePlugin(optionsResetBlockTypePlugin),
   P.createSoftBreakPlugin({
     rules: [
-      { hotkey: 'shift+enter' },
+      { hotkey: "shift+enter" },
       {
-        hotkey: 'enter',
+        hotkey: "enter",
         query: {
           allow: [P.ELEMENT_CODE_BLOCK, P.ELEMENT_BLOCKQUOTE, P.ELEMENT_TD],
         },
@@ -234,14 +251,14 @@ const defaultPlugins = [
   P.createExitBreakPlugin({
     rules: [
       {
-        hotkey: 'mod+enter',
+        hotkey: "mod+enter",
       },
       {
-        hotkey: 'mod+shift+enter',
+        hotkey: "mod+shift+enter",
         before: true,
       },
       {
-        hotkey: 'enter',
+        hotkey: "enter",
         query: {
           start: true,
           end: true,
@@ -250,79 +267,71 @@ const defaultPlugins = [
       },
     ],
   }),
-  P.createNormalizeTypesPlugin({
-    rules: [{ path: [0], strictType: P.ELEMENT_H1 }],
-  }),
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
-export default function ModalEditor() {
-  const webId = useWebId()
-  const { concepts } = useConcepts(webId)
-  const { workspace, slug: workspaceSlug } = useCurrentWorkspace()
+export default function ModalEditor({
+  editorId = "modal-editor",
+  initialValue = "",
+  onChange,
+}) {
+  const webId = useWebId();
+  const { concepts } = useConcepts(webId);
+  const { workspace, slug: workspaceSlug } = useCurrentWorkspace();
 
-  const plateId = 'modal-editor'
-  const editableProps = { placeholder: 'Title' }
-  const initialTitleElement = [{
-    type: P.ELEMENT_H1,
-    children: [{ text: '' }],
-  }]
+  const editableProps = {
+    placeholder: "What's on your mind?",
+  };
 
-  const value = P.useStoreEditorValue(plateId) 
-  const editor = P.useStoreEditorState(plateId) 
-  const { setValue, resetEditor } = P.usePlateActions(plateId)
-  const [createAnother, setCreateAnother] = useState(false)
-  const reset = () => {
-    setValue(initialTitleElement)
-    resetEditor()
-  }
+  const { getMentionSelectProps: getConceptProps, plugin: conceptPlugin } =
+    useCustomMentionPlugin({
+      mentionables: concepts
+        ? concepts.map((c) =>
+            toMentionable(urlSafeIdToConceptName(conceptIdFromUri(asUrl(c))))
+          )
+        : [],
+      pluginKey: ELEMENT_CONCEPT,
+      pattern: Patterns.Concept,
+      newMentionable: (s) => {
+        return toMentionable(s);
+      },
+    });
 
+  const { getMentionSelectProps: getTagProps, plugin: tagPlugin } =
+    useCustomMentionPlugin({
+      mentionables: TestMentionables.map((m) => toMentionable(m.email)),
+      pluginKey: ELEMENT_TAG,
+      pattern: Patterns.Tag,
+      newMentionable: (s) => {
+        return toMentionable(s);
+      },
+    });
 
-  const { getMentionSelectProps: getConceptProps, plugin: conceptPlugin } = useCustomMentionPlugin({
-    mentionables: concepts.map(c => toMentionable(urlSafeIdToConceptName(conceptIdFromUri(asUrl(c))))),
-    pluginKey: ELEMENT_CONCEPT,
-    pattern: Patterns.Concept,
-    newMentionable: (s) => {
-      return toMentionable(s)
-    }
-  })
-
-  const { getMentionSelectProps: getTagProps, plugin: tagPlugin } = useCustomMentionPlugin({
-    mentionables: TestMentionables.map((m) => toMentionable(m.email)),
-    pluginKey: ELEMENT_TAG,
-    pattern: Patterns.Tag,
-    newMentionable: (s) => {
-      return toMentionable(s)
-    }
-  })
-
-  const { getMentionSelectProps: getMentionProps, plugin: mentionPlugin } = useCustomMentionPlugin({
-    mentionables: TestMentionables.map((m) => toMentionable(m.name)),
-    pluginKey: P.ELEMENT_MENTION,
-    pattern: Patterns.Mention,
-    newMentionable: (s) => {
-      return toMentionable(s)
-    }
-  })
+  const { getMentionSelectProps: getMentionProps, plugin: mentionPlugin } =
+    useCustomMentionPlugin({
+      mentionables: TestMentionables.map((m) => toMentionable(m.name)),
+      pluginKey: P.ELEMENT_MENTION,
+      pattern: Patterns.Mention,
+      newMentionable: (s) => {
+        return toMentionable(s);
+      },
+    });
 
   const plugins = useMemo(
-    () => [
-      ...defaultPlugins,
-      conceptPlugin,
-      tagPlugin,
-      mentionPlugin,
-    ],
+    () => [...defaultPlugins, conceptPlugin, tagPlugin, mentionPlugin],
     [conceptPlugin, tagPlugin, mentionPlugin]
-  )
+  );
 
   return (
-    <P.Plate id={plateId}
+    <P.Plate
+      id={editorId}
       plugins={plugins}
       components={components}
       options={defaultOptions}
       editableProps={editableProps}
-      initialValue={initialTitleElement}>
-
+      initialValue={initialValue}
+      onChange={onChange}
+    >
       <P.HeadingToolbar>
         <ToolbarButtonsBasicElements />
         <ToolbarButtonsList />
@@ -336,10 +345,7 @@ export default function ModalEditor() {
         {...getConceptProps()}
         renderLabel={ConceptSelectLabel}
       />
-      <P.MentionSelect
-        {...getTagProps()}
-        renderLabel={TagSelectLabel}
-      />
+      <P.MentionSelect {...getTagProps()} renderLabel={TagSelectLabel} />
       <P.MentionSelect
         {...getMentionProps()}
         renderLabel={MentionSelectLabel}

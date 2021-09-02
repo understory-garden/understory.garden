@@ -52,5 +52,6 @@ export const US = {
   deployedAt: `${understoryRoot}deployedAt`,
   hasGnomeStatus: `${understoryRoot}hasGnomeStatus`,
   monetizedFor: `${understoryRoot}monetizedFor`,
-  usesCSS: `${understoryRoot}usesCSS`
+  usesCSS: `${understoryRoot}usesCSS`,
+  slateJSON: `${understoryRoot}slateJSON` // https://docs.slatejs.org/concepts/02-nodes
 }
