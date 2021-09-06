@@ -406,9 +406,6 @@ export default function NotePage({
                     <a>sharable link</a>
                   </Link>
                 ))}
-              <a href={noteStorageUri} target="_blank" rel="noopener">
-                source
-              </a>
               {!readOnly && (
                 <div className="flex flex-col">
                   <button
