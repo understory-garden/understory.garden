@@ -21,7 +21,6 @@ import Follows from '../components/Follows'
 import TabButton from '../components/TabButton'
 import { EditIcon } from '../components/icons'
 import WebMonetization from '../components/WebMonetization'
-import { useNeedsDowncaseMigration } from '../components/DowncaseMigrator'
 import { useApp, useWorkspace } from '../hooks/app'
 import { WorkspaceProvider } from '../contexts/WorkspaceContext'
 
