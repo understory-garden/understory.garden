@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import * as P from "@udecode/plate";
 import { useSelected, useReadOnly } from "slate-react";
-import { Editor } from "slate";
 import {
   ToolbarButtonsList,
   ToolbarButtonsBasicElements,
@@ -270,7 +269,7 @@ const defaultPlugins = [
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
 ];
 
-export default function ModalEditor({
+export default function Editor({
   editorId = "modal-editor",
   initialValue = "",
   onChange,

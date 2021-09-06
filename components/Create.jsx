@@ -1,5 +1,5 @@
 import ReactModal from "react-modal";
-import ModalEditor from "../components/Plate/ModalEditor";
+import PlateEditor from "../components/Plate/Editor";
 import { useState } from "react";
 import {
   useStoreEditorValue,
@@ -92,7 +92,7 @@ export function CreateModal({ isOpen, closeModal }) {
         </div>
 
         <div className="text-left p-4">
-          <ModalEditor editorId={editorId} initialValue={value} />
+          <PlateEditor editorId={editorId} initialValue={value} />
         </div>
 
         <div className="flex justify-end border-t-2 border-echeveria py-2">
