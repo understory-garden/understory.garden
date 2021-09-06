@@ -1,29 +1,3 @@
-const fbRoot = "https://face.baby/vocab#"
-export const FB = {
-  noteBody : `${fbRoot}noteBody`,
-  refs : `${fbRoot}refs`,
-  hasFeedItem : `${fbRoot}hasFeedItem`,
-  Credit : `${fbRoot}Credit`,
-  Debit : `${fbRoot}Debit`,
-  amount : `${fbRoot}amount`,
-  accountOf : `${fbRoot}accountOf`
-}
-
-const itmeRoot = "https://itme.online/vocab#"
-export const ITME = {
-  noteBody: `${itmeRoot}noteBody`,
-  refs: `${itmeRoot}refs`,
-  paymentPointer: `${itmeRoot}paymentPointer`,
-  storedAt: `${itmeRoot}storedAt`,
-  noteStorage: `${itmeRoot}noteStorage`,
-  publicPrefs: `${itmeRoot}publicPrefs`,
-  privatePrefs: `${itmeRoot}privatePrefs`,
-  backupsStorage: `${itmeRoot}backupsStorage`,
-  hasWorkspace: `${itmeRoot}hasWorkspace`,
-  conceptIndex: `${itmeRoot}conceptIndex`,
-  conceptPrefix: `${itmeRoot}conceptPrefix`
-}
-
 export const PP = {
   paymentPointer: "http://paymentpointers.org/ns#PaymentPointer"
 }
