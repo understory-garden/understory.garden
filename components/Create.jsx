@@ -7,15 +7,12 @@ import {
   usePlateActions,
 } from "@udecode/plate";
 import { useWebId, useThing } from "swrlit";
-import { getUrl } from "@inrupt/solid-client";
+import { getUrl, isThingLocal } from "@inrupt/solid-client";
 
-import { createOrUpdateSlateJSON } from "../model/note";
-import {
-  createOrUpdateConceptIndex,
-  getNoteStorageURL,
-} from "../model/concept";
+import { createOrUpdateSlateJSON, saveNote } from "../model/note";
+import { createOrUpdateConceptIndex } from "../model/concept";
 import { useWorkspace, useCurrentWorkspace } from "../hooks/app";
-import { useConcept, useNote } from "../hooks/concepts";
+import { useConcept } from "../hooks/concepts";
 
 export function CreateModal({ isOpen, closeModal }) {
   const [createAnother, setCreateAnother] = useState(false);
@@ -38,12 +35,12 @@ export function CreateModal({ isOpen, closeModal }) {
     saveIndex: saveConceptIndex,
   } = useConcept(webId, workspaceSlug, name);
 
-  const { note, saveNote } = useNote(concept);
+  const conceptExists = concept && !isThingLocal(concept);
 
   const save = async function save() {
     console.log("name: ", name);
     console.log("slateJSON: ", value);
-    const newNote = createOrUpdateSlateJSON(note, value);
+    const newNote = createOrUpdateSlateJSON(value);
     const newConceptIndex = createOrUpdateConceptIndex(
       editor,
       workspace,
@@ -53,8 +50,8 @@ export function CreateModal({ isOpen, closeModal }) {
     );
     setSaving(true);
     try {
-      await saveNote(newNote);
       await saveConceptIndex(newConceptIndex);
+      await saveNote(newNote, concept);
     } catch (e) {
       console.log("error saving note", e);
     } finally {
@@ -73,6 +70,7 @@ export function CreateModal({ isOpen, closeModal }) {
     if (createAnother) {
       reset();
     } else {
+      reset();
       closeModal();
     }
   };
@@ -80,15 +78,26 @@ export function CreateModal({ isOpen, closeModal }) {
   return (
     <ReactModal isOpen={isOpen}>
       <form className="w-full max-w-sm">
-        <div className="flex items-center border-b-2 border-lagoon py-2">
+        <div
+          className={`flex items-center border-b-2 py-2 ${
+            conceptExists
+              ? "border-ember text-ember"
+              : "border-lagoon text-lagoon"
+          }`}
+        >
           <input
-            className="appearance-none focus:ring-0 text-3xl bg-transparent outline-none border-none focus:border-none w-full text-lagoon mr-3 py-1 px-2 leading-tight focus:outline-none"
+            className="appearance-none focus:ring-0 text-3xl bg-transparent outline-none border-none focus:border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none"
             type="text"
             placeholder="Untitled"
             aria-label="Concept Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+          {conceptExists ? (
+            <span className="whitespace-nowrap">concept already exists</span>
+          ) : (
+            <></>
+          )}
         </div>
 
         <div className="text-left p-4">
@@ -127,7 +136,6 @@ export function CreateModal({ isOpen, closeModal }) {
 
 export function CreateButton() {
   const [modalOpen, setModalOpen] = useState(false);
-  const closeModal = () => setModalOpen(false);
 
   return (
     <div className="flex flex-row max-h-9 self-center">

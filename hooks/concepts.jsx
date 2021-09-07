@@ -71,7 +71,7 @@ function maybeNewConcept(url, workspace, name) {
     workspace &&
     name &&
     setUrl(
-      createThing({ url }),
+      createThing({ name }),
       US.storedAt,
       defaultNoteStorageUri(workspace, name)
     )
