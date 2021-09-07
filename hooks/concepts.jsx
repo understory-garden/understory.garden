@@ -127,8 +127,8 @@ export function useConcept(
       return {
         conceptUri,
         concept,
-        index: publicIndex,
-        saveIndex: savePublicIndex,
+        index: privateIndex,
+        saveIndex: savePrivateIndex,
       };
     } else {
       return {

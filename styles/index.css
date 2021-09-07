@@ -74,11 +74,11 @@ strong {
 }
 
 .btn {
-  @apply mx-2 rounded-xl border-none drop-shadow-lg shadow-lg px-4 py-2 bg-echeveria text-base font-medium text-snow;
+  @apply mx-2 rounded-lg border-none drop-shadow-lg px-4 py-2 bg-echeveria text-base font-medium text-snow;
 }
 
 .btn:hover {
-  @apply outline-none ring-2 ring-offset-2 ring-echeveria-dark ring-offset-echeveria-light bg-echeveria-dark;
+  @apply outline-none ring-2 ring-offset-2 ring-echeveria ring-offset-echeveria-light bg-echeveria-dark;
 }
 
 .btn:focus {
@@ -86,7 +86,11 @@ strong {
 }
 
 .btn:active {
-  @apply outline-none ring-inset ring-2 ring-offset-0 ring-echeveria;
+  @apply outline-none ring-2 ring-offset-0 ring-echeveria bg-echeveria-dark;
+}
+
+.btn:disabled {
+  @apply bg-echeveria-light cursor-not-allowed;
 }
 
 .destructive {
@@ -94,7 +98,7 @@ strong {
 }
 
 .destructive:hover {
-  @apply ring-ember-dark ring-offset-ember-light bg-ember-dark;
+  @apply bg-ember-dark;
 }
 
 .destructive:focus {
@@ -102,23 +106,27 @@ strong {
 }
 
 .destructive:active {
-  @apply ring-ember;
+  @apply bg-ember-dark ring-ember-dark;
+}
+
+.destructive:disabled {
+  @apply bg-ember-light cursor-not-allowed;
 }
 
 .cancel {
-  @apply bg-fog;
+  @apply bg-transparent text-echeveria;
 }
 
 .cancel:hover {
-  @apply ring-storm ring-offset-mist bg-storm;
+  @apply bg-transparent text-echeveria-dark;
 }
 
 .cancel:focus {
-  @apply ring-fog ring-offset-mist;
+  @apply bg-transparent ring-2 ring-echeveria;
 }
 
 .cancel:active {
-  @apply ring-fog;
+  @apply bg-transparent text-echeveria-dark ring-2 ring-echeveria-dark;
 }
 
 .block {
@@ -147,10 +155,6 @@ strong {
 
 .ReactModal__Overlay {
   @apply z-40;
-}
-
-.ReactModal__Content {
-  padding: 0px;
 }
 
 /* Start purging... */
