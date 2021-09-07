@@ -116,16 +116,13 @@ export function CreateModal({ isOpen, closeModal }) {
           </label>
           <button
             type="button"
-            className="flex-shrink-0 bg-echeveria hover:bg-echeveria-dark border-echeveria hover:border-echeveria-dark border-4 text-snow py-1 px-2 rounded"
+            disabled={conceptExists || saving || !concept}
+            className={`btn ${saving ? "cursor-wait" : ""}`}
             onClick={onSubmit}
           >
             Create
           </button>
-          <button
-            type="button"
-            className="flex-shrink-0 border-transparent border-4 text-echeveria hover:text-echeveria-dark py-1 px-2 rounded"
-            onClick={closeModal}
-          >
+          <button type="button" className="btn cancel" onClick={closeModal}>
             Cancel
           </button>
         </div>
