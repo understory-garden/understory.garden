@@ -15,6 +15,7 @@ import { useWebId } from "swrlit";
 
 import { asUrl } from "@inrupt/solid-client";
 import { urlSafeIdToConceptName } from "../../utils/uris";
+import { ELEMENT_CONCEPT, ELEMENT_TAG } from "../../utils/slate";
 import { conceptIdFromUri } from "../../model/concept";
 import {
   useCustomMentionPlugin,
@@ -22,9 +23,6 @@ import {
   toMentionable,
   fromMentionable,
 } from "./hooks/useCustomMentionPlugin";
-
-const ELEMENT_CONCEPT = "concept";
-const ELEMENT_TAG = "tag";
 
 const TestMentionables = [
   { value: "0", name: "Aayla Secura", email: "aayla_secura@force.com" },
@@ -270,7 +268,7 @@ const defaultPlugins = [
 ];
 
 export default function Editor({
-  editorId = "modal-editor",
+  editorId = "default-plate-editor",
   initialValue = "",
   onChange,
 }) {

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { ReactEditor, Slate } from "slate-react";
+import { ReactEditor } from "slate-react";
 import { useWebId, useThing, useAuthentication, useProfile } from "swrlit";
 import {
   setStringNoLocale,
@@ -26,8 +26,14 @@ import { FOAF } from "@inrupt/vocab-common-rdf";
 import { Transition } from "@headlessui/react";
 import { useDebounce } from "use-debounce";
 
-import EditorToolbar from "./EditorToolbar";
-import Editable, { useNewEditor } from "./Editable";
+import PlateEditor from "../components/Plate/Editor";
+import { EmptySlateJSON } from "../utils/slate";
+import {
+  useStoreEditorValue,
+  useStoreEditorState,
+  usePlateActions,
+} from "@udecode/plate";
+
 import Nav from "./nav";
 
 import NoteContext from "../contexts/NoteContext";
@@ -47,6 +53,7 @@ import {
   urlSafeIdToConceptName,
 } from "../utils/uris";
 import { deleteResource } from "../utils/fetch";
+import { noteBodyToSlateJSON } from "../utils/slate";
 import {
   createOrUpdateConceptIndex,
   conceptIdFromUri,
@@ -63,8 +70,6 @@ import { useConceptAutocomplete } from "../hooks/editor";
 
 import WebMonetization from "../components/WebMonetization";
 import { Loader, Portal } from "../components/elements";
-
-const emptyBody = [{ children: [{ text: "" }] }];
 
 function LinkToConcept({ uri, ...props }) {
   const id = conceptIdFromUri(uri);
@@ -244,32 +249,34 @@ export default function NotePage({
     mutate: mutateNote,
   } = useThing(noteStorageUri);
   const bodyJSON = note && getStringNoLocale(note, US.noteBody);
+  const slateJSON = note && getStringNoLocale(note, US.slateJSON);
+  const body =
+    (slateJSON && JSON.parse(slateJSON)) ||
+    (bodyJSON && noteBodyToSlateJSON(JSON.parse(bodyJSON)));
   const [showPrivacy, setShowPrivacy] = useState(false);
   const errorStatus = error && error.statusCode;
 
-  const [value, setValue] = useState(undefined);
+  const editorId = "note-page";
+  const value = useStoreEditorValue(editorId);
+  const editor = useStoreEditorState(editorId);
+  const { setValue, resetEditor } = usePlateActions(editorId);
+
   const [debouncedValue] = useDebounce(value, 1500);
   const [saving, setSaving] = useState(false);
-  const saved = value === undefined || bodyJSON === JSON.stringify(value);
-
-  const editor = useNewEditor();
-  useEffect(
-    function resetSelectionOnNameChange() {
-      editor.selection = null;
-    },
-    [name]
-  );
+  const saved = value === undefined || body === value;
 
   useEffect(
     function setValueFromNote() {
-      if (bodyJSON) {
-        const v = JSON.parse(bodyJSON);
-        setValue(v);
+      console.log("body", body);
+      console.log("bodyJSON", bodyJSON);
+      console.log("slateJSON", slateJSON);
+      if (body) {
+        setValue(body);
       } else if (errorStatus == 404) {
-        setValue(emptyBody);
+        setValue(EmptySlateJSON);
       }
     },
-    [bodyJSON, errorStatus]
+    [body, errorStatus]
   );
 
   const { profile: authorProfile } = useProfile(webId);
@@ -299,7 +306,7 @@ export default function NotePage({
     function saveAfterDebounce() {
       if (debouncedValue) {
         const isInitialNoteState =
-          debouncedValue === emptyBody && bodyJSON === undefined;
+          debouncedValue === EmptySlateJSON && body === undefined;
         if (
           JSON.stringify(debouncedValue) !== bodyJSON &&
           !isInitialNoteState
@@ -318,8 +325,7 @@ export default function NotePage({
   useEffect(() => {
     const handleRouteChange = (url) => {
       if (url !== window.location.pathname) {
-        setValue(undefined);
-        editor.selection = null;
+        resetEditor();
       }
     };
     router.events.on("routeChangeStart", handleRouteChange);
@@ -346,34 +352,6 @@ export default function NotePage({
     [path, workspaceSlug, note, save]
   );
 
-  const {
-    names: matchingConceptNames,
-    onChange: conceptAutocompleteOnChange,
-    onKeyDown,
-    target: popoverTarget,
-    selectionIndex: popoverSelectionIndex,
-  } = useConceptAutocomplete(editor);
-  const showPopover =
-    popoverTarget && matchingConceptNames && matchingConceptNames.length > 0;
-  const popoverRef = useRef();
-  useEffect(() => {
-    if (showPopover) {
-      const el = popoverRef.current;
-      const domRange = ReactEditor.toDOMRange(editor, popoverTarget);
-      const rect = domRange.getBoundingClientRect();
-      el.style.top = `${rect.top + window.pageYOffset + 24}px`;
-      el.style.left = `${rect.left + window.pageXOffset}px`;
-    }
-  }, [editor, popoverTarget]);
-
-  const onChange = useCallback(
-    function onChange(newValue) {
-      setValue(newValue);
-      conceptAutocompleteOnChange && conceptAutocompleteOnChange(editor);
-    },
-    [editor, conceptAutocompleteOnChange]
-  );
-
   return (
     <NoteContext.Provider value={noteContext}>
       <div className="flex flex-col page">
@@ -381,7 +359,7 @@ export default function NotePage({
         <Nav />
         <div className="relative overflow-y-hidden flex-none h-56">
           {coverImage && <img className="w-full" src={coverImage} />}
-          <div className="absolute top-0 left-0 w-full p-6 bg-gradient-to-b from-white via-gray-100 flex flex-col justify-between">
+          <div className="absolute top-0 left-0 w-full p-6 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-44 overflow-y-hidden">
               <div className="flex flex-col">
                 <h1 className="text-5xl font-bold text-gray-800">{name}</h1>
@@ -428,117 +406,13 @@ export default function NotePage({
           aria-labelledby="slide-over-heading"
         >
           <div className="w-full flex flex-col flex-grow">
-            {value !== undefined ? (
-              <Slate editor={editor} value={value} onChange={onChange}>
-                {!readOnly && (
-                  <EditorToolbar
-                    saving={saving}
-                    saved={saved}
-                    save={saveCallback}
-                    className="sticky top-0 z-20"
-                  />
-                )}
-                <div className="flex-grow flex flex-row mt-3">
-                  <Editable
-                    readOnly={readOnly}
-                    onKeyDown={onKeyDown}
-                    editor={editor}
-                    className="flex-grow text-gray-900"
-                  />
-                  <div className="relative">
-                    <button
-                      onClick={() => setSidebarOpen(!sidebarOpen)}
-                      className="h-2 text-3xl text-pink-500 font-bold fixed right-2"
-                    >
-                      {sidebarOpen ? ">>" : "<<"}
-                    </button>
-                    <Transition
-                      show={sidebarOpen}
-                      enter="transform transition ease-in-out duration-500 sm:duration-700"
-                      enterFrom="translate-x-full"
-                      enterTo="translate-x-0"
-                      leave="transform transition ease-in-out duration-500 sm:duration-700"
-                      leaveFrom="translate-x-0"
-                      leaveTo="translate-x-full"
-                    >
-                      {(ref) => (
-                        <div
-                          className="w-screen max-w-md flex-grow min-w-min"
-                          ref={ref}
-                        >
-                          <div className="h-full flex flex-col pb-6 shadow-xl overflow-y-scroll">
-                            <div className="px-6 sm:px-6">
-                              <div className="flex items-start justify-between">
-                                <h2
-                                  id="slide-over-heading"
-                                  className="text-xl font-bold text-gray-100"
-                                >
-                                  Links
-                                </h2>
-                              </div>
-                            </div>
-                            <div className="mt-6 relative flex-1 px-4 sm:px-6 flex flex-col">
-                              <div>
-                                <h3>Links to</h3>
-                                {concept && <LinksTo name={name} />}
-                              </div>
-                              <div>
-                                <h3>Linked from</h3>
-                                {conceptIndex && (
-                                  <LinksFrom conceptUri={conceptUri} />
-                                )}
-                              </div>
-                            </div>
-                            <div className="px-6 mt-6">
-                              <h2 className="text-xl">Actions</h2>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </Transition>
-                  </div>
-                </div>
-              </Slate>
+            {body !== undefined ? (
+              <PlateEditor editorId={editorId} initialValue={body} />
             ) : (
               <Loader />
             )}
-
-            {/*
-                 <div>
-                 <pre>
-                 {JSON.stringify(editor.selection, null, 2)}
-                 {JSON.stringify(value, null, 2)}
-                 </pre>
-                 </div>
-               */}
           </div>
         </section>
-        {showPopover && (
-          <Portal>
-            <div
-              ref={popoverRef}
-              className="bg-white p-1 border-2"
-              style={{
-                top: "-9999px",
-                left: "-9999px",
-                position: "absolute",
-                zIndex: 1,
-              }}
-            >
-              {matchingConceptNames &&
-                matchingConceptNames.map((name, i) => (
-                  <div
-                    key={name}
-                    className={`${
-                      i === popoverSelectionIndex ? "bg-purple-300" : "bg-white"
-                    }`}
-                  >
-                    {name}
-                  </div>
-                ))}
-            </div>
-          </Portal>
-        )}
       </div>
     </NoteContext.Provider>
   );
