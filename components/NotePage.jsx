@@ -267,9 +267,6 @@ export default function NotePage({
 
   useEffect(
     function setValueFromNote() {
-      console.log("body", body);
-      console.log("bodyJSON", bodyJSON);
-      console.log("slateJSON", slateJSON);
       if (body) {
         setValue(body);
       } else if (errorStatus == 404) {
