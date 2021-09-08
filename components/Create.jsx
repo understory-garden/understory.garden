@@ -6,6 +6,7 @@ import {
   useStoreEditorState,
   usePlateActions,
 } from "@udecode/plate";
+import { EmptySlateJSON } from "../utils/slate";
 import { useWebId, useThing } from "swrlit";
 import { getUrl, isThingLocal } from "@inrupt/solid-client";
 
@@ -21,8 +22,6 @@ export function CreateModal({ isOpen, closeModal }) {
   const value = useStoreEditorValue(editorId);
   const editor = useStoreEditorState(editorId);
   const { setValue, resetEditor } = usePlateActions(editorId);
-
-  const emptySlateJSON = [{ text: "" }];
 
   const webId = useWebId();
   const { workspace, slug: workspaceSlug } = useCurrentWorkspace();
@@ -61,7 +60,7 @@ export function CreateModal({ isOpen, closeModal }) {
 
   const reset = () => {
     setName("");
-    setValue(emptySlateJSON);
+    setValue(EmptySlateJSON);
     resetEditor();
   };
 
