@@ -250,9 +250,12 @@ export default function NotePage({
   } = useThing(noteStorageUri);
   const bodyJSON = note && getStringNoLocale(note, US.noteBody);
   const slateJSON = note && getStringNoLocale(note, US.slateJSON);
-  const body =
-    (slateJSON && JSON.parse(slateJSON)) ||
-    (bodyJSON && noteBodyToSlateJSON(JSON.parse(bodyJSON)));
+  const body = useMemo(
+    () =>
+      (slateJSON && JSON.parse(slateJSON)) ||
+      (bodyJSON && noteBodyToSlateJSON(JSON.parse(bodyJSON))),
+    [bodyJSON, slateJSON]
+  );
   const [showPrivacy, setShowPrivacy] = useState(false);
   const errorStatus = error && error.statusCode;
 
@@ -304,10 +307,7 @@ export default function NotePage({
       if (debouncedValue) {
         const isInitialNoteState =
           debouncedValue === EmptySlateJSON && body === undefined;
-        if (
-          JSON.stringify(debouncedValue) !== bodyJSON &&
-          !isInitialNoteState
-        ) {
+        if (debouncedValue !== body && !isInitialNoteState) {
           saveCallback();
         }
       }
