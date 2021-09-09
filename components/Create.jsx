@@ -64,13 +64,17 @@ export function CreateModal({ isOpen, closeModal }) {
     resetEditor();
   };
 
+  const close = () => {
+    reset();
+    closeModal();
+  };
+
   const onSubmit = () => {
     save();
     if (createAnother) {
       reset();
     } else {
-      reset();
-      closeModal();
+      close();
     }
   };
 
@@ -121,7 +125,7 @@ export function CreateModal({ isOpen, closeModal }) {
           >
             Create
           </button>
-          <button type="button" className="btn cancel" onClick={closeModal}>
+          <button type="button" className="btn cancel" onClick={close}>
             Cancel
           </button>
         </div>
