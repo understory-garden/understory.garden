@@ -61,7 +61,7 @@ import {
 } from "../model/concept";
 import {
   createNote,
-  createOrUpdateNote,
+  createOrUpdateSlateJSON,
   noteStorageFileAndThingName,
 } from "../model/note";
 import { US } from "../vocab";
@@ -281,7 +281,7 @@ export default function NotePage({
     authorProfile && getStringNoLocale(authorProfile, FOAF.name);
 
   const saveCallback = async function saveNote() {
-    const newNote = createOrUpdateNoteBody(note, value);
+    const newNote = createOrUpdateSlateJSON(value, note);
     const newConceptIndex = createOrUpdateConceptIndex(
       editor,
       workspace,
