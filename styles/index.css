@@ -98,7 +98,7 @@ strong {
 }
 
 .destructive:hover {
-  @apply bg-ember-dark;
+  @apply bg-ember-dark ring-ember ring-offset-ember-light;
 }
 
 .destructive:focus {
@@ -106,7 +106,7 @@ strong {
 }
 
 .destructive:active {
-  @apply bg-ember-dark ring-ember-dark;
+  @apply bg-ember-dark ring-ember;
 }
 
 .destructive:disabled {
