@@ -70,7 +70,7 @@ strong {
 }
 
 .page {
-  @apply bg-mist text-night h-screen overflow-y-scroll w-screen;
+  @apply bg-snow text-night h-screen overflow-y-scroll w-screen;
 }
 
 .btn {

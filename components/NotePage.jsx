@@ -354,14 +354,14 @@ export default function NotePage({
       <div className="flex flex-col page">
         <WebMonetization webId={webId} />
         <Nav />
-        <div className="relative overflow-y-hidden flex-none h-56">
+        <div className="relative overflow-y-hidden flex-none h-56 border-b-2 bg-mist border-passionflower">
           {coverImage && <img className="w-full" src={coverImage} />}
           <div className="absolute top-0 left-0 w-full p-6 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-44 overflow-y-hidden">
               <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-gray-800">{name}</h1>
+                <h1 className="text-5xl font-bold text-night">{name}</h1>
                 {authorName && (
-                  <div className="text-lg text-gray-800">
+                  <div className="text-lg text-night">
                     by&nbsp;
                     <Link href={profilePath(webId) || ""}>
                       <a>{authorName}</a>
@@ -402,7 +402,7 @@ export default function NotePage({
           className="relative w-full flex flex-grow"
           aria-labelledby="slide-over-heading"
         >
-          <div className="w-full flex flex-col flex-grow">
+          <div className="w-full flex flex-col flex-grow mx-16 bg-snow">
             {body !== undefined ? (
               <PlateEditor editorId={editorId} initialValue={body} />
             ) : (
