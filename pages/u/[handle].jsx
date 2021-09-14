@@ -10,7 +10,6 @@ import Notes from '../../components/Notes'
 import Nav from '../../components/nav'
 import WebMonetization from '../../components/WebMonetization'
 import { useFollows } from '../../hooks/people'
-import { useLedgerTotalFor } from '../../hooks/feed'
 
 export default function ProfilePage(){
   const router = useRouter()
@@ -32,7 +31,6 @@ export default function ProfilePage(){
   const isMyProfile = (myWebId === webId)
   const follows = useFollows()
   const alreadyFollowing = follows && follows.includes(webId)
-  const ledgerTotal = useLedgerTotalFor(webId)
   return (
     <div className="page">
       <WebMonetization webId={webId}/>
