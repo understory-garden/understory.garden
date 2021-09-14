@@ -25,7 +25,7 @@ export function getTagNameFromNode(node) {
   return node.value;
 }
 
-const mapElementType = {
+const newElementType = {
   "heading-one": P.ELEMENT_H1,
   "heading-two": P.ELEMENT_H2,
   "heading-three": P.ELEMENT_H3,
@@ -45,6 +45,13 @@ const mapElementType = {
   paragraph: P.ELEMENT_PARAGRAPH,
 };
 
+function convertLeaf(l) {
+  // must be a text node
+  console.assert(l.text);
+  // no conversion needed
+  return l;
+}
+
 function convertElement(e) {
   // recursive
   switch (e.type) {
@@ -63,27 +70,26 @@ function convertElement(e) {
     case "link":
       return {
         ...e,
-        type: mapElementType(e.type),
+        type: newElementType[e.type],
         children: e.children.map(convertElement),
       };
     case "image":
     case "video":
       return {
         ...e,
-        type: mapElementType(e.type),
+        type: newElementType[e.type],
         children: [{ text: "" }],
       };
     case "concept":
     case "tag":
       return {
         ...e,
-        type: mapElementType(e.type),
+        type: newElementType[e.type],
         children: [{ text: "" }],
         value: e.name,
       };
     default:
-      console.log("conversion failed", e);
-      throw new Error("WHY IS GAMORA");
+      return convertLeaf(e);
   }
 }
 
