@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import * as P from "@udecode/plate";
 import { useSelected, useReadOnly } from "slate-react";
 import {
@@ -6,15 +6,20 @@ import {
   ToolbarButtonsBasicElements,
   BallonToolbarMarks,
 } from "./Toolbars";
-import { Image } from "@styled-icons/material/Image";
-import { Link } from "@styled-icons/material/Link";
+import { Image as ImageIcon } from "@styled-icons/material/Image";
+import { Link as LinkIcon } from "@styled-icons/material/Link";
+import Link from "next/link";
+import { Portal } from "../../components/elements";
 
 import { useCurrentWorkspace } from "../../hooks/app";
 import { useConcepts } from "../../hooks/concepts";
 import { useWebId } from "swrlit";
 
 import { asUrl } from "@inrupt/solid-client";
-import { urlSafeIdToConceptName } from "../../utils/uris";
+import {
+  urlSafeIdToConceptName,
+  conceptNameToUrlSafeId,
+} from "../../utils/uris";
 import { ELEMENT_CONCEPT, ELEMENT_TAG } from "../../utils/slate";
 import { conceptIdFromUri } from "../../model/concept";
 import {
@@ -23,6 +28,7 @@ import {
   toMentionable,
   fromMentionable,
 } from "./hooks/useCustomMentionPlugin";
+import NoteContext from "../../contexts/NoteContext";
 
 const TestMentionables = [
   { value: "0", name: "Aayla Secura", email: "aayla_secura@force.com" },
@@ -44,6 +50,28 @@ const TestMentionables = [
   },
 ];
 
+const ConceptElement = (m) => {
+  const name = fromMentionable(m);
+  const { path } = useContext(NoteContext);
+  const id = conceptNameToUrlSafeId(name);
+  return (
+    <Link href={`${path}/${id}`}>
+      <a className="text-lagoon">[[{name}]]</a>
+    </Link>
+  );
+};
+
+const TagElement = (m) => {
+  const tag = fromMentionable(m);
+
+  return <span className="text-lagoon">#{tag}</span>;
+};
+
+const MentionElement = (m) => {
+  const mention = fromMentionable(m);
+  return <span className="text-lagoon">@{mention}</span>;
+};
+
 const ConceptSelectLabel = (m) => {
   const name = fromMentionable(m);
   return <span className="text-lagoon">[[{name}]]</span>;
@@ -64,13 +92,13 @@ const components = P.createPlateComponents({
   [P.ELEMENT_H2]: P.withProps(P.StyledElement, { as: "h2" }),
   [P.ELEMENT_H3]: P.withProps(P.StyledElement, { as: "h3" }),
   [ELEMENT_CONCEPT]: P.withProps(P.MentionElement, {
-    renderLabel: ConceptSelectLabel,
+    renderLabel: ConceptElement,
   }),
   [ELEMENT_TAG]: P.withProps(P.MentionElement, {
-    renderLabel: TagSelectLabel,
+    renderLabel: TagElement,
   }),
   [P.ELEMENT_MENTION]: P.withProps(P.MentionElement, {
-    renderLabel: MentionSelectLabel,
+    renderLabel: MentionElement,
   }),
 });
 
@@ -332,8 +360,8 @@ export default function Editor({
       <P.HeadingToolbar>
         <ToolbarButtonsBasicElements />
         <ToolbarButtonsList />
-        <P.ToolbarLink icon={<Link />} />
-        <P.ToolbarImage icon={<Image />} />
+        <P.ToolbarLink icon={<LinkIcon />} />
+        <P.ToolbarImage icon={<ImageIcon />} />
       </P.HeadingToolbar>
 
       <BallonToolbarMarks />
