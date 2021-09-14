@@ -82,6 +82,7 @@ function convertElement(e) {
         value: e.name,
       };
     default:
+      console.log("conversion failed", e);
       throw new Error("WHY IS GAMORA");
   }
 }
