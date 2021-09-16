@@ -1,11 +1,16 @@
+import { namedNode, dataset } from "@rdfjs/dataset";
+import type { DatasetCore } from "@rdfjs/types";
 import {
+  Thing,
+  SolidDataset,
   createThing,
   buildThing,
   setThing,
-  SolidDataset,
+  getThing,
   createSolidDataset,
 } from "@inrupt/solid-client";
-import { SKOS, RDF, FOAF, DCT } from "@inrupt/vocab-common-rdf";
+import { MY, MIME } from "../vocab";
+import { SKOS, RDF, FOAF, DCTERMS } from "@inrupt/vocab-common-rdf";
 
 /*
 Design:
@@ -26,13 +31,16 @@ An Image will be stored as a url with the foaf.Image type.
 A File will be stored as a url with the foaf.Document type.
 Any url without a known type in the concepts index will be treated as a Link.
 
-SKOS:Concept can refer to unnamed things and a label can be set later.  To make
-querying easier, everything will be represented as SKOS:Concepts with associated
-'SKOS:note' and 'FOAF:page' properties linking that Concept to a particular note
-or page. The semantics of both the `note` predicate FOAF:Document type specify
-that they can (and should) be used for Image content as well. Given that the
-definition of Document / note is so broad, we will likely need to write our own
-SOKS extension library to add additional specificity.
+SKOS:Concept can refer to unnamed things and a label can be set later. However,
+unless the user has explicityly created an unnamed Concept, we should not create
+one for them. Instead, use MYSKOS:Bookmark, which is intended to represent
+Bookmarked resources that might eventually be attached to a Concept, but are not
+yet. An SKOS:Concept can be linked to a Bookmarked resource by using the
+associated 'SKOS:note' and 'FOAF:page'. The semantics of both the `note`
+predicate FOAF:Document type specify that they can (and should) be used for
+Image content as well. Given that the definition of Document / note is so broad,
+we will likely need to write our own SOKS extension library to add additional
+specificity.
 
 Tags and Mentions will be implemented as SKOS-XL:Labels (with the appropriate
 '@' or '#' included in the label string).  Mentions should also be linked to an
@@ -41,21 +49,47 @@ This allows us to maintain Label Things to represent Tags and Mentions
 independanlty of Concepts.  Mutiple labels can be set on a Concept, and
 SKOS-XL:Labels can be easily reset on mutiple Concepts. Neither a Tag nor a
 Mention shoudl be set at the prefLabel for a particular Concept.
+
+DCTERMS:format should be used as a property to indicate the format of a resource.
+As reccomended by the DCTERMS documentation, we use mime types:
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+
 */
 
-export function getAllLinks(index: SolidDataset): []Thing {
-  return getAllConcepts(index).filter(({ sub }) => subject.value )
+// This is a temporary hack. We create a DatasetCore from a SolidDataset, and
+// the Inrupt libraries seems to know what to do with it. So define this type to
+// the TS happy. But this is a brittle assumption that may break later.
+type SolidDatasetCore = SolidDataset & DatasetCore;
+
+export function getAllLinks(index: SolidDatasetCore): Thing[] {
+  return Array.from(
+    index
+      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
+      .match(null, namedNode(RDF.type), namedNode(FOAF.Link))
+  ).map(({ subject }) => getThing(index, subject.value));
 }
 
-export function getAllImages(index: SolidDataset): []Thing {}
-export function getAllFiles(index: SolidDataset): []Thing {
+export function getAllImages(index: SolidDatasetCore): Thing[] {
   return Array.from(
-    index.match(null, namedNode(RDF.type), namedNode(FOAF.Document))
-  ).map(({ subject }) => createThing({ url: subject.value }));
+    index
+      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
+      .match(null, namedNode(RDF.type), namedNode(FOAF.Image))
+  ).map(({ subject }) => getThing(index, subject.value));
+}
+export function getAllFiles(index: SolidDatasetCore): Thing[] {
+  return Array.from(
+    index
+      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
+      .match(null, namedNode(RDF.type), namedNode(MY.FOAF.File))
+  ).map(({ subject }) => getThing(index, subject.value));
 }
 
 export function addLinkToIndex(index: SolidDataset, url: string): SolidDataset {
-  const LinkThing = createThing({ url });
+  const LinkThing = buildThing(createThing({ url }))
+    .addUrl(RDF.type, MY.SKOS.Bookmark)
+    .addUrl(RDF.type, MY.FOAF.Link)
+    .addStringNoLocale(DCTERMS.format, MIME.html)
+    .build();
   return setThing(index || createSolidDataset(), LinkThing);
 }
 
@@ -64,7 +98,9 @@ export function addImageToIndex(
   url: string
 ): SolidDataset {
   const ImageThing = buildThing(createThing({ url }))
+    .addUrl(RDF.type, MY.SKOS.Bookmark)
     .addUrl(RDF.type, FOAF.Image)
+    // TODO:     .addStringNoLocale(DCTERMS.format, ...)
     .build();
 
   return setThing(index || createSolidDataset(), ImageThing);
@@ -72,7 +108,9 @@ export function addImageToIndex(
 
 export function addFileToIndex(index: SolidDataset, url: string): SolidDataset {
   const FileThing = buildThing(createThing({ url }))
-    .addUrl(RDF.type, FOAF.Document)
+    .addUrl(RDF.type, MY.SKOS.Bookmark)
+    .addUrl(RDF.type, MY.FOAF.File)
+    // TODO:     .addStringNoLocale(DCTERMS.format, ...)
     .build();
 
   return setThing(index || createSolidDataset(), FileThing);
