@@ -335,7 +335,7 @@ export function ImageUploadAndEditor({onSave, onClose, imageUploadContainerUri})
                </button>
              </>
             }
-            <button onClick={() => onClose && onClose()}>
+            <button className="btn cancel mr-3"onClick={() => onClose && onClose()}>
               cancel
             </button>
           </div>
