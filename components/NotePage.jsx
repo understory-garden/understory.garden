@@ -17,6 +17,7 @@ import {
   getDatetime,
   setThing,
   createSolidDataset,
+  isThingLocal,
   getUrlAll,
   removeThing,
   getUrl,
@@ -261,6 +262,7 @@ export default function NotePage({
     index: conceptIndex,
     saveIndex: saveConceptIndex,
   } = useConcept(webId, workspaceSlug, name);
+  const conceptExists = concept && !isThingLocal(concept);
 
   const noteStorageUri = concept && getUrl(concept, US.storedAt);
   const now = new Date();
@@ -341,8 +343,6 @@ export default function NotePage({
     [debouncedValue]
   );
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const { fetch } = useAuthentication();
   const router = useRouter();
   useEffect(() => {
@@ -380,68 +380,85 @@ export default function NotePage({
       <div className="flex flex-col page">
         <WebMonetization webId={webId} />
         <Nav />
-        <div className="relative overflow-y-hidden flex-none h-56 border-b-2 bg-mist border-passionflower">
-          {coverImage && <img className="w-full" src={coverImage} />}
-          <div className="absolute top-0 left-0 w-full p-6 flex flex-col justify-between">
-            <div className="flex flex-row justify-between h-44 overflow-y-hidden">
-              <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-lagoon">{name}</h1>
-                {authorName && (
-                  <span className="text-lg text-night">
-                    by&nbsp;
-                    <Link href={profilePath(webId) || ""}>
-                      <a>{authorName}</a>
-                    </Link>
-                  </span>
-                )}
-                <span className="text-md text-storm">
-                  {`First created: ${created && getRelativeTime(created)}`}
-                </span>
-                <span className="text-md text-storm">
-                  {`Last saved: ${modified && getRelativeTime(modified)}`}
-                </span>
-              </div>
-              {name &&
-                (readOnly ? (
-                  myWebId === webId && (
-                    <Link href={privateNotePath(workspaceSlug, name) || ""}>
-                      <a>edit</a>
-                    </Link>
-                  )
-                ) : (
-                  <Link href={publicNotePath(webId, workspaceSlug, name) || ""}>
-                    <a>sharable link</a>
-                  </Link>
-                ))}
-              {!readOnly && (
-                <div className="flex flex-col">
-                  <button
-                    className="btn"
-                    onClick={() => setShowPrivacy(!showPrivacy)}
-                  >
-                    {showPrivacy ? "hide" : "show"} privacy control
-                  </button>
-                  <button className="btn" onClick={deleteCallback}>
-                    delete
-                  </button>
+        {conceptExists ? (
+          body === undefined ? (
+            <Loader />
+          ) : (
+            <>
+              <div className="relative overflow-y-hidden flex-none h-56 border-b-2 bg-mist border-passionflower">
+                {coverImage && <img className="w-full" src={coverImage} />}
+                <div className="absolute top-0 left-0 w-full p-6 flex flex-col justify-between">
+                  <div className="flex flex-row justify-between h-44 overflow-y-hidden">
+                    <div className="flex flex-col">
+                      <h1 className="text-5xl font-bold text-lagoon">{name}</h1>
+                      {authorName && (
+                        <span className="text-lg text-night">
+                          by&nbsp;
+                          <Link href={profilePath(webId) || ""}>
+                            <a>{authorName}</a>
+                          </Link>
+                        </span>
+                      )}
+                      <span className="text-md text-storm">
+                        {`First created: ${
+                          created && getRelativeTime(created)
+                        }`}
+                      </span>
+                      <span className="text-md text-storm">
+                        {`Last saved: ${modified && getRelativeTime(modified)}`}
+                      </span>
+                    </div>
+                    {name &&
+                      (readOnly ? (
+                        myWebId === webId && (
+                          <Link
+                            href={privateNotePath(workspaceSlug, name) || ""}
+                          >
+                            <a>edit</a>
+                          </Link>
+                        )
+                      ) : (
+                        <Link
+                          href={
+                            publicNotePath(webId, workspaceSlug, name) || ""
+                          }
+                        >
+                          <a>sharable link</a>
+                        </Link>
+                      ))}
+                    {!readOnly && (
+                      <div className="flex flex-col">
+                        <button
+                          className="btn"
+                          onClick={() => setShowPrivacy(!showPrivacy)}
+                        >
+                          {showPrivacy ? "hide" : "show"} privacy control
+                        </button>
+                        <button className="btn" onClick={deleteCallback}>
+                          delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+              {showPrivacy && <PrivacyControl name={name} />}
+              <section
+                className="relative w-full flex flex-grow"
+                aria-labelledby="slide-over-heading"
+              >
+                <div className="w-full flex flex-col flex-grow mx-16 bg-snow">
+                  <PlateEditor editorId={editorId} initialValue={body} />
+                </div>
+              </section>
+            </>
+          )
+        ) : (
+          <div className="text-center h-full-w-full py-4 text-bold text-ember border-ember border-t-4">
+            No note exists at this location. Wanna create one? Use the create
+            button in the bar above.
           </div>
-        </div>
-        {showPrivacy && <PrivacyControl name={name} />}
-        <section
-          className="relative w-full flex flex-grow"
-          aria-labelledby="slide-over-heading"
-        >
-          <div className="w-full flex flex-col flex-grow mx-16 bg-snow">
-            {body !== undefined ? (
-              <PlateEditor editorId={editorId} initialValue={body} />
-            ) : (
-              <Loader />
-            )}
-          </div>
-        </section>
+        )}
       </div>
     </NoteContext.Provider>
   );
