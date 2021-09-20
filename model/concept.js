@@ -6,6 +6,7 @@ import {
   setThing,
   createSolidDataset,
   setDatetime,
+  getDatetime,
   getUrl,
 } from "@inrupt/solid-client";
 import { DCTERMS } from "@inrupt/vocab-common-rdf";
@@ -88,6 +89,7 @@ export function createOrUpdateConceptIndex(
     getConceptNameFromNode(concept)
   );
   const tagNames = getTagNodes(editor).map(([tag]) => getTagNameFromNode(tag));
+  const created = getDatetime(concept, DCTERMS.created) || new Date();
   let newConcept = createConceptFor(
     name,
     conceptPrefix,
@@ -97,5 +99,6 @@ export function createOrUpdateConceptIndex(
   );
   newConcept = addUrl(newConcept, US.storedAt, storageUri);
   newConcept = setDatetime(newConcept, DCTERMS.modified, new Date());
+  newConcept = setDatetime(newConcept, DCTERMS.created, created);
   return setThing(conceptIndex || createSolidDataset(), newConcept);
 }
