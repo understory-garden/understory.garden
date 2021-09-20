@@ -11,6 +11,7 @@ import {
 } from "@inrupt/solid-client";
 import { MY, MIME } from "../vocab";
 import { SKOS, RDF, FOAF, DCTERMS } from "@inrupt/vocab-common-rdf";
+import * as base58 from "micro-base58";
 
 /*
 Design:
@@ -23,37 +24,34 @@ SKOS:Concepts.
 For now, the Index file will still be serialized to
 {Storage}/concepts.ttl to maintain simplicifty.
 
-I am going to try something a bit experimental here,
-using existing ontologies rather than inventing our own.
-This model file will try storing data using the SKOS, DCT, FOAF ontologies.  
+I am going to try something a bit experimental here, using existing ontologies
+as much as possible rather than inventing our own.  This model file will try
+storing and indexing data using the SKOS, DCTERMS, and FOAF ontologies.  
 
-An Image will be stored as a url with the foaf.Image type.
-A File will be stored as a url with the foaf.Document type.
-Any url without a known type in the concepts index will be treated as a Link.
+An Image will be stored as a url with the FOAF.Image type.
+A File will be stored as a url with the MY.FOAF.File type from the MY.FOAF extension.
+A Link will be stored as a url with the MY.FOAF.Link type from the MY.FOAF extension.
 
 SKOS:Concept can refer to unnamed things and a label can be set later. However,
 unless the user has explicityly created an unnamed Concept, we should not create
-one for them. Instead, use MYSKOS:Bookmark, which is intended to represent
-Bookmarked resources that might eventually be attached to a Concept, but are not
-yet. An SKOS:Concept can be linked to a Bookmarked resource by using the
-associated 'SKOS:note' and 'FOAF:page'. The semantics of both the `note`
-predicate FOAF:Document type specify that they can (and should) be used for
-Image content as well. Given that the definition of Document / note is so broad,
-we will likely need to write our own SOKS extension library to add additional
-specificity.
+one for them. Instead, use the MY.SKOS.Bookmark type from the MY.SKOS extension,
+which is intended to represent Bookmarked resources that might eventually be
+attached to a Concept, but are not yet.
 
-Tags and Mentions will be implemented as SKOS-XL:Labels (with the appropriate
+An SKOS.Concept can be linked to a Bookmarked resource by using the associated
+SKOS.note and FOAF.page properties. The semantics of both SKOS.note and FOAF.Document
+specify that they can (and should) be used for all content, including Images.
+Please rememember to add additional format information using DCTERMS.format.  As
+reccomended by the DCTERMS documentation, we use mime types:
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types</DCTERMS>
+
+Tags and Mentions will be implemented as SKOS_XL.Label (with the appropriate
 '@' or '#' included in the label string).  Mentions should also be linked to an
 FOAF:Person record, as they include additional semantices beyong just labeling.
 This allows us to maintain Label Things to represent Tags and Mentions
-independanlty of Concepts.  Mutiple labels can be set on a Concept, and
-SKOS-XL:Labels can be easily reset on mutiple Concepts. Neither a Tag nor a
+independanlty of Concepts and Bookmarks.  Mutiple Labels can be set on a Concept, and
+SKOS_XL.Label can be easily reset on mutiple Concepts. Neither a Tag nor a
 Mention shoudl be set at the prefLabel for a particular Concept.
-
-DCTERMS:format should be used as a property to indicate the format of a resource.
-As reccomended by the DCTERMS documentation, we use mime types:
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-
 */
 
 // This is a temporary hack. We create a DatasetCore from a SolidDataset, and
@@ -114,4 +112,78 @@ export function addFileToIndex(index: SolidDataset, url: string): SolidDataset {
     .build();
 
   return setThing(index || createSolidDataset(), FileThing);
+}
+
+export function addTagToIndex(index: SolidDataset, tag: string): SolidDataset {
+  const TagThing = buildThing(
+    createThing({ name: `TAG:base58:${base58.encode(tag)}` })
+  )
+    .addUrl(RDF.type, SKOS.Label)
+    .addUrl(RDF.type, MY.SKOS.Tag)
+    .addStringNoLocale(SKOS.prefLabel, tag)
+    // TODO:     .addStringNoLocale(DCTERMS.format, ...)
+    .build();
+
+  return setThing(index || createSolidDataset(), TagThing);
+}
+
+export function addMentionToIndex(
+  index: SolidDataset,
+  handle: string
+): SolidDataset {
+  const MentionThing = buildThing(
+    createThing({ name: `MENTION:base58:${base58.encode(handle)}` })
+  )
+    .addUrl(RDF.type, SKOS.Label)
+    .addUrl(RDF.type, MY.SKOS.Mention)
+    .addStringNoLocale(SKOS.prefLabel, handle)
+    .build();
+
+  return setThing(index || createSolidDataset(), MentionThing);
+}
+
+// DO NOT USE -- only a prototype for how we might store Contacts
+function _addPersonToIndex(
+  index: SolidDataset,
+  handle: string,
+  name: string
+): SolidDataset {
+  const PersonThing = buildThing(
+    createThing({ name: `PERSON:base58:${base58.encode(handle)}` })
+  )
+    .addUrl(RDF.type, FOAF.Person)
+    .addStringNoLocale(SKOS.prefLabel, handle)
+    .addStringNoLocale(FOAF.nick, handle)
+    .addStringNoLocale(FOAF.name, name)
+    .build();
+
+  return setThing(index || createSolidDataset(), PersonThing);
+}
+
+// DO NOT USE -- only a prototype for how we might use SKOS for collections
+function _addConceptToIndex(index: SolidDataset, name: string) {
+  const ConceptThing = buildThing(
+    // NOTE: This will not work if we move the concept.
+    createThing({ name: `COCNEPT:base58:${base58.encode(name)}` })
+  )
+    .addUrl(RDF.type, SKOS.Concept)
+    .addStringNoLocale(SKOS.prefLabel, name)
+    // .addUrl(SKOS.note, ...)
+    .build();
+
+  return setThing(index || createSolidDataset(), ConceptThing);
+}
+
+// DO NOT USE -- only a prototype for how we might uaw SKOS for Collections
+function _addCollectionToIndex(index: SolidDataset, name: string) {
+  const ConceptThing = buildThing(
+    // NOTE: This will not work if we move the concept.
+    createThing({ name: `COCNEPT:base58:${base58.encode(name)}` })
+  )
+    .addUrl(RDF.type, SKOS.Collection)
+    .addStringNoLocale(SKOS.prefLabel, name)
+    // .addUrl(SKOS.note, ...)
+    .build();
+
+  return setThing(index || createSolidDataset(), ConceptThing);
 }
