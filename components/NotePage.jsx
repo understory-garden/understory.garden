@@ -14,6 +14,7 @@ import { useWebId, useThing, useAuthentication, useProfile } from "swrlit";
 import {
   setStringNoLocale,
   getStringNoLocale,
+  getDatetime,
   setThing,
   createSolidDataset,
   getUrlAll,
@@ -22,7 +23,7 @@ import {
   setUrl,
 } from "@inrupt/solid-client";
 import { namedNode } from "@rdfjs/dataset";
-import { FOAF } from "@inrupt/vocab-common-rdf";
+import { FOAF, DCTERMS } from "@inrupt/vocab-common-rdf";
 import { Transition } from "@headlessui/react";
 import { useDebounce } from "use-debounce";
 
@@ -70,6 +71,27 @@ import { useConceptAutocomplete } from "../hooks/editor";
 
 import WebMonetization from "../components/WebMonetization";
 import { Loader, Portal } from "../components/elements";
+
+function getRelativeTime(d1, d2 = new Date()) {
+  var units = {
+    year: 24 * 60 * 60 * 1000 * 365,
+    month: (24 * 60 * 60 * 1000 * 365) / 12,
+    day: 24 * 60 * 60 * 1000,
+    hour: 60 * 60 * 1000,
+    minute: 60 * 1000,
+    second: 1000,
+  };
+
+  const rtf = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+  });
+  var elapsed = d1 - d2;
+
+  // "Math.abs" accounts for both "past" & "future" scenarios
+  for (var u in units)
+    if (Math.abs(elapsed) > units[u] || u == "second")
+      return rtf.format(Math.round(elapsed / units[u]), u);
+}
 
 function LinkToConcept({ uri, ...props }) {
   const id = conceptIdFromUri(uri);
@@ -241,6 +263,9 @@ export default function NotePage({
   } = useConcept(webId, workspaceSlug, name);
 
   const noteStorageUri = concept && getUrl(concept, US.storedAt);
+  const now = new Date();
+  const created = concept && getDatetime(concept, DCTERMS.created);
+  const modified = concept && getDatetime(concept, DCTERMS.modified);
 
   const {
     error,
@@ -360,15 +385,21 @@ export default function NotePage({
           <div className="absolute top-0 left-0 w-full p-6 flex flex-col justify-between">
             <div className="flex flex-row justify-between h-44 overflow-y-hidden">
               <div className="flex flex-col">
-                <h1 className="text-5xl font-bold text-night">{name}</h1>
+                <h1 className="text-5xl font-bold text-lagoon">{name}</h1>
                 {authorName && (
-                  <div className="text-lg text-night">
+                  <span className="text-lg text-night">
                     by&nbsp;
                     <Link href={profilePath(webId) || ""}>
                       <a>{authorName}</a>
                     </Link>
-                  </div>
+                  </span>
                 )}
+                <span className="text-md text-storm">
+                  {`First created: ${created && getRelativeTime(created)}`}
+                </span>
+                <span className="text-md text-storm">
+                  {`Last saved: ${modified && getRelativeTime(modified)}`}
+                </span>
               </div>
               {name &&
                 (readOnly ? (
