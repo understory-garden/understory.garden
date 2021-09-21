@@ -17,10 +17,29 @@ import { useFathom } from "../hooks/fathom";
 import { getUrl } from "@inrupt/solid-client";
 import { SOLID } from "@inrupt/vocab-solid";
 
+function AuthValidator() {
+  // makes a dummy request to a known private resource.
+  // If the resource can't be reached because of a 401, logout
+  const webId = useWebId();
+  const privateTypeIndex = webId && getUrl(webId, SOLID.privateTypeIndex);
+  const { error } = useResource(privateTypeIndex);
+  const { logout } = useAuthentication();
+  useEffect(
+    function () {
+      if (error && error.statusCode == 401) {
+        logout();
+      }
+    },
+    [error && error.statusCode]
+  );
+  return <></>;
+}
+
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   // disable to debug issues in staging
   useFathom();
+  const loggedIn = useLoggedIn();
   return (
     <>
       <Head>
@@ -56,6 +75,7 @@ function MyApp({ Component, pageProps }) {
       <SWRConfig value={{ shouldRetryOnError: false }}>
         <DndProvider backend={HTML5Backend}>
           <AuthenticationProvider>
+            {loggedIn && <AuthValidator />}
             <Component {...pageProps} />
           </AuthenticationProvider>
         </DndProvider>
