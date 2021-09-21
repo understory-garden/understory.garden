@@ -1,4 +1,5 @@
 import ReactModal from "react-modal";
+
 import PlateEditor from "../components/Plate/Editor";
 import { useState, useEffect } from "react";
 import {
@@ -14,6 +15,9 @@ import { createOrUpdateSlateJSON, saveNote } from "../model/note";
 import { createOrUpdateConceptIndex } from "../model/concept";
 import { useWorkspace, useCurrentWorkspace } from "../hooks/app";
 import { useConcept } from "../hooks/concepts";
+import { useImageUploadUri } from "../hooks/uris";
+import { EditIcon } from "../components/icons";
+import { ImageUploadAndEditor } from "../components/ImageUploader";
 
 const TabId = {
   Concept: "Concept",
@@ -54,6 +58,37 @@ export function Tabs({ tabs, selectedTab, setSelectedTab }) {
           ))}
         </nav>
       </div>
+    </div>
+  );
+}
+
+export function ImageCreator({ save, ...props }) {
+  const [uploading, setUploading] = useState(false);
+  const webId = useWebId();
+  const imageUploadContainer = useImageUploadUri(webId);
+  function saveImage(newImageUri) {
+    save(new URL(newProfileImageUri, webId).toString());
+    setUploading(false);
+  }
+  function onEdit() {
+    setUploading(true);
+  }
+  return (
+    <div {...props}>
+      {uploading ? (
+        <div className="flex flex-row justify-center">
+          <ImageUploadAndEditor
+            onSave={saveImage}
+            imageUploadContainerUri={imageUploadContainer}
+            onClose={() => setUploading(false)}
+          />
+        </div>
+      ) : (
+        <EditIcon
+          className="relative -top-6 text-purple-300 cursor-pointer"
+          onClick={onEdit}
+        />
+      )}
     </div>
   );
 }
@@ -100,6 +135,11 @@ export function CreateModal({ isOpen, closeModal }) {
       setSaving(false);
     }
   };
+
+  async function onSaveImage(newImageUri) {
+    // write Image Uri to Bookmark
+    // do the same for Link Bookmarks
+  }
 
   const reset = () => {
     resetEditor();
@@ -161,7 +201,7 @@ export function CreateModal({ isOpen, closeModal }) {
             </div>
           </>
         ) : (
-          <span> upload image or link </span>
+          <ImageCreator save={onSaveImage} />
         )}
 
         <div className="flex justify-end border-t-2 border-echeveria py-2">

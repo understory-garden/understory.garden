@@ -170,6 +170,7 @@ function _addConceptToIndex(index: SolidDataset, name: string) {
     .addStringNoLocale(SKOS.prefLabel, name)
     // .addUrl(SKOS.note, noteUrl)
     // .addUrl(MY.SKOS.prefImage, imgUrl)
+    // .addUrl(FOAF.depiction, imgUrl)
     // .addUrl(SKOS.example, imgUrl)
     // .addStringNoLocale(SKOS.definition, definition) // preview text
     .build();
