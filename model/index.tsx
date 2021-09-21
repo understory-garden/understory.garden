@@ -164,7 +164,7 @@ function _addPersonToIndex(
 function _addConceptToIndex(index: SolidDataset, name: string) {
   const ConceptThing = buildThing(
     // NOTE: This will not work if we move the concept.
-    createThing({ name: `COCNEPT:base58:${base58.encode(name)}` })
+    createThing({ name: `CONCEPT:base58:${base58.encode(name)}` })
   )
     .addUrl(RDF.type, SKOS.Concept)
     .addStringNoLocale(SKOS.prefLabel, name)
@@ -178,11 +178,11 @@ function _addConceptToIndex(index: SolidDataset, name: string) {
 function _addCollectionToIndex(index: SolidDataset, name: string) {
   const ConceptThing = buildThing(
     // NOTE: This will not work if we move the concept.
-    createThing({ name: `COCNEPT:base58:${base58.encode(name)}` })
+    createThing({ name: `COLLECTION:base58:${base58.encode(name)}` })
   )
     .addUrl(RDF.type, SKOS.Collection)
     .addStringNoLocale(SKOS.prefLabel, name)
-    // .addUrl(SKOS.note, ...)
+    // ...
     .build();
 
   return setThing(index || createSolidDataset(), ConceptThing);
