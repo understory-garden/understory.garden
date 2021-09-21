@@ -168,7 +168,10 @@ function _addConceptToIndex(index: SolidDataset, name: string) {
   )
     .addUrl(RDF.type, SKOS.Concept)
     .addStringNoLocale(SKOS.prefLabel, name)
-    // .addUrl(SKOS.note, ...)
+    // .addUrl(SKOS.note, noteUrl)
+    // .addUrl(MY.SKOS.prefImage, imgUrl)
+    // .addUrl(SKOS.example, imgUrl)
+    // .addStringNoLocale(SKOS.definition, definition) // preview text
     .build();
 
   return setThing(index || createSolidDataset(), ConceptThing);
