@@ -221,6 +221,9 @@ h2.font-logo {
   @apply font-normal text-base;
 }
 
+.slate-MentionSelect {
+  @apply z-50 !important;
+}
 /* hex grid inspired by https://github.com/web-tiki/responsive-grid-of-hexagons/blob/css-grid/hexagons.css */
 
 .grid.hex {
