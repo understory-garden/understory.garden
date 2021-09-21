@@ -47,4 +47,10 @@ export const MY = {
 
 export const MIME = {
   html: "text/html",
+  gif: "image/gif",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  svg: "image/svg+xml",
+  webp: "image/webp",
 };
