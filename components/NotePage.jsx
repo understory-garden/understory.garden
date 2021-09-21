@@ -297,7 +297,6 @@ export default function NotePage({
 
   useEffect(
     function setValueFromNote() {
-      resetEditor();
       if (body) {
         setValue(body);
       } else if (errorStatus == 404) {
