@@ -46,6 +46,11 @@ module.exports = {
       'full': '100%',
     },
     extend: {
+      boxShadow: {
+        "btn-border-gray-300": "inset 0px 0px 0px 1px #d1d5db",
+        "btn-border-white-shadow": "inset 0px 0px 0px 1px white, 8px 16px 24px -8px rgba(0, 0, 0, 0.12)",
+        "btn-border-gray-300-shadow": "inset 0px 0px 0px 1px #d1d5db, 8px 16px 24px -8px rgba(0, 0, 0, 0.12)"
+      },
       colors: {
         passionflower: {
           light: '#e0c3d7',
@@ -101,6 +106,9 @@ module.exports = {
         fog: '#b2aeb1',
         storm: '#665e63',
         night: '#190d15',
+
+        'white-a10': 'rgba(255, 255, 255, 0.1)',
+        'white-a20': 'rgba(255, 255, 255, 0.2)'
       },
     },
     fontFamily: {
@@ -109,7 +117,11 @@ module.exports = {
       mono: ['fira-mono', 'monospace']
     },
   },
-  variants: {},
+  variants: {
+    extend: {
+      borderWidth: ['hover'],
+    }
+  },
   plugins: [
     require('@tailwindcss/forms')
   ],

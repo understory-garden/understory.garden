@@ -1,0 +1,35 @@
+{
+    "projects": [
+        "61327f6d0e26559ad2dce006"
+    ],
+    "styleguides": [],
+    "components": [
+        {
+            "path": "components/buttons.jsx",
+            "zeplinIds": [
+                "614815f11739e023de68afae",
+                "614815f025df846adc8b71c1",
+                "614815f1cdbfc5219d246333",
+                "614815f1c6dc54350825acc5",
+                "614815f0f55c3967e7f94e17",
+                "614815f153567e6a1ea41acb",
+                "614815f3d6ef3222ad43ba60",
+                "614815f481ff696858444bc5",
+                "614815f2d430182f131cf908",
+                "614815f6effc0926984b7244",
+                "614815f2f6582a6ab3b062c5",
+                "614815f2effc0926984b7234",
+                "614815f287bf1624ff72fa3b"
+            ]
+        }
+    ],
+    "plugins": [
+        {
+            "name": "@zeplin/cli-connect-storybook-plugin",
+            "config": {
+                "url": "http://localhost:6006",
+                "startScript": "storybook"
+            }
+        }
+    ]
+}
