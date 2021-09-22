@@ -60,7 +60,7 @@ strong {
 }
 
 .btn-emphasis {
-  @apply bg-white text-white bg-opacity-10 border border-white blur-2xl hover:bg-opacity-20 hover:shadow-btn-border-white-shadow;
+  @apply bg-white text-white bg-opacity-10 ring-1 ring-white ring-inset blur-2xl hover:bg-opacity-20 hover:shadow-btn;
 }
 
 .btn-notification {
@@ -68,11 +68,11 @@ strong {
 }
 
 .btn-filled {
-  @apply bg-white text-gray-700 text-black hover:bg-gray-100 shadow-btn-border-gray-300 hover:shadow-btn-border-gray-300-shadow;
+  @apply bg-white text-gray-700 ring-1 ring-gray-300 ring-inset hover:bg-gray-100 hover:shadow-btn;
 }
 
 .btn-transparent {
-  @apply bg-white text-white bg-opacity-0 hover:bg-opacity-20 hover:shadow-btn-border-white-shadow;
+  @apply bg-white text-white bg-opacity-0 hover:bg-opacity-20 hover:ring-1 hover:ring-inset hover:ring-white hover:shadow-btn;
 }
 
 .btn-round {

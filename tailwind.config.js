@@ -47,9 +47,7 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        "btn-border-gray-300": "inset 0px 0px 0px 1px #d1d5db",
-        "btn-border-white-shadow": "inset 0px 0px 0px 1px white, 8px 16px 24px -8px rgba(0, 0, 0, 0.12)",
-        "btn-border-gray-300-shadow": "inset 0px 0px 0px 1px #d1d5db, 8px 16px 24px -8px rgba(0, 0, 0, 0.12)"
+        btn: "8px 16px 24px -8px rgba(0, 0, 0, 0.12)"
       },
       colors: {
         passionflower: {
@@ -120,6 +118,8 @@ module.exports = {
   variants: {
     extend: {
       borderWidth: ['hover'],
+      ringWidth: ['hover'],
+      ringColor: ['hover']
     }
   },
   plugins: [
