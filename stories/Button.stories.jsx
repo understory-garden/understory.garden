@@ -4,7 +4,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Button } from '../components/buttons';
 
 export default {
-  title: 'Mysilio/Button',
+  title: 'Components/Button',
   component: Button,
   argTypes: {
   },
