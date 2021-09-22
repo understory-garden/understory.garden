@@ -53,6 +53,38 @@ strong {
 
 /* Write your own custom component styles here */
 
+/* start components from Dylan - https://app.zeplin.io/project/61327f6d0e26559ad2dce006/styleguide */
+
+.btn-md {
+  @apply text-sm px-6 py-2.5;
+}
+
+.btn-emphasis {
+  @apply bg-white text-white bg-opacity-10 ring-1 ring-white ring-inset blur-2xl hover:bg-opacity-20 hover:shadow-btn;
+}
+
+.btn-notification {
+  @apply bg-white text-gray-700 hover:bg-gray-100;
+}
+
+.btn-filled {
+  @apply bg-white text-gray-700 ring-1 ring-gray-300 ring-inset hover:bg-gray-100 hover:shadow-btn;
+}
+
+.btn-transparent {
+  @apply bg-white text-white bg-opacity-0 hover:bg-opacity-20 hover:ring-1 hover:ring-inset hover:ring-white hover:shadow-btn;
+}
+
+.btn-round {
+  @apply rounded-full;
+}
+
+.btn-square {
+  @apply rounded-lg;
+}
+
+ /* end components from Dylan - https://app.zeplin.io/project/61327f6d0e26559ad2dce006/styleguide */
+
 .tab-btn {
   @apply text-xl rounded-lg p-3;
 }
@@ -224,6 +256,7 @@ h2.font-logo {
 .slate-MentionSelect {
   @apply z-50 !important;
 }
+
 /* hex grid inspired by https://github.com/web-tiki/responsive-grid-of-hexagons/blob/css-grid/hexagons.css */
 
 .grid.hex {

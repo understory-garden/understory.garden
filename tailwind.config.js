@@ -46,6 +46,9 @@ module.exports = {
       'full': '100%',
     },
     extend: {
+      boxShadow: {
+        btn: "8px 16px 24px -8px rgba(0, 0, 0, 0.12)"
+      },
       colors: {
         passionflower: {
           light: '#e0c3d7',
@@ -101,6 +104,9 @@ module.exports = {
         fog: '#b2aeb1',
         storm: '#665e63',
         night: '#190d15',
+
+        'white-a10': 'rgba(255, 255, 255, 0.1)',
+        'white-a20': 'rgba(255, 255, 255, 0.2)'
       },
     },
     fontFamily: {
@@ -109,7 +115,13 @@ module.exports = {
       mono: ['fira-mono', 'monospace']
     },
   },
-  variants: {},
+  variants: {
+    extend: {
+      borderWidth: ['hover'],
+      ringWidth: ['hover'],
+      ringColor: ['hover']
+    }
+  },
   plugins: [
     require('@tailwindcss/forms')
   ],
