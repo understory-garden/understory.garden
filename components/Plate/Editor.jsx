@@ -30,26 +30,6 @@ import {
 } from "./hooks/useCustomMentionPlugin";
 import NoteContext from "../../contexts/NoteContext";
 
-const TestMentionables = [
-  { value: "0", name: "Aayla Secura", email: "aayla_secura@force.com" },
-  { value: "1", name: "Adi Gallia", email: "adi_gallia@force.com" },
-  {
-    value: "2",
-    name: "Admiral Dodd Rancit",
-    email: "admiral_dodd_rancit@force.com",
-  },
-  {
-    value: "3",
-    name: "Admiral Firmus Piett",
-    email: "admiral_firmus_piett@force.com",
-  },
-  {
-    value: "4",
-    name: "Admiral Gial Ackbar",
-    email: "admiral_gial_ackbar@force.com",
-  },
-];
-
 const ConceptElement = (m) => {
   const name = fromMentionable(m);
   const { path } = useContext(NoteContext);
@@ -324,7 +304,7 @@ export default function Editor({
 
   const { getMentionSelectProps: getTagProps, plugin: tagPlugin } =
     useCustomMentionPlugin({
-      mentionables: TestMentionables.map((m) => toMentionable(m.email)),
+      mentionables: [],
       pluginKey: ELEMENT_TAG,
       pattern: Patterns.Tag,
       newMentionable: (s) => {
@@ -334,7 +314,7 @@ export default function Editor({
 
   const { getMentionSelectProps: getMentionProps, plugin: mentionPlugin } =
     useCustomMentionPlugin({
-      mentionables: TestMentionables.map((m) => toMentionable(m.name)),
+      mentionables: [],
       pluginKey: P.ELEMENT_MENTION,
       pattern: Patterns.Mention,
       newMentionable: (s) => {
