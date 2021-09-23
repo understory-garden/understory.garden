@@ -2,13 +2,24 @@
 
 import { useCallback, useMemo, useState } from "react";
 import * as P from "@udecode/plate";
-import { Range, Transforms, Editor } from "slate";
+import { ELEMENT_MENTION } from "@udecode/plate";
+import { ELEMENT_CONCEPT, ELEMENT_TAG } from "../../../utils/slate";
+import { Range, Transforms, Editor, Text } from "slate";
 
-export const Patterns = {
-  Concept: /\B\[\[([^\]]*)\]{0,2}$/,
-  Tag: /\B\#([\w-]*)\b$/,
-  Mention: /\B\@([\w-]*)\b$/,
-};
+export function patternForPluginKey(pluginKey) {
+  switch (pluginKey) {
+    case ELEMENT_CONCEPT:
+      return /\B\[\[([^\]]*)\]{0,2}/;
+    case ELEMENT_TAG:
+      return /\B\#([\w-]*)\b/;
+    case ELEMENT_MENTION:
+      return /\B\@([\w-]*)\b/;
+    default:
+      throw new Error(
+        `Unsupported pluginType used with customMentionPlugin: ${pluginKey}`
+      );
+  }
+}
 
 export const toMentionable = (data) => {
   return { value: data };
@@ -27,15 +38,16 @@ export function useCustomMentionPlugin({
   mentionables = [],
   maxSuggestions = 10,
   mentionableFilter = (search) => (c) =>
-    c.value.toLowerCase().includes(search.toLowerCase()),
+    search && c.value.toLowerCase().includes(search.toLowerCase()),
   insertSpaceAfterMention = true,
   pluginKey = ELEMENT_MENTION,
-  pattern = Patterns.Mention,
   newMentionable = undefined, // if not defined, won't create new mentionable.
 }) {
   const [targetRange, setTargetRange] = useState(null);
   const [valueIndex, setValueIndex] = useState(0);
   const [search, setSearch] = useState("");
+  const pattern = patternForPluginKey(pluginKey);
+  console.log(pluginKey, pattern);
   const values = useMemo(() => {
     const filtered = mentionables
       .filter(mentionableFilter(search))
@@ -156,3 +168,40 @@ export function useCustomMentionPlugin({
     searchValue: search,
   };
 }
+
+const withNormalizeMentions =
+  ({ pluginKeys }) =>
+  (editor) => {
+    const { normalizeNode } = editor;
+
+    editor.normalizeNode = ([node, path]) => {
+      if (Text.isText(node)) {
+        for (const pluginKey of pluginKeys) {
+          const pattern = patternForPluginKey(pluginKey);
+          const matchInfo = node.text.match(pattern);
+
+          if (matchInfo) {
+            const { index, 0: match, 1: word } = matchInfo;
+            const at = {
+              anchor: { path, offset: index },
+              focus: { path, offset: index + match.length },
+            };
+            Transforms.setNodes(
+              editor,
+              { type: pluginKey, value: word, children: [] },
+              { at, split: true }
+            );
+            return;
+          }
+        }
+      }
+
+      normalizeNode([node, path]); // continue the normalization chain if not transformed
+    };
+
+    return editor;
+  };
+
+export const createNormalizeMentionsPlugin = P.getPlatePluginWithOverrides(
+  withNormalizeMentions
+);

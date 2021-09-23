@@ -24,6 +24,7 @@ import { ELEMENT_CONCEPT, ELEMENT_TAG } from "../../utils/slate";
 import { conceptIdFromUri } from "../../model/concept";
 import {
   useCustomMentionPlugin,
+  createNormalizeMentionsPlugin,
   Patterns,
   toMentionable,
   fromMentionable,
@@ -273,6 +274,11 @@ const defaultPlugins = [
     ],
   }),
   P.createSelectOnBackspacePlugin({ allow: P.ELEMENT_IMAGE }),
+  /* not yet working
+  createNormalizeMentionsPlugin({
+    pluginKeys: [P.ELEMENT_MENTION, ELEMENT_CONCEPT, ELEMENT_TAG],
+  }),
+  */
 ];
 
 export default function Editor({
@@ -296,7 +302,6 @@ export default function Editor({
           )
         : [],
       pluginKey: ELEMENT_CONCEPT,
-      pattern: Patterns.Concept,
       newMentionable: (s) => {
         return toMentionable(s);
       },
@@ -306,7 +311,6 @@ export default function Editor({
     useCustomMentionPlugin({
       mentionables: [],
       pluginKey: ELEMENT_TAG,
-      pattern: Patterns.Tag,
       newMentionable: (s) => {
         return toMentionable(s);
       },
@@ -316,7 +320,6 @@ export default function Editor({
     useCustomMentionPlugin({
       mentionables: [],
       pluginKey: P.ELEMENT_MENTION,
-      pattern: Patterns.Mention,
       newMentionable: (s) => {
         return toMentionable(s);
       },
