@@ -12,7 +12,7 @@ export function PrivacyToggle({ enabled, setEnabled }) {
       checked={enabled}
       onChange={setEnabled}
       className={classNames(
-        'bg-white bg-opacity-10 relative inline-flex flex-shrink-0 h-6 w-11 p-0.5 ring-1 ring-white rounded-full cursor-pointer transition-colors ease-in-out duration-200'
+        'bg-white bg-opacity-10 relative inline-flex flex-shrink-0 h-6 w-11 p-0.5 ring-1 ring-white ring-inset rounded-full cursor-pointer transition-colors ease-in-out duration-200'
       )}>
       <span className="sr-only">Use setting</span>
       <span
