@@ -38,10 +38,9 @@ export const MY = {
     Bookmark: `${MY_SKOS}Bookmark`, // disjoint with SKOS:Concept. Concepts and Bookmarks can both point to the same notes / resources, but a Bookmark is explicitly defined as a "Concept Fragmet" rather than a full Concept.
     prefImage: `${MY_SKOS}prefImage`, //  should have no more than 1 value per resource, similar to SKOS:prefLabel, but references an FOAF:Image.
     altImage: `${MY_SKOS}altImage`, // similar to SKOS:altLabel, but references an FOAF:Image
-  },
-  FOAF: {
-    File: `${MY_FOAF}File`, // subclass of Document, disjoint with Link. For resources that are intended to be downloaded as Files.
-    Link: `${MY_FOAF}Link`, // subclass of Document, disjoint with File. For resources that are intended to be treated as Links / viewed in a WebBrowser
+    Tag: `${MY_SKOS}Tag`, // a subclass of SKOS-XL:Label
+    mentioned: `${MY_SKOS}mentioned`, // subclass of SKOS:semanticRelation
+    tagged: `${MY_SKOS}tagged`, // subclass of SKOS:semanticRelation`
   },
 };
 

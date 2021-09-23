@@ -10,7 +10,7 @@ import {
   createSolidDataset,
 } from "@inrupt/solid-client";
 import { MY, MIME } from "../vocab";
-import { SKOS, RDF, FOAF, DCTERMS } from "@inrupt/vocab-common-rdf";
+import { SKOS, RDF, FOAF, DCTERMS, OWL } from "@inrupt/vocab-common-rdf";
 import * as base58 from "micro-base58";
 
 /*
@@ -59,36 +59,17 @@ Mention shoudl be set at the prefLabel for a particular Concept.
 // the TS happy. But this is a brittle assumption that may break later.
 type SolidDatasetCore = SolidDataset & DatasetCore;
 
-export function getAllLinks(index: SolidDatasetCore): Thing[] {
-  return Array.from(
-    index
-      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
-      .match(null, namedNode(RDF.type), namedNode(FOAF.Link))
-  ).map(({ subject }) => getThing(index, subject.value));
-}
-
-export function getAllImages(index: SolidDatasetCore): Thing[] {
-  return Array.from(
-    index
-      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
-      .match(null, namedNode(RDF.type), namedNode(FOAF.Image))
-  ).map(({ subject }) => getThing(index, subject.value));
-}
-export function getAllFiles(index: SolidDatasetCore): Thing[] {
-  return Array.from(
-    index
-      .match(null, namedNode(RDF.type), namedNode(MY.SKOS.Bookmark))
-      .match(null, namedNode(RDF.type), namedNode(MY.FOAF.File))
-  ).map(({ subject }) => getThing(index, subject.value));
-}
-
-export function addLinkToIndex(index: SolidDataset, url: string): SolidDataset {
-  const LinkThing = buildThing(createThing({ url }))
+export function addBookmarkToIndex(
+  index: SolidDataset,
+  url: string
+): SolidDataset {
+  const BookmarkThing = buildThing(createThing())
     .addUrl(RDF.type, MY.SKOS.Bookmark)
-    .addUrl(RDF.type, MY.FOAF.Link)
-    .addStringNoLocale(DCTERMS.format, MIME.html)
+    // .addUrl(MY.SKOS.prefImage, imgUrl)
+    .addUrl(FOAF.focus, url)
     .build();
-  return setThing(index || createSolidDataset(), LinkThing);
+
+  return setThing(index || createSolidDataset(), BookmarkThing);
 }
 
 export function addImageToIndex(
@@ -96,62 +77,26 @@ export function addImageToIndex(
   url: string
 ): SolidDataset {
   const ImageThing = buildThing(createThing({ url }))
-    .addUrl(RDF.type, MY.SKOS.Bookmark)
     .addUrl(RDF.type, FOAF.Image)
     // TODO:     .addStringNoLocale(DCTERMS.format, ...)
+    // TODO:    FOAF.depiction
     .build();
 
   return setThing(index || createSolidDataset(), ImageThing);
-}
-
-export function addFileToIndex(index: SolidDataset, url: string): SolidDataset {
-  const FileThing = buildThing(createThing({ url }))
-    .addUrl(RDF.type, MY.SKOS.Bookmark)
-    .addUrl(RDF.type, MY.FOAF.File)
-    // TODO:     .addStringNoLocale(DCTERMS.format, ...)
-    .build();
-
-  return setThing(index || createSolidDataset(), FileThing);
-}
-
-export function addTagToIndex(index: SolidDataset, tag: string): SolidDataset {
-  const TagThing = buildThing(
-    createThing({ name: `TAG:base58:${base58.encode(tag)}` })
-  )
-    .addUrl(RDF.type, SKOS.Label)
-    .addUrl(RDF.type, MY.SKOS.Tag)
-    .addStringNoLocale(SKOS.prefLabel, tag)
-    // TODO:     .addStringNoLocale(DCTERMS.format, ...)
-    .build();
-
-  return setThing(index || createSolidDataset(), TagThing);
-}
-
-export function addMentionToIndex(
-  index: SolidDataset,
-  handle: string
-): SolidDataset {
-  const MentionThing = buildThing(
-    createThing({ name: `MENTION:base58:${base58.encode(handle)}` })
-  )
-    .addUrl(RDF.type, SKOS.Label)
-    .addUrl(RDF.type, MY.SKOS.Mention)
-    .addStringNoLocale(SKOS.prefLabel, handle)
-    .build();
-
-  return setThing(index || createSolidDataset(), MentionThing);
 }
 
 // DO NOT USE -- only a prototype for how we might store Contacts
 function _addPersonToIndex(
   index: SolidDataset,
   handle: string,
-  name: string
+  name: string,
+  webId: WebId
 ): SolidDataset {
   const PersonThing = buildThing(
     createThing({ name: `PERSON:base58:${base58.encode(handle)}` })
   )
     .addUrl(RDF.type, FOAF.Person)
+    .addUrl(OWL.sameAs, webId)
     .addStringNoLocale(SKOS.prefLabel, handle)
     .addStringNoLocale(FOAF.nick, handle)
     .addStringNoLocale(FOAF.name, name)
@@ -171,8 +116,8 @@ function _addConceptToIndex(index: SolidDataset, name: string) {
     // .addUrl(SKOS.note, noteUrl)
     // .addUrl(MY.SKOS.prefImage, imgUrl)
     // .addUrl(FOAF.depiction, imgUrl)
-    // .addUrl(SKOS.example, imgUrl)
-    // .addStringNoLocale(SKOS.definition, definition) // preview text
+    // .addStringNoLocale(SCHEMA_INRUPT.description, imgUrl)
+    // .addUrl(FOAF.focus, someIRI)
     .build();
 
   return setThing(index || createSolidDataset(), ConceptThing);
@@ -191,3 +136,43 @@ function _addCollectionToIndex(index: SolidDataset, name: string) {
 
   return setThing(index || createSolidDataset(), ConceptThing);
 }
+
+export type IRI = string;
+export type Tag = string;
+export type Mention = string;
+export type WebId = IRI;
+export type Image = IRI;
+export type File = IRI;
+export type Link = IRI;
+export type PlateEditorValue = JSON;
+
+export type Note = {
+  iri: IRI;
+  body: PlateEditorValue;
+};
+
+export type Concept = {
+  iri: IRI; // https://www.w3.org/TR/rdf11-concepts/#section-IRIs
+  prefImage?: Image; // cover image
+  description?: string; // preview text
+  focus?: IRI; // the main focus of the Concept
+  name: string;
+  note: IRI; // main content
+  related: IRI[];
+  tagged: Tag[];
+  mentioned: Mention[];
+};
+
+export type Bookmark = {
+  iri: IRI;
+  prefImage?: Image;
+  description?: Image;
+  focus: IRI;
+};
+
+export type Person = {
+  iri: IRI;
+  webId: WebId;
+  handle: string;
+  name: string;
+};
