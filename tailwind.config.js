@@ -52,6 +52,9 @@ module.exports = {
       boxShadow: {
         btn: "8px 16px 24px -8px rgba(0, 0, 0, 0.12)"
       },
+      fontSize: {
+        '2xs': '.625rem'
+      },
       colors: {
         passionflower: {
           light: '#e0c3d7',
@@ -107,6 +110,8 @@ module.exports = {
         fog: '#b2aeb1',
         storm: '#665e63',
         night: '#190d15',
+
+        'my-green': '#0e90a3',
 
         'white-a10': 'rgba(255, 255, 255, 0.1)',
         'white-a20': 'rgba(255, 255, 255, 0.2)'
