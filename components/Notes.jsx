@@ -13,7 +13,6 @@ import Link from "next/link";
 import { DCTERMS } from "@inrupt/vocab-common-rdf";
 import WorkspaceContext from "../contexts/WorkspaceContext";
 
-import NewNoteForm from './NewNoteForm'
 import { conceptIdFromUri } from "../model/concept";
 import { useConcepts } from "../hooks/concepts";
 import NoteContext from "../contexts/NoteContext";
@@ -55,15 +54,18 @@ export function NotesFromConcepts({ path = "/notes", webId, concepts }) {
 }
 
 export default function Notes({ path = "/notes", webId }) {
-  const { concepts } = useConcepts(webId)
-  return (<>
-    { concepts && (concepts.length > 0) ? (
-      <NotesFromConcepts path={path} webId={webId} concepts={concepts} />
-    ) : (
-      <div>
-        <h2 className="text-2xl mb-2">Create a New Note</h2>
-        <NewNoteForm />
-      </div>
-    )}
-  </>)
+  const { concepts } = useConcepts(webId);
+  return (
+    <>
+      {concepts && concepts.length > 0 ? (
+        <NotesFromConcepts path={path} webId={webId} concepts={concepts} />
+      ) : (
+        <div>
+          <h2 className="text-2xl mb-2">
+            Add something to your garden using the Create menu above ^^
+          </h2>
+        </div>
+      )}
+    </>
+  );
 }
