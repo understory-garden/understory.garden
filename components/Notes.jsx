@@ -25,11 +25,11 @@ export function Note({ concept }) {
   const { path } = useContext(NoteContext);
 
   return (
-    <li className="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200 overflow-x-scroll">
+    <li className="col-span-1 bg-mist rounded-lg shadow overflow-x-auto">
       <Link href={`${path}/${id}`}>
         <a>
-          <div className="w-full flex flex-col items-center justify-between p-6 space-x-6">
-            <h3 className="text-gray-900 text-xl font-medium truncate text-center">
+          <div className="w-full flex flex-col items-center justify-between p-6">
+            <h3 className="text-lagoon text-xl font-medium truncate text-center">
               {name}
             </h3>
           </div>
