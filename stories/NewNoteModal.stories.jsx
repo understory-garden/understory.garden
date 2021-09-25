@@ -17,3 +17,9 @@ DefaultNewNoteModal.args = {
   label: 'NewNote/Default',
 };
 
+export const PublicNewNoteModal = Template.bind({});
+PublicNewNoteModal.args = {
+  label: 'NewNote/Public',
+  isPublic: true
+};
+

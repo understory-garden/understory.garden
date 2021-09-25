@@ -46,18 +46,6 @@ strong {
   @apply font-bold;
 }
 
-input {
-  @apply rounded-lg ring-1 ring-gray-300 py-2.5 px-4 text-sm placeholder-gray-200;
-}
-
-input.error {
-  @apply ring-ember;
-}
-
-input.success {
-  @apply ring-my-green;
-}
-
 /* Start purging... */
 
 @tailwind components;
@@ -93,6 +81,18 @@ input.success {
 
 .btn-square {
   @apply rounded-lg;
+}
+
+.ipt {
+  @apply rounded-lg border-0 ring-1 ring-gray-300 py-2.5 px-4 text-sm placeholder-gray-200 focus:ring-gray-300 focus:shadow-ipt-focus;
+}
+
+.ipt.error {
+  @apply ring-ember;
+}
+
+.ipt.success {
+  @apply ring-my-green;
 }
 
  /* end components from Dylan - https://app.zeplin.io/project/61327f6d0e26559ad2dce006/styleguide */
