@@ -12,7 +12,7 @@ export const Search = () => (
   <Formik>
     <IconInput type="search" name="example" placeholder="Search"
       icon={<SearchIcon className="text-white"/>}
-      className="ipt-header-search" />
+      inputClassName="ipt-header-search" />
   </Formik>
 )
 Search.parameters = {

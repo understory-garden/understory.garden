@@ -8,7 +8,7 @@ export default function Header() {
       <Formik>
         <IconInput type="search" name="search" placeholder="Search"
           icon={<SearchIcon className="text-white" />}
-          className="ipt-header-search" />
+          inputClassName="ipt-header-search" />
       </Formik>
     </nav>
   )
