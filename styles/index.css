@@ -95,6 +95,10 @@ strong {
   @apply ring-my-green;
 }
 
+.ipt-header-search {
+  @apply rounded-full ring-0 bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-40 hover:ring-0 focus:ring-0 focus:shadow-none;
+}
+
  /* end components from Dylan - https://app.zeplin.io/project/61327f6d0e26559ad2dce006/styleguide */
 
 .tab-btn {

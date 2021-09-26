@@ -12,3 +12,14 @@ export function Input({ className = '', ...props }) {
     </div>
   )
 }
+
+export function IconInput({icon, className, ...props}){
+  return (
+    <div className="mt-1 relative">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          {icon}
+        </div>
+        <Input className={`pl-12e ${className}`} {...props} />
+    </div>
+  )
+}

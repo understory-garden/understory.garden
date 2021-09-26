@@ -1,11 +1,11 @@
 import React from 'react';
 import { Formik } from 'formik';
-import { Input } from '../../components/inputs';
-import * as Yup from 'yup';
+import { Input } from '../components/inputs';
+import { Search as SearchIcon } from '../components/icons';
 
 export default {
   component: Input,
-  title: 'Components/Inputs/Text'
+  title: 'Components/Input'
 }
 
 
@@ -20,7 +20,7 @@ export const EntrySuccess = () => (
 )
 
 export const Fail = () => (
-  <Formik initialTouched={{ example: true }} initialErrors={{example: "this input is bad and it should feel bad!"}}>
+  <Formik initialTouched={{ example: true }} initialErrors={{ example: "this input is bad and it should feel bad!" }}>
     <Input type="text" name="example" value="bad input" />
   </Formik>
 )
