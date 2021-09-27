@@ -49,6 +49,9 @@ module.exports = {
       height: {
         '18': '4.5rem'
       },
+      width: {
+        '18': '4.5rem'
+      },
       boxShadow: {
         btn: "8px 16px 24px -8px rgba(0, 0, 0, 0.12)",
         'ipt-focus': "0 0 0 3px rgba(12, 122, 138, 0.5)"

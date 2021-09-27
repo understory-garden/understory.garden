@@ -15,7 +15,7 @@ export function Input({ className = '', inputClassName = '', ...props }) {
 
 export function IconInput({ icon, className = '', inputClassName = '', ...props }) {
   return (
-    <div className={`my-1 relative ${className}`}>
+    <div className={`relative ${className}`}>
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
         {icon}
       </div>
